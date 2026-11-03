@@ -283,15 +283,16 @@
   .up:hover svg{transform:translateY(-3px)}.up svg{transition:transform .2s}
 
   /* ── lettura ── */
-  .rd{position:absolute;inset:0;z-index:8;background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(--pink) 20%,transparent),transparent 72%),var(--navy);color:var(--seal);visibility:hidden;clip-path:circle(0 at var(--ox,50%) var(--oy,50%));transition:clip-path .6s cubic-bezier(.65,0,.25,1) .14s,visibility 0s .74s}
-  .rd.on{visibility:visible;clip-path:circle(165% at var(--ox,50%) var(--oy,50%));transition:clip-path .85s cubic-bezier(.2,.75,.2,1),visibility 0s}
-  /* contenuto: in chiusura si ritira per primo (veloce), in apertura entra dopo che il cerchio e' partito */
+  .rd{position:absolute;inset:0;z-index:8;background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(--pink) 20%,transparent),transparent 72%),var(--navy);color:var(--seal);visibility:hidden;opacity:0;transition:opacity .45s ease .25s,visibility 0s .7s}
+  .rd.on{visibility:visible;opacity:1;transition:opacity .5s ease .1s,visibility 0s}
+  /* contenuto: in chiusura si ritira per primo (veloce), in apertura entra mentre il titolo vola */
   .rd .rsc,.rd .rbar{opacity:0;transition:opacity .16s ease}
   .rd.on .rsc,.rd.on .rbar{opacity:1;transition:opacity .45s ease .3s}
-  .rt .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.14em;margin-bottom:-.14em}
-  .rt .w>span{display:inline-block}
-  .rd.on .rt .w>span{animation:wrise .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.4s + var(--k) * 80ms)}
-  @keyframes wrise{from{transform:translateY(112%)}to{transform:none}}
+  /* titolo che vola: durante il volo il titolo vero e' nascosto, il clone .fly fa il viaggio */
+  .rt{transition:opacity .25s ease}
+  .rt.fly{opacity:0;transition:none}
+  .rt.rise{animation:trise .9s cubic-bezier(.2,.8,.2,1) .35s both}
+  @keyframes trise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
   .rbar{position:absolute;top:0;left:0;right:0;height:64px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:2;background:linear-gradient(180deg,var(--navy) 55%,transparent)}
   .rbar .cap{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .site .rbtn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--soft);cursor:pointer;font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--fg);transition:background .2s,border-color .2s}
@@ -540,7 +541,7 @@
     if(cat)site.dataset.cat=cat;
   }
   qi.addEventListener('input',()=>{q=qi.value;render();});
-  rows.addEventListener('click',e=>{const b=e.target.closest('.entry');if(b)openPost(POSTS.find(x=>x.t===b.dataset.t));});
+  rows.addEventListener('click',e=>{const b=e.target.closest('.entry');if(b)openPost(POSTS.find(x=>x.t===b.dataset.t),b);});
 
   $('[data-status]').textContent='Ultimo scritto il '+new Date(POSTS[0].d+'T12:00:00').toLocaleDateString('it-IT',{day:'numeric',month:'long'})+' · '+POSTS.length+' scritti';
   // ── il blocco "ultimi scritti" si scrive da solo, in ordine, dal piu' recente ──
@@ -617,25 +618,54 @@
     if(LINES(p.c))return txt.split('\n').map(l=>l===''?'<span class="gap"></span>':`<span class="u l">${esc(l)}</span>`).join('');
     return txt.split('\n\n').map(par=>'<p>'+par.split(/(?<=[.!?:])\s+/).map(se=>`<span class="u">${esc(se)} </span>`).join('')+'</p>').join('');
   }
-  // punto da cui il cerchio si apre (clic/tocco) e verso cui si richiude
-  let lastPt=null;
-  site.addEventListener('pointerdown',e=>{lastPt={x:e.clientX,y:e.clientY,t:performance.now()};},true);
-  function setOrigin(pt){
-    const r=rd.getBoundingClientRect();
-    if(!pt){
-      if(lastPt&&performance.now()-lastPt.t<1500)pt=lastPt;
-      else{const f=lastFocus&&lastFocus.getBoundingClientRect?lastFocus.getBoundingClientRect():null;pt=f&&f.width?{x:f.left+f.width/2,y:f.top+f.height/2}:{x:r.left+r.width/2,y:r.top+r.height/2};}
-    }
-    rd.style.setProperty('--ox',Math.max(0,Math.min(r.width,pt.x-r.left))+'px');
-    rd.style.setProperty('--oy',Math.max(0,Math.min(r.height,pt.y-r.top))+'px');
+  // ── titolo che vola: il titolo della riga cliccata diventa il titolo della pagina (e torna indietro) ──
+  let flySrc=null,flyEl=null,flyTimer=0;
+  const EASE_FLY='cubic-bezier(.65,0,.25,1)';
+  const rtEl=$('[data-rt]');
+  function textRect(el){
+    const n=[...el.childNodes].find(x=>x.nodeType===3&&x.textContent.trim());if(!n)return null;
+    const r=document.createRange();r.selectNodeContents(n);const b=r.getClientRects()[0];return b&&b.width?b:null;
   }
-  function openPost(p){
+  // copia del testo con lo stile della riga: sta sopra tutto, parte da (0,0) e si muove solo con transform
+  function makeFly(srcEl,txt){
+    const cs=getComputedStyle(srcEl),c=document.createElement('span');
+    c.textContent=txt;
+    Object.assign(c.style,{position:'absolute',left:'0',top:'0',margin:'0',whiteSpace:'nowrap',pointerEvents:'none',zIndex:'20',transformOrigin:'0 0',
+      fontFamily:cs.fontFamily,fontSize:cs.fontSize,fontWeight:cs.fontWeight,letterSpacing:cs.letterSpacing,lineHeight:cs.lineHeight,color:cs.color});
+    rd.parentElement.append(c);return c;
+  }
+  function endFly(){clearTimeout(flyTimer);if(flyEl){flyEl.remove();flyEl=null;}rtEl.classList.remove('fly');}
+  const tf=(r,R,k)=>`translate(${r.left-R.left}px,${r.top-R.top}px) scale(${k})`;
+  function flyIn(srcEl,p){
+    const sr=textRect(srcEl),tr=textRect(rtEl);if(!sr||!tr)return false;
+    const R=rd.getBoundingClientRect(),k=Math.min(8,Math.max(1,tr.width/sr.width)),c=makeFly(srcEl,p.t);
+    flyEl=c;flySrc=srcEl;srcEl.style.opacity='0';rtEl.classList.add('fly');
+    c.animate([{transform:tf(sr,R,1)},{transform:tf(tr,R,k)}],{duration:750,delay:80,easing:EASE_FLY,fill:'both'});
+    // a fine volo il titolo vero compare e la copia svanisce
+    flyTimer=setTimeout(()=>{rtEl.classList.remove('fly');c.animate([{opacity:1},{opacity:0}],{duration:260,fill:'both'});flyTimer=setTimeout(()=>{if(flyEl===c){c.remove();flyEl=null;}},280);},80+560);
+    return true;
+  }
+  function flyOut(){
+    const srcEl=flySrc;flySrc=null;
+    if(!srcEl)return;
+    const sr=srcEl.isConnected?textRect(srcEl):null,tr=textRect(rtEl);
+    if(!sr||!tr||!curPost){srcEl.style.opacity='';return;}
+    const R=rd.getBoundingClientRect(),k=Math.min(8,Math.max(1,tr.width/sr.width)),c=makeFly(srcEl,curPost.t);
+    rtEl.classList.add('fly');
+    c.animate([{opacity:0},{opacity:1}],{duration:160,fill:'both'});
+    c.animate([{transform:tf(tr,R,k)},{transform:tf(sr,R,1)}],{duration:650,delay:100,easing:EASE_FLY,fill:'both'});
+    // timer invece di .finished: la pulizia deve avvenire sempre, anche se il browser salta i frame
+    setTimeout(()=>{c.remove();srcEl.style.opacity='';if(!rd.classList.contains('on'))rtEl.classList.remove('fly');},780);
+  }
+  function openPost(p,src){
     if(!p)return;
     curPost=p;
-    if(!rd.classList.contains('on')){lastFocus=document.activeElement;setOrigin();}
+    const wasOn=rd.classList.contains('on');
+    if(wasOn){endFly();if(flySrc){flySrc.style.opacity='';flySrc=null;}}  // da 'Leggi anche': niente volo, la chiusura sara' una dissolvenza
+    else{lastFocus=src||document.activeElement;endFly();}
     $('[data-rcat]').textContent=NAMES[p.c];
     $('[data-rmeta]').textContent=NAMES[p.c]+' · '+fmt(p.d)+' · '+mins(p)+' min';
-    const rt=$('[data-rt]');rt.setAttribute('aria-label',p.t);rt.innerHTML=p.t.split(' ').map((w,k)=>`<span class="w" aria-hidden="true"><span style="--k:${k}">${esc(w)}</span></span> `).join('');
+    rtEl.textContent=p.t;rtEl.classList.remove('rise');
     rb.innerHTML=buildBody(p);
     const rel=POSTS.filter(x=>x!==p&&x.c===p.c).concat(POSTS.filter(x=>x!==p&&x.c!==p.c)).slice(0,2);
     rend.innerHTML='<span class="cap">Leggi anche</span>'+rel.map(x=>`<button type="button" class="ra" data-open="${esc(x.t)}"><b>${esc(x.t)}</b><small>${SHORT[x.c]} · ${fmt(x.d)}</small></button>`).join('')
@@ -644,13 +674,17 @@
     rsc.scrollTop=0;cue.classList.remove('off');rd.style.setProperty('--rp',0);
     units=[...rb.querySelectorAll('.u'),rend];
     sizeHead();requestAnimationFrame(reveal);
+    const srcEl=src&&src.querySelector('.et');
+    // volo solo se si parte da una riga con titolo e il movimento e' consentito; altrimenti il titolo sale da solo
+    if(!wasOn&&!reduced&&srcEl&&flyIn(srcEl,p)){}else{void rtEl.offsetWidth;rtEl.classList.add('rise');}
     rd.classList.add('on');rd.setAttribute('aria-hidden','false');
     sc.setAttribute('inert','');tbar.setAttribute('inert','');
     $('[data-rback]').focus({preventScroll:true});
   }
   function closeReader(){
     if(!rd.classList.contains('on'))return;
-    if(lastFocus&&lastFocus.isConnected&&lastFocus.getBoundingClientRect().width){const f=lastFocus.getBoundingClientRect();setOrigin({x:f.left+f.width/2,y:f.top+f.height/2});}
+    endFly();
+    if(!reduced)flyOut();else if(flySrc){flySrc.style.opacity='';flySrc=null;}
     rd.classList.remove('on');rd.setAttribute('aria-hidden','true');
     sc.removeAttribute('inert');tbar.removeAttribute('inert');
     if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
