@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog 04 - Emozione per testo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&display=swap" rel="stylesheet">
+<style>
+/* ===== Font di Tomas (uso personale, vedi PROGETTO.md) ===== */
+@font-face{font-family:"Vetro";src:url("fonts/vetro.otf") format("opentype");font-display:swap}
+@font-face{font-family:"Balligesta";src:url("fonts/balligesta.otf") format("opentype");font-display:swap}
+@font-face{font-family:"Fibonacci";src:url("fonts/fibonacci.ttf") format("truetype");font-style:normal;font-display:swap}
+@font-face{font-family:"Fibonacci";src:url("fonts/fibonacci-italic.ttf") format("truetype");font-style:italic;font-display:swap}
+
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:#171514;color:#e9e2d6;
+  font-family:"Newsreader","Iowan Old Style",serif;
+  display:flex;flex-direction:column;overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit}
+
+/* Il DEMO di Vetro ha le legature rotte (spariscono lettere): spente */
+.topbar .mark,.card .emo,.hero h1{font-variant-ligatures:none;font-feature-settings:"liga" 0,"clig" 0,"dlig" 0}
+
+/* ===== Barra del visualizzatore (fuori dal sito) ===== */
+.bar{flex:none;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:10px 16px;border-bottom:1px solid #2e2a27}
+.bar-t{display:flex;flex-direction:column;line-height:1.2;margin-right:auto}
+.bar-t b{font-size:1rem;font-weight:600}
+.bar-t span{font-size:.78rem;color:#9a9288;font-style:italic}
+.seg,.jump{display:flex;gap:6px}
+.bar button{min-height:44px;padding:0 14px;border:1px solid #3a3531;background:#201d1b;border-radius:10px;cursor:pointer;font-size:.9rem}
+.bar button[aria-pressed="true"]{background:#e9e2d6;color:#171514;border-color:#e9e2d6}
+.main{flex:1;min-height:0;display:flex;justify-content:center;padding:14px 10px}
+
+/* ===== Palco: mobile = 390px, desktop = largo ===== */
+.stage{
+  --bar:54px;
+  position:relative;width:min(390px,100%);height:100%;
+  border-radius:26px;overflow:hidden;border:1px solid #3a3531;
+  container-type:inline-size;container-name:site;
+  transition:width .35s cubic-bezier(.3,.7,.2,1);
+}
+body[data-view="desktop"] .stage{width:min(1280px,100%);border-radius:14px}
+.scroller{height:100%;overflow-y:auto;overflow-x:hidden;scroll-behavior:auto;position:relative}
+.scroller::-webkit-scrollbar{width:0}
+
+/* ===== Mondi: ogni emozione = variabili colore proprie ===== */
+[data-world="home"]{--bg:#141210;--fg:#efe8dc;--acc:#efe8dc}
+[data-world="malinconia"]{--bg:#1d2833;--fg:#cfd8de;--acc:#86a2ba}
+[data-world="rabbia"]{--bg:#0d0a09;--fg:#f3ebe2;--acc:#ff3b1f}
+[data-world="meraviglia"]{--bg:#f6e06a;--fg:#17140a;--acc:#d9431b}
+[data-world="tenerezza"]{--bg:#f2c6b8;--fg:#4a2b2a;--acc:#b8484a}
+[data-world="ansia"]{--bg:#d6dbdd;--fg:#101416;--acc:#e8470e}
+[data-world="ironia"]{--bg:#2f6b5f;--fg:#f4efe1;--acc:#f7b32b}
+
+/* ===== Barra in alto dentro il sito ===== */
+.topbar{
+  position:sticky;top:0;z-index:20;height:var(--bar);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 14px 0 18px;background:var(--bg);color:var(--fg);
+  border-bottom:1px solid color-mix(in srgb,var(--fg) 16%,transparent);
+}
+.topbar .mark{font-family:"Vetro",serif;text-transform:uppercase;letter-spacing:.06em;font-size:1rem}
+.topbar .back{
+  display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 10px 0 0;
+  background:none;border:0;cursor:pointer;font-size:1.02rem;font-style:italic;color:var(--fg)
+}
+.topbar .back svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.topbar .back:hover svg{transform:translateX(-4px)}
+.topbar .rt{display:flex;align-items:baseline;gap:10px;font-size:.92rem;font-style:italic;opacity:.85}
+.topbar .rt .n{font-family:"Fibonacci",serif;font-style:italic;font-size:1.35rem}
+[hidden]{display:none!important}
+
+/* ===== HOME ===== */
+.intro{background:var(--bg);color:var(--fg);padding:2.2rem 1.4rem 2.4rem}
+.intro h1{margin:0;font-weight:300;font-style:italic;font-size:clamp(2.1rem,11.5cqw,3.4rem);line-height:1.02;letter-spacing:-.01em;text-wrap:balance}
+.intro p{margin:1rem 0 0;font-size:1.08rem;max-width:26ch;opacity:.78;text-wrap:pretty}
+.intro .hint{display:inline-flex;align-items:center;gap:.6rem;margin-top:1.5rem;font-size:.86rem;opacity:.6;letter-spacing:.04em}
+.intro .hint i{display:block;width:1px;height:34px;background:var(--fg);transform-origin:top;animation:hint 2.4s ease-in-out infinite}
+@keyframes hint{0%{transform:scaleY(0)}60%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+
+.grid{display:block}
+.card{
+  --h:.6;position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:.55rem;
+  min-height:calc(var(--fh,720px)*var(--h));padding:1.4rem 1.3rem 1.5rem;
+  background:var(--bg);color:var(--fg);text-decoration:none;overflow:hidden;isolation:isolate;
+  transition:filter .3s;
+}
+.card:focus-visible{outline:3px solid var(--acc);outline-offset:-6px}
+.card .num{position:absolute;top:1rem;left:1.2rem;font-family:"Fibonacci",serif;font-style:italic;font-size:2.7rem;line-height:1;opacity:.55}
+.card .ico{position:absolute;width:62%;max-width:300px;aspect-ratio:1;color:var(--acc);z-index:-1}
+.card .emo{font-family:"Vetro",serif;text-transform:uppercase;letter-spacing:.03em;line-height:.95;font-size:clamp(1.7rem,9cqw,3.2rem)}
+.card .frag{font-style:italic;font-size:1.06rem;line-height:1.3;max-width:23ch;opacity:.92;text-wrap:pretty}
+.card .meta{display:flex;align-items:center;gap:.7rem;font-size:.84rem;letter-spacing:.05em;opacity:.7;min-height:44px}
+.card .meta .go{display:inline-block;width:26px;height:1px;background:currentColor;position:relative;transition:width .25s}
+.card .meta .go::after{content:"";position:absolute;right:0;top:-4px;width:8px;height:8px;border-top:1px solid currentColor;border-right:1px solid currentColor;transform:rotate(45deg)}
+.card:hover .meta .go{width:46px}
+.card.soon{cursor:default}
+.card.soon .meta{opacity:.5;font-style:italic}
+
+/* composizione diversa per ogni scheda (mobile) */
+.card[data-world="malinconia"]{--h:.72}
+.card[data-world="malinconia"] .ico{top:12%;right:-6%}
+.card[data-world="rabbia"]{--h:.6;align-items:flex-end;text-align:right}
+.card[data-world="rabbia"] .num{left:auto;right:1.2rem}
+.card[data-world="rabbia"] .ico{top:6%;left:-8%;width:70%}
+.card[data-world="rabbia"] .frag{max-width:20ch}
+.card[data-world="meraviglia"]{--h:.78;align-items:center;text-align:center}
+.card[data-world="meraviglia"] .ico{top:10%;left:50%;translate:-50% 0;width:66%}
+.card[data-world="meraviglia"] .frag{max-width:22ch}
+.card[data-world="tenerezza"]{--h:.56;justify-content:flex-start;padding-top:4.2rem}
+.card[data-world="tenerezza"] .ico{bottom:3%;right:-2%;width:58%}
+.card[data-world="ansia"]{--h:.62;align-items:flex-end;text-align:right}
+.card[data-world="ansia"] .num{left:1.2rem}
+.card[data-world="ansia"] .ico{top:6%;left:6%;width:48%}
+.card[data-world="ironia"]{--h:.52}
+.card[data-world="ironia"] .ico{top:8%;right:-4%;width:50%}
+.card .shine{display:none}
+
+/* ===== Icone: tratto a mano animato ===== */
+.ico svg{width:100%;height:100%;overflow:visible;filter:url(#wob)}
+.leaf,.ripple,.crack,.rage,.shard,.rays,.ray,.core,.spark,.pb,.warm,.jit,.brow,.smirk{transform-box:fill-box;transform-origin:center}
+.ico .ln,.ico .st{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.ico .fl{fill:currentColor;stroke:none}
+
+/* malinconia: foglia che cade */
+.leaf{animation:fall 7.5s ease-in-out infinite}
+@keyframes fall{0%{transform:translate(16px,-60px) rotate(-24deg);opacity:0}12%{opacity:1}45%{transform:translate(-22px,0) rotate(18deg)}75%{transform:translate(14px,40px) rotate(-14deg);opacity:1}100%{transform:translate(-4px,64px) rotate(8deg);opacity:0}}
+.ripple{animation:ripple 7.5s ease-out infinite;transform:scale(0)}
+@keyframes ripple{0%,76%{transform:scale(0);opacity:0}78%{opacity:.9}100%{transform:scale(1);opacity:0}}
+/* rabbia: crepa che si apre */
+.crack{stroke-dasharray:420;animation:crk 3.4s steps(16,end) infinite}
+@keyframes crk{0%{stroke-dashoffset:420;opacity:1}30%,88%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+.rage{animation:trem 3.4s linear infinite}
+@keyframes trem{0%,28%,40%,100%{transform:none}30%{transform:translate(4px,-3px)}32%{transform:translate(-4px,3px)}34%{transform:translate(3px,2px)}36%{transform:translate(-2px,-2px)}}
+.shard{animation:shard 3.4s ease-out infinite;opacity:0}
+@keyframes shard{0%,28%{transform:translate(0,0);opacity:0}30%{opacity:1}62%{transform:translate(var(--dx),var(--dy)) rotate(60deg);opacity:0}100%{opacity:0}}
+/* meraviglia: sole che respira */
+.rays{animation:spin 46s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ray{animation:ray 3.2s ease-in-out infinite;animation-delay:calc(var(--i)*-.27s)}
+@keyframes ray{0%,100%{opacity:1}50%{opacity:.25}}
+.core{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+.spark{animation:twinkle 2.6s ease-in-out infinite}
+@keyframes twinkle{0%,100%{transform:scale(.4) rotate(0);opacity:.3}50%{transform:scale(1) rotate(45deg);opacity:1}}
+/* tenerezza: due sassi che si cercano */
+.pb{animation:lean 5s ease-in-out infinite;transform-origin:90% 100%!important}
+@keyframes lean{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(7deg)}}
+.warm{animation:warm 5s ease-in-out infinite}
+@keyframes warm{0%,30%{transform:translateY(8px) scale(.5);opacity:0}60%{opacity:1}100%{transform:translateY(-30px) scale(1);opacity:0}}
+/* ansia: spirale che trema */
+.spiral{stroke-dasharray:14 7;animation:flow 1.4s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-42}}
+.jit{animation:jit .55s steps(1) infinite}
+@keyframes jit{0%{transform:translate(0,0)}25%{transform:translate(2px,-2px)}50%{transform:translate(-2px,1px)}75%{transform:translate(1px,2px)}}
+/* ironia: il sopracciglio */
+.brow{animation:brow 3.6s ease-in-out infinite}
+@keyframes brow{0%,52%,100%{transform:translateY(0) rotate(0)}62%,86%{transform:translateY(-10px) rotate(-12deg)}}
+.smirk{animation:smirk 3.6s ease-in-out infinite}
+@keyframes smirk{0%,52%,100%{transform:none}62%,86%{transform:rotate(-6deg) translateY(-2px)}}
+
+/* ===== PAGINA DI LETTURA (comune) ===== */
+.read{background:var(--bg);color:var(--fg);position:relative;min-height:100%}
+.read-fx{
+  position:sticky;top:var(--bar);z-index:0;pointer-events:none;overflow:hidden;
+  height:calc(var(--fh,720px) - var(--bar));margin-bottom:calc(-1*(var(--fh,720px) - var(--bar)));
+}
+.read>*:not(.read-fx){position:relative;z-index:1}
+.hero{min-height:calc(var(--fh,720px) - var(--bar));display:flex;flex-direction:column;padding:1.6rem 1.5rem 2rem}
+.hero .ico{color:var(--acc)}
+.hero .kick{display:flex;gap:.8rem;align-items:baseline;font-size:.95rem;font-style:italic;opacity:.8}
+.hero .kick .n{font-family:"Fibonacci",serif;font-size:1.6rem}
+.hero h1{margin:0;font-family:"Vetro",serif;font-weight:400;text-transform:uppercase}
+.hero .scroll{display:flex;align-items:center;gap:.7rem;font-size:.85rem;font-style:italic;opacity:.65;min-height:44px}
+.hero .scroll i{display:block;width:1px;height:30px;background:currentColor;transform-origin:top;animation:hint 2.4s ease-in-out infinite}
+.txt{padding:2.4rem 1.6rem 3rem}
+.sign{padding:1rem 1.6rem 2.4rem}
+.sign .firma{display:inline-block;font-family:"Balligesta",cursive;font-size:3.6rem;line-height:1.1;color:var(--acc);clip-path:inset(0 100% 0 0);padding:.1em .3em .1em 0}
+.sign.in .firma{animation:pen 2s cubic-bezier(.5,0,.2,1) .2s forwards}
+@keyframes pen{to{clip-path:inset(0 0 0 0)}}
+.sign .data{display:flex;align-items:center;gap:.9rem;font-family:"Fibonacci",serif;font-style:normal;font-size:1.3rem;opacity:.75;margin-top:.2rem}
+.sign .data span+span::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;vertical-align:middle;margin-right:.9rem}
+.more{padding:1.4rem 1.6rem 3rem;border-top:1px solid color-mix(in srgb,var(--fg) 16%,transparent)}
+.more h3{margin:0 0 .8rem;font-weight:400;font-style:italic;font-size:.95rem;opacity:.7}
+.more .chips{display:flex;flex-wrap:wrap;gap:8px}
+.more a{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:0 16px 0 10px;border:1px solid color-mix(in srgb,var(--fg) 30%,transparent);border-radius:99px;color:var(--fg);text-decoration:none;font-size:.98rem;font-style:italic;cursor:pointer;transition:background .2s}
+.more a:hover{background:color-mix(in srgb,var(--fg) 10%,transparent)}
+.more a i{width:18px;height:18px;border-radius:50%;border:1px solid color-mix(in srgb,var(--fg) 40%,transparent)}
+
+/* ----- MALINCONIA: lento, freddo, i versi affondano ----- */
+#r-malinconia .hero{justify-content:space-between}
+#r-malinconia .hero .ico{width:64%;align-self:flex-end;margin-right:-6%}
+#r-malinconia .hero h1{font-size:clamp(2.2rem,12cqw,3.4rem);line-height:.95;margin:.4rem 0 .9rem;letter-spacing:.02em}
+#r-malinconia .rain i{position:absolute;top:-130px;width:1px;background:linear-gradient(transparent,var(--acc));animation:rain linear infinite}
+@keyframes rain{to{transform:translateY(calc(var(--fh,720px) + 180px))}}
+#r-malinconia .read-fx::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 70% at 50% 110%,rgba(134,162,186,.16),transparent 70%)}
+#r-malinconia .st-gap{height:2.6rem}
+#r-malinconia .ln{margin:0;font-weight:300;font-size:1.28rem;line-height:2.05;letter-spacing:.015em;margin-left:calc(var(--k,0)*1.1rem);opacity:0;transform:translateY(10px);transition:opacity 2.4s ease,transform 2.4s ease}
+#r-malinconia .ln.in{opacity:.94;transform:none}
+
+/* ----- RABBIA: secco, rosso, i versi sbattono ----- */
+#r-rabbia .hero{justify-content:space-between;overflow:hidden}
+#r-rabbia .hero .ico{position:absolute;right:-6%;top:8%;width:80%;opacity:.9}
+#r-rabbia .hero h1{position:relative;font-size:clamp(3.4rem,27cqw,7rem);line-height:.82;color:var(--acc);transform:rotate(-4deg);margin:5rem 0 .8rem -.1em;transform-origin:left bottom}
+#r-rabbia .hero.go h1{animation:slamT .5s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes slamT{0%{transform:rotate(-4deg) scale(2.2);opacity:0}60%{opacity:1}100%{transform:rotate(-4deg) scale(1)}}
+#r-rabbia.shake,#r-rabbia .shake{animation:quake .5s linear 1}
+@keyframes quake{0%,100%{transform:none}15%{transform:translate(-9px,5px)}30%{transform:translate(8px,-6px)}45%{transform:translate(-6px,-4px)}60%{transform:translate(5px,5px)}80%{transform:translate(-2px,2px)}}
+#r-rabbia .flash{position:absolute;inset:0;background:var(--acc);opacity:0}
+#r-rabbia .flash.go{animation:flash .45s ease-out}
+@keyframes flash{0%{opacity:.55}100%{opacity:0}}
+#r-rabbia .crackfx{position:absolute;inset:0;width:100%;height:100%}
+#r-rabbia .crackfx path{fill:none;stroke:var(--acc);stroke-width:.7;stroke-linecap:square;stroke-linejoin:miter;opacity:.45}
+#r-rabbia .txt{padding-top:2.2rem;overflow-x:clip}
+#r-rabbia .st-gap{height:2rem}
+#r-rabbia .ln{margin:0;font-weight:800;font-size:1.5rem;line-height:1.14;letter-spacing:-.012em;opacity:0;transform:translateX(-70px) skewX(-12deg)}
+#r-rabbia .ln:nth-child(even){transform:translateX(70px) skewX(12deg)}
+#r-rabbia .ln.in{animation:slam .26s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes slam{0%{opacity:0}55%{opacity:1;transform:translateX(7px) skewX(-3deg)}100%{opacity:1;transform:none}}
+#r-rabbia .ln.big{font-size:clamp(2.2rem,14cqw,3.6rem);line-height:.98;text-transform:uppercase;margin:.3rem 0}
+#r-rabbia .ln em{font-style:normal;color:var(--acc);display:inline-block;animation:tremble .35s steps(1) infinite}
+@keyframes tremble{0%{transform:translate(0,0)}33%{transform:translate(1.5px,-1px)}66%{transform:translate(-1.5px,1px)}}
+#r-rabbia .ln:hover{color:var(--acc)}
+
+/* ----- MERAVIGLIA: leggero, le parole salgono ----- */
+#r-meraviglia .hero{align-items:center;text-align:center;justify-content:space-between}
+#r-meraviglia .hero .kick{justify-content:center}
+#r-meraviglia .hero .ico{width:66%;max-width:340px;margin:.5rem 0}
+#r-meraviglia .hero h1{font-size:clamp(2rem,10.5cqw,3.6rem);line-height:.98;text-wrap:balance}
+#r-meraviglia .read-fx{opacity:.5}
+#r-meraviglia .sp{position:absolute;color:var(--acc);animation:twinkle var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+#r-meraviglia .sp svg{display:block;width:100%;height:100%;fill:currentColor}
+#r-meraviglia .txt{text-align:center;padding-top:1rem}
+#r-meraviglia p.pp{margin:0 0 2.6rem;font-style:italic;font-weight:400;font-size:1.42rem;line-height:1.5;text-wrap:balance}
+#r-meraviglia .w{display:inline-block;opacity:0;transform:translateY(22px) rotate(var(--r,0deg));transition:opacity 1s ease,transform 1s cubic-bezier(.2,.8,.2,1);transition-delay:calc(var(--i)*55ms);white-space:pre}
+#r-meraviglia .pp.in .w{opacity:1;transform:none;animation:bob 5s ease-in-out infinite;animation-delay:calc(var(--i)*-.4s)}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -3px}}
+
+/* ===== Cambio pagina: cerchio di colore ===== */
+.wipe{position:absolute;inset:0;z-index:50;display:none;pointer-events:all}
+
+/* ===== DESKTOP (palco largo) ===== */
+@container site (min-width:760px){
+  .stage{--bar:60px}
+  .topbar{padding:0 28px}
+  .intro{padding:3.6rem 3.5rem 3.2rem;display:flex;justify-content:space-between;align-items:flex-end;gap:3rem}
+  .intro h1{font-size:clamp(3rem,6.4cqw,5.6rem);max-width:12ch}
+  .intro p{max-width:30ch;font-size:1.2rem}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr)}
+  .card{min-height:calc(var(--fh,720px)*var(--h));padding:2rem 2rem 2rem}
+  .card[data-world="malinconia"]{grid-column:span 7;--h:.9}
+  .card[data-world="rabbia"]{grid-column:span 5;--h:.9}
+  .card[data-world="meraviglia"]{grid-column:span 4;--h:.82}
+  .card[data-world="tenerezza"]{grid-column:span 4;--h:.82}
+  .card[data-world="ansia"]{grid-column:span 4;--h:.82}
+  .card[data-world="ironia"]{grid-column:span 12;--h:.5}
+  .card .num{font-size:3.3rem;top:1.4rem;left:2rem}
+  .card[data-world="rabbia"] .num{right:2rem}
+  .card .emo{font-size:min(3.5cqw,3.4rem)}
+  .card[data-world="malinconia"] .emo,.card[data-world="rabbia"] .emo{font-size:min(4.6cqw,4.6rem)}
+  .card .frag{font-size:1.2rem}
+  .card .ico{width:56%;max-width:340px}
+  .card[data-world="malinconia"] .ico{width:46%;right:2%;top:8%}
+  .card[data-world="rabbia"] .ico{width:66%;left:-6%}
+  .card[data-world="tenerezza"]{padding-top:6.2rem}
+  .card[data-world="tenerezza"] .ico{width:64%;bottom:2%;right:0}
+  .card[data-world="ansia"] .ico{width:60%;top:8%;left:6%}
+  .card[data-world="ironia"]{flex-direction:row;align-items:flex-end;justify-content:flex-start;gap:3rem;flex-wrap:wrap}
+  .card[data-world="ironia"] .ico{width:20%;max-width:260px;top:50%;right:5%;translate:0 -50%}
+  .card[data-world="ironia"] .emo{font-size:min(7cqw,6.4rem)}
+  .card[data-world="ironia"] .frag{font-size:1.5rem;max-width:26ch}
+  .card:hover{filter:brightness(1.07)}
+
+  .hero{padding:2.4rem 3.5rem 2.6rem}
+  .txt{padding:3.5rem 3.5rem 4rem}
+  .sign,.more{padding-left:3.5rem;padding-right:3.5rem}
+  .read>.txt>*{max-width:34rem}
+
+  #r-malinconia .hero{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto;align-items:end}
+  #r-malinconia .hero .kick{grid-column:1}
+  #r-malinconia .hero .ico{grid-column:2;grid-row:1/4;align-self:center;width:84%;margin:0;justify-self:center}
+  #r-malinconia .hero h1{grid-column:1;font-size:min(8cqw,6.8rem);align-self:end}
+  #r-malinconia .hero .scroll{grid-column:1}
+  #r-malinconia .txt{margin-left:calc(50% - 8rem)}
+  #r-malinconia .ln{font-size:1.5rem}
+
+  #r-rabbia .hero h1{font-size:min(20cqw,15rem);margin-top:6rem}
+  #r-rabbia .hero .ico{width:46%;right:2%;top:6%}
+  #r-rabbia .crackfx{width:44%;left:auto;right:0}
+  #r-rabbia .ln{font-size:2rem}
+  #r-rabbia .ln.big{font-size:clamp(3rem,6.4cqw,5.2rem)}
+  #r-rabbia .read>.txt>*{max-width:44rem}
+
+  #r-meraviglia .hero{display:grid;grid-template-columns:1fr;justify-items:center}
+  #r-meraviglia .hero .ico{width:34%;max-width:420px}
+  #r-meraviglia .hero h1{font-size:min(7.4cqw,7rem)}
+  #r-meraviglia .txt{margin:0 auto}
+  #r-meraviglia p.pp{font-size:1.9rem;max-width:28em;margin-left:auto;margin-right:auto}
+  #r-meraviglia .read>.txt>*,#r-meraviglia .txt>*{max-width:none}
+}
+
+/* ===== Accessibilita: niente movimento se richiesto ===== */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  #r-malinconia .ln,#r-rabbia .ln,#r-meraviglia .w{opacity:1!important;transform:none!important}
+  .sign .firma{clip-path:none}
+}
+</style>
+</head>
+<body data-view="mobile">
+
+<!-- filtro "tremolio a mano" per le icone -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="wob" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5"/>
+  </filter>
+</svg>
+
+<header class="bar">
+  <div class="bar-t"><b>Blog - mockup 04 · Emozione per testo</b><span>Testi di esempio scritti da Claude, non tuoi. Font: Vetro, Balligesta, Fibonacci.</span></div>
+  <div class="seg" role="group" aria-label="Vista">
+    <button type="button" data-v="mobile" aria-pressed="true">Mobile</button>
+    <button type="button" data-v="desktop" aria-pressed="false">Desktop</button>
+  </div>
+  <nav class="jump" id="jump" aria-label="Salta a"></nav>
+</header>
+
+<main class="main">
+  <div class="stage" id="stage">
+    <div class="scroller" id="scroller">
+      <div class="topbar" id="topbar" data-world="home"></div>
+      <div id="views"></div>
+    </div>
+    <div class="wipe" id="wipe"></div>
+  </div>
+</main>
+
+<script>
+/* =========================================================
+   DATI: 6 emozioni. 3 con pagina di lettura (built:true).
+   Tutti i testi sono ESEMPI scritti per evocare l'emozione.
+   ========================================================= */
+const E = [
+  {id:'malinconia',name:'Malinconia',num:'01',type:'poesia',min:'1 min',built:true,
+   title:'Senza fretta',frag:'Metto il tuo nome in fondo ai pensieri.'},
+  {id:'rabbia',name:'Rabbia',num:'02',type:'mini racconto',min:'1 min',built:true,
+   title:'Basta',frag:'Tre anni a dire sì con la bocca.'},
+  {id:'meraviglia',name:'Meraviglia',num:'03',type:'pensiero',min:'1 min',built:true,
+   title:'Il primo sguardo',frag:'Per un secondo sei di nuovo lui.'},
+  {id:'tenerezza',name:'Tenerezza',num:'04',type:'mini racconto',min:'1 min',built:false,
+   frag:'Ti ho tenuto la mano finché non hai smesso di avere paura.'},
+  {id:'ansia',name:'Ansia',num:'05',type:'pensiero',min:'1 min',built:false,
+   frag:'Ho controllato la porta. Ho controllato di nuovo.'},
+  {id:'ironia',name:'Ironia',num:'06',type:'pensiero',min:'1 min',built:false,
+   frag:'Ho smesso di procrastinare. Ma lo farò domani.'}
+];
+const BYID = Object.fromEntries(E.map(e=>[e.id,e]));
+
+/* Testi: stanze di versi. "!" = riga enorme, *...* = parola in rosso */
+const TXT = {
+  malinconia:[
+    ['La casa tiene ancora','il tuo modo di fare piano.','Le tazze, il lato del letto,','una luce che non so spegnere.'],
+    ['Fuori piove senza fretta,','come chi sa di avere tempo','e non sa più per cosa.'],
+    ['Metto il tuo nome in fondo ai pensieri,','dove le cose non fanno rumore.','Così non cade.','Così resta.']
+  ],
+  rabbia:[
+    ['Ho contato fino a dieci.','Poi fino a venti.','A trenta il bicchiere era già per terra.'],
+    ['!Non era il bicchiere.','Non era nemmeno lui, con quel sorriso da «calmati».','Erano tre anni di «va bene».','Tre anni di «non importa».','Tre anni a dire sì con la bocca','mentre le mani si stringevano sotto il tavolo.'],
+    ['Adesso c\'è vetro dappertutto.','E per la prima volta','*sento tutto.*','Anche il silenzio.','Soprattutto il silenzio.'],
+    ['!Non chiedo scusa.']
+  ],
+  meraviglia:[
+    'Da qualche parte c\'è stato un primo essere umano che ha alzato la testa e ha visto la notte per davvero. Non uno schermo. Non un\'idea. Tutta, addosso.',
+    'Non sapeva i nomi. Non sapeva le distanze. Sapeva solo che era enorme e che, per qualche motivo, lo stava guardando anche lei.',
+    'Succede ancora, a volte. Esci a buttare la spazzatura, alzi gli occhi, e il mondo si riapre come una mano. Per un secondo sei di nuovo lui. Piccolo, minuscolo, e finalmente al posto giusto.'
+  ]
+};
+
+/* =========================================================
+   ICONE: linee a mano, ognuna con la sua animazione
+   ========================================================= */
+const ICONS = {
+malinconia:`<svg viewBox="0 0 200 200"><g class="leaf"><path class="ln" d="M100 34 C142 66 150 118 100 158 C50 118 58 66 100 34 Z"/><path class="ln" d="M100 34 L100 170"/><path class="ln" d="M100 78 L124 94 M100 78 L76 94 M100 112 L126 128 M100 112 L74 128"/></g><ellipse class="st ripple" cx="100" cy="184" rx="42" ry="7"/><path class="ln" d="M24 184 H70 M130 184 H176" stroke-dasharray="2 9"/></svg>`,
+rabbia:`<svg viewBox="0 0 200 200"><g class="rage"><circle class="ln" cx="100" cy="100" r="66"/><path class="ln crack" d="M104 34 L90 68 L114 88 L88 114 L110 134 L96 166"/><path class="ln crack" d="M114 88 L142 94 L152 120"/><path class="ln crack" d="M88 114 L60 118 L48 142"/><polygon class="fl shard" style="--dx:30px;--dy:-24px" points="150,60 162,56 156,70"/><polygon class="fl shard" style="--dx:-34px;--dy:22px" points="46,150 58,146 52,160"/><polygon class="fl shard" style="--dx:26px;--dy:34px" points="146,150 158,150 150,162"/></g></svg>`,
+meraviglia:`<svg viewBox="0 0 200 200"><g class="rays">${[0,1,2,3,4,5,6,7,8,9,10,11].map(i=>{const a=i*Math.PI/6,r1=i%2?44:40,r2=i%2?66:76,c=Math.cos(a),n=Math.sin(a);return `<line class="ln ray" style="--i:${i}" x1="${(100+r1*c).toFixed(1)}" y1="${(100+r1*n).toFixed(1)}" x2="${(100+r2*c).toFixed(1)}" y2="${(100+r2*n).toFixed(1)}"/>`}).join('')}</g><circle class="ln core" cx="100" cy="100" r="26"/><path class="ln" d="M90 100 Q100 90 110 100" /><path class="fl spark" d="M30 40 L33 33 L36 40 L43 43 L36 46 L33 53 L30 46 L23 43Z"/><path class="fl spark" style="animation-delay:-1.1s" d="M168 150 L171 144 L174 150 L180 153 L174 156 L171 162 L168 156 L162 153Z"/><path class="fl spark" style="animation-delay:-1.8s" d="M160 36 L162 31 L164 36 L169 38 L164 40 L162 45 L160 40 L155 38Z"/></svg>`,
+tenerezza:`<svg viewBox="0 0 200 200"><path class="ln pb" d="M34 150 C24 112 56 82 92 96 C122 110 118 156 80 162 C56 166 38 160 34 150Z"/><g transform="translate(200 0) scale(-1 1)"><path class="ln pb" style="animation-delay:-2.5s" d="M34 150 C24 112 56 82 92 96 C122 110 118 156 80 162 C56 166 38 160 34 150Z"/></g><circle class="fl warm" cx="100" cy="110" r="4"/><circle class="fl warm" style="animation-delay:-2.4s" cx="92" cy="116" r="2.6"/></svg>`,
+ansia:`<svg viewBox="0 0 200 200"><g class="jit"><path class="ln spiral" d="M100 100 a7 7 0 0 1 14 0 a16 16 0 0 1 -32 0 a25 25 0 0 1 50 0 a34 34 0 0 1 -68 0 a43 43 0 0 1 86 0 a52 52 0 0 1 -104 0"/></g><path class="ln" d="M170 40 l10 -8 M176 58 l14 -2 M24 168 l-10 8 M30 150 l-14 2"/></svg>`,
+ironia:`<svg viewBox="0 0 200 200"><circle class="ln" cx="100" cy="100" r="64"/><circle class="fl" cx="78" cy="94" r="5"/><circle class="fl" cx="124" cy="94" r="5"/><path class="ln" d="M64 76 Q78 70 92 76"/><path class="ln brow" d="M108 76 Q124 64 140 74"/><g class="smirk"><path class="ln" d="M72 128 Q100 144 132 120"/><path class="ln" d="M132 120 q7 -3 9 -11"/></g></svg>`
+};
+
+/* =========================================================
+   COSTRUZIONE DOM
+   ========================================================= */
+const stage=document.getElementById('stage'), scroller=document.getElementById('scroller');
+const views=document.getElementById('views'), topbar=document.getElementById('topbar'), wipe=document.getElementById('wipe');
+const reduced = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const ARROW='<svg viewBox="0 0 24 24"><path d="M15 5 L8 12 L15 19"/></svg>';
+
+function buildHome(){
+  const s=document.createElement('section'); s.id='v-home'; s.dataset.world='home';
+  s.innerHTML=`
+    <div class="intro" data-world="home">
+      <h1>Ogni testo<br>ha un clima.</h1>
+      <div><p>Scegli quello che hai addosso oggi.</p><span class="hint"><i></i>scorri</span></div>
+    </div>
+    <div class="grid">${E.map(e=>`
+      <a class="card${e.built?'':' soon'}" data-world="${e.id}" href="#${e.built?e.id:''}" ${e.built?'':'aria-disabled="true"'}>
+        <span class="num">${e.num}</span>
+        <span class="ico" aria-hidden="true">${ICONS[e.id]}</span>
+        <span class="emo">${e.name}</span>
+        <span class="frag">«${e.frag}»</span>
+        <span class="meta">${e.type} · ${e.min}<i class="go"></i>${e.built?'':'<em>lettura nel prossimo giro</em>'}</span>
+      </a>`).join('')}
+    </div>`;
+  views.appendChild(s);
+}
+
+function words(str){ /* spezza in parole per l'effetto "salgono" */
+  let i=0; return str.split(' ').map(w=>`<span class="w" style="--i:${i++};--r:${rnd(-4,4).toFixed(1)}deg">${w} </span>`).join('');
+}
+
+function buildRead(id){
+  const e=BYID[id]; const a=document.createElement('article');
+  a.className='read'; a.id='r-'+id; a.dataset.world=id; a.hidden=true;
+  let fx='', body='';
+  if(id==='malinconia'){
+    fx='<div class="rain"></div>';
+    body=TXT.malinconia.map((st,si)=>`${si?'<div class="st-gap"></div>':''}${st.map((l,k)=>`<p class="ln" style="--k:${k}">${l}</p>`).join('')}`).join('');
+  }
+  if(id==='rabbia'){
+    const CR=[[[54,-2],[46,9],[58,16],[44,27],[56,36],[47,47],[60,55],[49,66],[58,75],[46,86],[53,102]],[[58,16],[76,20],[84,32]],[[44,27],[26,33],[18,47]],[[60,55],[80,60],[90,74]],[[47,47],[30,56],[24,70]],[[49,66],[34,78],[36,92]]];
+    fx=`<svg class="crackfx" viewBox="0 0 100 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${CR.map(c=>`<path class="cr" d="${c.map((q,i)=>(i?'L':'M')+q[0]+' '+q[1]*2).join(' ')}"/>`).join('')}</svg><div class="flash"></div>`;
+    body=TXT.rabbia.map((st,si)=>`${si?'<div class="st-gap"></div>':''}${st.map(l=>{
+      let big=false; if(l[0]==='!'){big=true;l=l.slice(1);}
+      l=l.replace(/\*(.+?)\*/,'<em>$1</em>');
+      return `<p class="ln${big?' big':''}">${l}</p>`;}).join('')}`).join('');
+  }
+  if(id==='meraviglia'){
+    fx=Array.from({length:12},()=>`<span class="sp" style="left:${rnd(3,94).toFixed(0)}%;top:${rnd(4,92).toFixed(0)}%;width:${rnd(10,26).toFixed(0)}px;height:${rnd(10,26).toFixed(0)}px;--d:${rnd(2,4.2).toFixed(1)}s;--dl:${(-rnd(0,4)).toFixed(1)}s"><svg viewBox="0 0 20 20"><path d="M10 0C11 7 13 9 20 10C13 11 11 13 10 20C9 13 7 11 0 10C7 9 9 7 10 0Z"/></svg></span>`).join('');
+    body=TXT.meraviglia.map(p=>`<p class="pp">${words(p)}</p>`).join('');
+  }
+  const more=['malinconia','rabbia','meraviglia'].filter(x=>x!==id).map(x=>`<a href="#${x}"><i style="background:${getW(x,'--bg')}"></i>${BYID[x].name}</a>`).join('');
+  a.innerHTML=`
+    <div class="read-fx" aria-hidden="true">${fx}</div>
+    <header class="hero">
+      <div class="kick"><span class="n">${e.num}</span><span>${e.type} · ${e.name.toLowerCase()}</span></div>
+      <div class="ico" aria-hidden="true">${ICONS[id]}</div>
+      <div><h1>${e.title}</h1><div class="scroll"><i></i>scorri per leggere</div></div>
+    </header>
+    <div class="txt">${body}</div>
+    <div class="sign"><span class="firma">Tomas</span><div class="data"><span>2</span><span>novembre</span><span>2026</span></div></div>
+    <nav class="more" aria-label="Altri climi"><h3>Cambia clima</h3><div class="chips">${more}<a href="#home"><i></i>Indice</a></div></nav>`;
+  views.appendChild(a);
+  if(id==='malinconia' && !reduced) makeRain(a.querySelector('.rain'));
+}
+const W_BG={home:'#141210',malinconia:'#1d2833',rabbia:'#0d0a09',meraviglia:'#f6e06a'};
+function getW(id,v){return W_BG[id]||'#999'}
+function makeRain(el){
+  for(let i=0;i<34;i++){const d=document.createElement('i');
+    d.style.cssText=`left:${rnd(0,100).toFixed(1)}%;height:${rnd(40,100).toFixed(0)}px;animation-duration:${rnd(2.2,4.8).toFixed(1)}s;animation-delay:${(-rnd(0,5)).toFixed(1)}s;opacity:${rnd(.12,.34).toFixed(2)}`;
+    el.appendChild(d);}
+}
+
+buildHome(); ['malinconia','rabbia','meraviglia'].forEach(buildRead);
+
+/* ---------- barra in alto ---------- */
+function setTopbar(id){
+  topbar.dataset.world=id;
+  if(id==='home'){
+    topbar.innerHTML=`<span class="mark">Appunti a margine</span><span class="rt"><span>6 climi</span></span>`;
+  }else{
+    const e=BYID[id];
+    topbar.innerHTML=`<button class="back" data-go="home">${ARROW}Indice</button><span class="rt"><span>${e.name}</span><span class="n">${e.num}</span></span>`;
+  }
+}
+
+/* ---------- altezza reale del palco per le unita' interne ---------- */
+function setFh(){stage.style.setProperty('--fh',stage.clientHeight+'px')}
+addEventListener('resize',setFh);
+
+/* ---------- osservatore: i testi si "accendono" quando entrano ---------- */
+const io=new IntersectionObserver(es=>es.forEach(en=>{
+  if(en.isIntersecting){en.target.classList.add('in'); }
+}),{root:scroller,threshold:.35});
+function arm(root){
+  root.querySelectorAll('.ln,.pp,.sign').forEach(el=>{el.classList.remove('in'); io.observe(el);});
+}
+
+/* ---------- crepa che si disegna con lo scroll (rabbia) ---------- */
+const crackPaths=[...document.querySelectorAll('#r-rabbia .cr')];
+crackPaths.forEach(p=>{const l=p.getTotalLength?p.getTotalLength():300;p.dataset.l=l;p.style.strokeDasharray=l;p.style.strokeDashoffset=l;});
+function onScroll(){
+  const max=Math.max(1,scroller.scrollHeight-scroller.clientHeight), p=scroller.scrollTop/max;
+  if(cur==='rabbia'){
+    crackPaths.forEach((c,i)=>{const l=+c.dataset.l;const k=Math.min(1,Math.max(0,(p*1.5)-(0.06*i)));c.style.strokeDashoffset=l*(1-k);});
+  }
+  if(cur==='meraviglia'){
+    const ico=document.querySelector('#r-meraviglia .hero .ico svg');
+    if(ico) ico.style.transform=`rotate(${scroller.scrollTop*0.12}deg)`;
+  }
+}
+let tick=false; scroller.addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(()=>{onScroll();tick=false;});}},{passive:true});
+
+/* =========================================================
+   ROUTING + transizione (cerchio di colore)
+   ========================================================= */
+let cur='home', busy=false;
+function swap(id){
+  cur=id;
+  document.querySelectorAll('#views>*').forEach(v=>v.hidden=true);
+  const v=document.getElementById(id==='home'?'v-home':'r-'+id); v.hidden=false;
+  scroller.scrollTop=0; setTopbar(id); setFh();
+  if(id!=='home') arm(v);
+  if(id==='rabbia'){
+    const h=v.querySelector('.hero'), f=v.querySelector('.flash');
+    [h,f,v].forEach(n=>n&&n.classList.remove('go','shake')); void v.offsetWidth;
+    h.classList.add('go'); f.classList.add('go'); if(!reduced) v.classList.add('shake');
+    crackPaths.forEach(c=>c.style.strokeDashoffset=c.dataset.l);
+  }
+  document.querySelectorAll('#jump button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.go===id));
+  onScroll();
+}
+function go(id,ev){
+  if(id===cur||busy) return;
+  if(reduced){swap(id);history.replaceState(null,'','#'+id);return;}
+  busy=true;
+  const r=stage.getBoundingClientRect();
+  const x=ev&&ev.clientX?ev.clientX-r.left:r.width/2, y=ev&&ev.clientY?ev.clientY-r.top:r.height/2;
+  wipe.style.background=W_BG[id]||'#141210'; wipe.style.display='block';
+  const a1=wipe.animate([{clipPath:`circle(0px at ${x}px ${y}px)`},{clipPath:`circle(160% at ${x}px ${y}px)`}],{duration:620,easing:'cubic-bezier(.7,0,.2,1)',fill:'forwards'});
+  a1.finished.then(()=>{swap(id);history.replaceState(null,'','#'+id);
+    return wipe.animate([{opacity:1},{opacity:0}],{duration:450,fill:'forwards'}).finished})
+  .then(()=>{wipe.getAnimations().forEach(a=>a.cancel());wipe.style.display='none';busy=false;});
+}
+addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home'; if(BYID[id]&&BYID[id].built||id==='home') swap(id);});
+
+/* click su schede, chip, indietro */
+document.addEventListener('click',ev=>{
+  const a=ev.target.closest('a[href^="#"], [data-go]'); if(!a||!stage.contains(a)) return;
+  ev.preventDefault();
+  const id=a.dataset.go||a.getAttribute('href').slice(1);
+  if(!id) return;                 // schede "in arrivo": nessuna pagina
+  if(id==='home'||(BYID[id]&&BYID[id].built)) go(id,ev);
+});
+
+/* barra del visualizzatore */
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
+  document.body.dataset.view=b.dataset.v;
+  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  setTimeout(()=>{setFh();onScroll();},380);
+}));
+const jump=document.getElementById('jump');
+[['home','Indice'],['malinconia','Malinconia'],['rabbia','Rabbia'],['meraviglia','Meraviglia']].forEach(([id,l])=>{
+  const b=document.createElement('button');b.type='button';b.dataset.go=id;b.textContent=l;
+  b.addEventListener('click',()=>{ if(id===cur)return; if(reduced||busy){swap(id)}else{const r=stage.getBoundingClientRect();go(id,{clientX:r.left+r.width/2,clientY:r.top+r.height/2});}});
+  jump.appendChild(b);
+});
+
+/* avvio: ?v=desktop e #rotta permettono link diretti */
+const q=new URLSearchParams(location.search);
+if(q.get('v')==='desktop'){document.body.dataset.view='desktop';document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v==='desktop'));}
+setFh();
+const start=location.hash.slice(1); swap(BYID[start]&&BYID[start].built?start:'home');
+setTimeout(setFh,300);
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>teloscrivo - mockup 15c header</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"Fibonacci";src:url("fonts/fibonacci.ttf");font-style:normal}
+@font-face{font-family:"Fibonacci";src:url("fonts/fibonacci-italic.ttf");font-style:italic}
+@font-face{font-family:"Vetro";src:url("fonts/vetro.otf")}
+:root{--seal:#DBF2FC;--navy:#072D59;--deep:#041B38;--pink:#FD6E88;--serif:"Newsreader","Iowan Old Style",serif}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#0a1424;color:var(--seal);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+
+/* ===== SHELL DEL MOCKUP ===== */
+.shell{max-width:1360px;margin:0 auto;padding:16px 16px 40px}
+.top{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-bottom:12px}
+.top h1{font:italic 400 1.7rem/1 "Fibonacci";margin:0 12px 0 0}
+.top h1 i{display:inline-block;width:.17em;height:.17em;border-radius:50%;background:var(--pink);margin-left:.06em}
+.grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grp>span{font:500 .7rem var(--serif);letter-spacing:.2em;text-transform:uppercase;color:#6f88a3;margin-right:2px}
+.grp button{font:500 .78rem var(--serif);letter-spacing:.14em;text-transform:uppercase;color:#9db6cc;background:transparent;border:1px solid #20344f;border-radius:8px;padding:0 14px;min-height:44px;cursor:pointer}
+.grp button[aria-pressed="true"]{color:var(--deep);background:var(--seal);border-color:var(--seal)}
+.grp button:hover{color:var(--seal);border-color:#3c5a80}
+.grp button[aria-pressed="true"]:hover{color:var(--deep)}
+.grp button[disabled]{opacity:.3;cursor:not-allowed}
+.why{font-size:.95rem;color:#9db6cc;max-width:92ch;margin:0 0 16px;line-height:1.5;text-wrap:pretty}
+.why b{color:var(--seal);font-weight:500}
+.stagebox{display:flex;justify-content:center}
+
+/* ===== DEVICE ===== */
+.device{position:relative;overflow:hidden;background:var(--deep);container-type:size;width:390px;max-width:100%;height:min(800px,calc(100vh - 230px));min-height:560px;border-radius:30px;border:1px solid #2a4163}
+.device.d{width:100%;max-width:1280px;border-radius:14px;height:min(780px,calc(100vh - 230px))}
+.H{position:absolute;inset:0;overflow:hidden}
+
+/* cielo + luna (identico al 15) */
+.sk2{position:absolute;inset:0;background:var(--deep);overflow:hidden}
+.sk2 .moon{position:absolute;inset:-4% 0;background:url("img/luna-mobile.webp") 100% 12%/cover no-repeat}
+.sk2 .veil{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,27,56,.25),rgba(4,27,56,0) 30%,rgba(4,27,56,0) 60%,rgba(4,27,56,.35))}
+@container (min-width:820px){.sk2 .moon{background-image:url("img/luna-desktop.webp");background-position:50% 30%}}
+
+/* ===== HOME (invariata) ===== */
+.scroller{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+.H.open .scroller{overflow:hidden}
+.hero{position:relative;height:100cqh}
+.hero .in{position:absolute;left:0;right:0;bottom:7cqh;padding:0 24px}
+.big{font:italic 400 3.7rem/1 "Fibonacci",serif;letter-spacing:-.01em;color:#fff;white-space:nowrap}
+.big i{display:inline-block;width:.16em;height:.16em;border-radius:50%;background:var(--pink);margin-left:.06em;box-shadow:0 0 .5em rgba(253,110,136,.55)}
+.tg{display:flex;align-items:center;gap:12px;margin-top:1.4rem;font:italic 400 .72rem/1.3 var(--serif);letter-spacing:.24em;text-transform:uppercase;color:var(--seal)}
+.tg::before{content:"";width:28px;height:2px;background:var(--pink);flex:none}
+.more{position:relative;padding:60px 24px 80px;background:linear-gradient(rgba(4,27,56,0),var(--deep) 90px)}
+.more .lab{font:500 .74rem/1 var(--serif);letter-spacing:.24em;text-transform:uppercase;color:var(--pink);margin:0 0 20px}
+.more article{border-top:1px solid rgba(219,242,252,.16);padding:22px 0}
+.more h3{font:400 1.5rem/1.1 "Vetro",serif;font-variant-ligatures:none;text-transform:uppercase;margin:0 0 8px;letter-spacing:.02em}
+.more p{margin:0;opacity:.75;font-size:1rem}
+.ex{font:italic .76rem var(--serif);opacity:.55;margin-top:14px}
+@container (min-width:820px){.hero .in{padding:0 56px;bottom:12cqh}.big{font-size:7.2rem}.more{padding:80px 56px 100px}.more .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:0 36px}}
+
+/* ===== MONOGRAMMA ===== */
+.lgM{display:block;line-height:0}
+.lgM svg{display:block;width:46px;height:46px;overflow:visible;transition:width .35s,height .35s,transform .9s cubic-bezier(.2,.7,.2,1)}
+.lgM .mt{fill:#fff}.lgM .mm{fill:var(--pink)}
+.sc .lgM svg{width:36px;height:36px}
+.open .lgM svg{transform:rotate(-12deg)}
+@container (min-width:820px){.lgM svg{width:54px;height:54px}.sc .lgM svg{width:40px;height:40px}}
+
+/* ===== HEADER: parti comuni ===== */
+.hd{position:absolute;left:0;right:0;top:0;z-index:20}
+.hd::before{content:"";position:absolute;left:0;right:0;top:0;bottom:-28px;background:linear-gradient(rgba(4,27,56,.94),rgba(4,27,56,.62) 62%,rgba(4,27,56,0));opacity:0;transition:opacity .4s;pointer-events:none}
+.sc .hd::before{opacity:1}
+.H.open .hd::before{opacity:0}
+.bar{position:relative;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;transition:padding .35s}
+.sc .bar{padding:9px 20px}
+.nav{display:none}
+.mb{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 2px;background:none;border:0;color:var(--seal);font:500 .74rem var(--serif);letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+.mb i{display:block;width:22px;height:8px;border-top:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transition:transform .3s}
+.H.open .mb i{transform:scaleY(.2)}
+.mb .c{display:none}.H.open .mb .c{display:inline}.H.open .mb .o{display:none}
+.nav a,.mb,.items a,.lgM{outline-offset:6px}
+:focus-visible{outline:2px solid var(--pink)}
+
+/* pannello mobile a schermata intera */
+.panel{position:absolute;inset:0;z-index:15;padding:96px 26px 28px;display:flex;flex-direction:column;justify-content:center;
+  background:linear-gradient(rgba(4,27,56,.84),rgba(4,27,56,.97) 70%),url("img/luna-mobile.webp") 100% 8%/cover no-repeat;
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s,visibility .4s}
+.H.open .panel{opacity:1;visibility:visible;pointer-events:auto}
+.items{list-style:none;margin:0;padding:0}
+.items li{transform:translateY(16px);opacity:0;transition:transform .55s cubic-bezier(.2,.7,.2,1),opacity .55s}
+.H.open .items li{transform:none;opacity:1}
+.H.open .items li:nth-child(2){transition-delay:.06s}.H.open .items li:nth-child(3){transition-delay:.12s}.H.open .items li:nth-child(4){transition-delay:.18s}.H.open .items li:nth-child(5){transition-delay:.24s}
+.items a{display:flex;cursor:pointer;min-height:44px}
+.pf{margin-top:34px}
+.pf .tg{margin:0}
+
+/* ---- tratto di penna (variante B) ---- */
+.pen{position:absolute;left:0;bottom:-2px;width:100%;height:9px;overflow:visible;pointer-events:none}
+.pen path{fill:none;stroke:var(--pink);stroke-width:2;stroke-linecap:round;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .5s cubic-bezier(.3,.6,.2,1)}
+
+/* ================= A - ORBITA ================= */
+.dA .nav{position:relative;gap:34px;font:500 .74rem var(--serif);letter-spacing:.2em;text-transform:uppercase;padding-bottom:16px}
+.dA .nav a{padding:8px 0;color:var(--seal);opacity:.82;transition:color .25s,opacity .25s}
+.dA .nav a .n{display:none}
+.dA .nav:hover a:not(:hover){opacity:.5}
+.dA .nav a:hover,.dA .nav a.on{color:#fff;opacity:1}
+.dA .orb{position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(219,242,252,.4) 18%,rgba(219,242,252,.4) 82%,transparent)}
+.dA .orb i{position:absolute;top:-6px;left:0;width:12px;height:12px;border-radius:50%;background:var(--pink);transform:translateX(var(--x,0px));transition:transform .6s cubic-bezier(.3,1.25,.45,1)}
+.dA .orb i::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--deep);transform:translate(3px,-1.5px) scale(.86)}
+.dA .items li{border-top:1px solid rgba(219,242,252,.16)}
+.dA .items li:last-child{border-bottom:1px solid rgba(219,242,252,.16)}
+.dA .items a{align-items:baseline;gap:16px;padding:14px 0}
+.dA .items .n{font:italic 400 1rem "Fibonacci";color:var(--pink)}
+.dA .items .t{font:400 1.7rem/1 "Vetro",serif;font-variant-ligatures:none;text-transform:uppercase}
+
+/* ================= B - PENNA ================= */
+.dB .nav{gap:32px;align-items:center}
+.dB .nav a{position:relative;padding:10px 2px 14px;font:italic 400 1.1rem/1 var(--serif);color:var(--seal);opacity:.85;transition:opacity .25s}
+.dB .nav a .n{display:none}
+.dB .nav a:hover,.dB .nav a.on{opacity:1}
+.dB .nav a:hover .pen path,.dB .nav a.on .pen path{stroke-dashoffset:0}
+.dB .nav:hover a.on:not(:hover) .pen path{stroke-dashoffset:1}
+.dB .hd::after{content:"";position:absolute;left:20px;right:20px;bottom:0;height:1px;background:rgba(219,242,252,.14);opacity:1;transition:opacity .3s}
+.dB.sc .hd::after{opacity:0}
+.dB .items a{position:relative;align-items:baseline;padding:10px 0 16px;font:italic 400 2.2rem/1.05 var(--serif);width:max-content;max-width:100%}
+.dB .items .n{display:none}
+.dB .items .pen{bottom:4px}
+.dB.open .items .pen path{stroke-dashoffset:0;transition-duration:.8s}
+.dB.open .items li:nth-child(1) .pen path{transition-delay:.35s}.dB.open .items li:nth-child(2) .pen path{transition-delay:.5s}.dB.open .items li:nth-child(3) .pen path{transition-delay:.65s}.dB.open .items li:nth-child(4) .pen path{transition-delay:.8s}.dB.open .items li:nth-child(5) .pen path{transition-delay:.95s}
+
+/* ================= C - INDICE ================= */
+.dC .nav{grid-template-columns:repeat(5,auto);gap:0 34px;align-items:start}
+.dC .nav a{position:relative;display:block;min-width:84px;padding-top:11px;border-top:1px solid rgba(219,242,252,.26);color:var(--seal);opacity:.9;transition:opacity .3s}
+.dC .nav a::before{content:"";position:absolute;left:0;top:-1px;height:2px;width:0;background:var(--pink);transition:width .45s cubic-bezier(.3,.6,.2,1)}
+.dC .nav a:hover::before,.dC .nav a.on::before{width:100%}
+.dC .nav:hover a:not(:hover){opacity:.45}
+.dC .nav .n{display:block;font:italic 400 .86rem/1 "Fibonacci";color:var(--pink);max-height:1.4em;overflow:hidden;margin-bottom:6px;transition:max-height .35s,opacity .3s,margin .35s}
+.dC .nav .t{display:block;font:500 .72rem/1.2 var(--serif);letter-spacing:.2em;text-transform:uppercase;padding-bottom:4px}
+.dC.sc .nav .n{max-height:0;opacity:0;margin:0}
+.dC .bar{align-items:flex-start}
+.dC .items li{border-bottom:1px solid rgba(219,242,252,.16)}
+.dC .items li:first-child{border-top:1px solid rgba(219,242,252,.16)}
+.dC .items a{align-items:center;gap:18px;padding:10px 0}
+.dC .items .n{width:64px;font:italic 400 3rem/1 "Fibonacci";color:var(--pink);flex:none}
+.dC .items .t{font:500 .9rem/1.2 var(--serif);letter-spacing:.22em;text-transform:uppercase}
+
+/* ===== DESKTOP: barra con nav in linea ===== */
+@container (min-width:820px){
+  .bar{padding:30px 56px}.sc .bar{padding:12px 56px}
+  .nav{display:flex}.mb{display:none}.panel{display:none}
+  .dC .nav{display:grid}
+  .dB .hd::after{left:56px;right:56px}
+  .dA .nav{padding-bottom:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top"><h1>teloscrivo<i></i></h1>
+    <div class="grp" id="gDir"></div><div class="grp" id="gDev"></div><div class="grp" id="gSt"></div></div>
+  <p class="why" id="why"></p>
+  <div class="stagebox"><div class="device" id="dev"></div></div>
+</div>
+<script>
+const MONO='<svg viewBox="98 82 1605 1605" role="img" aria-label="teloscrivo"><g transform="translate(0 1760) scale(.1 -.1)"><path class="mt" d="M11629 16137 c-52 -47 -146 -153 -294 -332 -296 -358 -947 -1037 -1285 -1341 -1142 -1026 -2256 -1614 -3750 -1980 -291 -71 -429 -109 -735 -201 -404 -121 -425 -129 -1075 -394 -835 -341 -1888 -1078 -2193 -1534 -76 -113 -28 -97 191 64 374 273 692 464 1069 640 993 463 1937 700 3123 781 186 13 1036 26 1074 16 71 -18 61 -52 -104 -341 -56 -99 -165 -292 -242 -430 -77 -137 -164 -290 -193 -340 -29 -49 -85 -151 -125 -225 -40 -74 -119 -218 -175 -320 -980 -1776 -1610 -3415 -1767 -4590 -247 -1862 835 -3559 2656 -4165 700 -232 1462 -317 2166 -242 374 40 399 70 120 137 -1395 335 -2431 1634 -2697 3385 -32 213 -41 833 -15 1070 84 765 286 1520 685 2560 44 115 374 916 425 1032 409 926 731 1608 1220 2580 99 195 108 203 302 223 571 60 1548 218 2123 344 468 103 1116 281 1195 329 98 59 -39 63 -1223 39 -957 -20 -1825 -14 -1855 13 -37 34 -23 70 238 596 138 277 270 547 295 599 24 52 131 277 237 500 106 223 227 482 270 575 42 94 120 260 173 371 255 536 304 708 166 581z"/><path class="mm" d="M15856 7108 c-14 -24 -60 -128 -101 -233 -80 -204 -327 -712 -418 -862 -185 -304 -510 -757 -658 -918 -41 -44 -108 -121 -150 -170 -549 -644 -1456 -1255 -2299 -1546 -1655 -572 -3465 -57 -4399 1253 -176 247 -197 180 -86 -263 498 -1976 1934 -3204 3445 -2944 1826 314 3425 1745 4223 3780 255 652 509 1621 498 1908 -1 50 -23 48 -55 -5z"/></g></svg>';
+const ITEMS=[['01','Testi'],['02','Poesie'],['03','Racconti brevi'],['04','Dalle canzoni'],['05','TikTok']];
+const PEN='<svg class="pen" viewBox="0 0 100 9" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M1 6 C 14 2, 26 8, 41 4 S 70 7, 99 2.5"/></svg>';
+const ORB='<span class="orb" aria-hidden="true"><i></i></span>';
+const DIRS=[['A','A · Orbita'],['B','B · Penna'],['C','C · Indice']];
+const DESC={
+ A:'<b>A · Orbita.</b> Voci in maiuscoletto con una piccola luna rosa che scivola sotto la barra fino alla voce che tocchi, come un corpo in orbita. Le altre voci si abbassano di luce. Mobile: schermata intera con le voci grandi in Vetro.',
+ B:'<b>B · Penna.</b> Voci in corsivo, scritte a mano più che stampate: al passaggio una linea rosa viene tracciata sotto la parola come un segno di penna. È la più "graffiante". Mobile: le voci grandi in corsivo e le linee si tracciano una dopo l\'altra.',
+ C:'<b>C · Indice.</b> Cinque colonne numerate 01-05 con una riga in alto che si colora di rosa, come l\'indice di un libro. È la più editoriale. Allo scroll i numeri spariscono e resta solo la riga. Mobile: numeri enormi in Fibonacci accanto a ogni voce.'
+};
+let dir='A',mode='m',st='top';
+(()=>{const h=location.hash.slice(1).split('-');if(['A','B','C'].includes(h[0]))dir=h[0];if(h[1]==='d')mode='d';if(['top','scroll','menu'].includes(h[2]))st=h[2]})();
+const $=id=>document.getElementById(id), dev=$('dev');
+function chip(box,label,on,fn,dis){const b=document.createElement('button');b.textContent=label;b.setAttribute('aria-pressed',on);if(dis)b.disabled=true;b.onclick=fn;box.appendChild(b)}
+function setHash(){history.replaceState(null,'','#'+dir+'-'+mode+'-'+st)}
+function header(){
+  const nav=ITEMS.map(([n,t],i)=>`<a href="#" class="${i?'':'on'}"><span class="n">${n}</span><span class="t">${t}</span>${dir==='B'?PEN:''}</a>`).join('');
+  const li=ITEMS.map(([n,t])=>`<li><a href="#"><span class="n">${n}</span><span class="t">${t}</span>${dir==='B'?PEN:''}</a></li>`).join('');
+  return `<header class="hd"><div class="bar"><a href="#" class="lgM" aria-label="teloscrivo, home">${MONO}</a>
+   <nav class="nav" aria-label="Principale">${nav}${dir==='A'?ORB:''}</nav>
+   <button class="mb" data-mb aria-expanded="false" aria-controls="pnl"><span class="o">Menu</span><span class="c">Chiudi</span><i></i></button></div></header>
+   <div class="panel" id="pnl"><ul class="items">${li}</ul><div class="pf"><div class="tg">La luna porta consiglio</div></div></div>`;
+}
+function render(){
+  dev.className='device'+(mode==='d'?' d':'');
+  dev.innerHTML=`<div class="H d${dir}"><div class="sk2"><div class="moon"></div><div class="veil"></div></div>
+   <div class="scroller" id="sc"><section class="hero"><div class="in"><div class="big">teloscrivo<i></i></div><div class="tg">La luna porta consiglio</div></div></section>
+   <section class="more"><p class="lab">Ultimi testi</p><div class="wrap"><article><h3>Notte senza fine</h3><p>Una poesia sul non riuscire a dormire.</p></article><article><h3>Le cose che non ti ho detto</h3><p>Un racconto breve, tre pagine.</p></article><article><h3>Piove da ieri</h3><p>Pensieri sparsi di novembre.</p></article></div><p class="ex">Titoli di esempio, solo per vedere la barra scorrere.</p></section></div>${header()}</div>`;
+  const H=dev.querySelector('.H'),sc=$('sc'),mb=dev.querySelector('[data-mb]');
+  const upd=()=>H.classList.toggle('sc',sc.scrollTop>40);
+  sc.addEventListener('scroll',upd);
+  const setOpen=o=>{H.classList.toggle('open',o);mb.setAttribute('aria-expanded',o)};
+  mb.onclick=()=>setOpen(!H.classList.contains('open'));
+  addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
+  H.addEventListener('click',e=>{const a=e.target.closest('a[href="#"]');if(a)e.preventDefault()});
+  // A: la luna in orbita segue la voce
+  const nav=H.querySelector('.nav'),orb=H.querySelector('.orb i');
+  if(orb){const go=a=>{const r=a.getBoundingClientRect(),n=nav.getBoundingClientRect(),k=n.width/nav.offsetWidth||1;nav.style.setProperty('--x',((r.left-n.left)/k+a.offsetWidth/2-6)+'px');orb.style.setProperty('--x',((r.left-n.left)/k+a.offsetWidth/2-6)+'px')};
+    const links=[...nav.querySelectorAll('a')];let cur=links[0];requestAnimationFrame(()=>go(cur));
+    links.forEach(a=>{a.onmouseenter=()=>go(a);a.onclick=()=>{links.forEach(l=>l.classList.remove('on'));a.classList.add('on');cur=a};});nav.onmouseleave=()=>go(cur)}
+  // B/C: la voce toccata diventa attiva
+  if(dir!=='A')H.querySelectorAll('.nav a').forEach(a=>a.onclick=()=>{H.querySelectorAll('.nav a').forEach(l=>l.classList.remove('on'));a.classList.add('on')});
+  if(st==='scroll'){sc.scrollTop=320;upd()}
+  if(st==='menu'&&mode==='m')setOpen(true);
+  $('why').innerHTML=DESC[dir]+' La home è sempre la stessa (titolo, frase, luna): cambiano solo header e nav bar. Il monogramma resta sempre visibile e si rimpicciolisce allo scroll.';
+  const g1=$('gDir'),g2=$('gDev'),g3=$('gSt');g1.innerHTML=g2.innerHTML=g3.innerHTML='';
+  g1.innerHTML='<span>Direzione</span>';g2.innerHTML='<span>Schermo</span>';g3.innerHTML='<span>Stato</span>';
+  DIRS.forEach(([k,l])=>chip(g1,l,dir===k,()=>{dir=k;setHash();render()}));
+  chip(g2,'Mobile',mode==='m',()=>{mode='m';setHash();render()});chip(g2,'Desktop',mode==='d',()=>{mode='d';if(st==='menu')st='top';setHash();render()});
+  [['top','In alto'],['scroll','Scrollato'],['menu','Menu aperto']].forEach(([k,l])=>chip(g3,l,st===k,()=>{st=k;setHash();render()},k==='menu'&&mode==='d'));
+}
+render();
+</script>
+</body>
+</html>

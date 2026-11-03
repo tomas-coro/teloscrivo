@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog personale · direzioni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&family=Hedvig+Letters+Serif&family=Sora:wght@400;500;600&family=Spectral:ital,wght@0,400;0,600;1,400&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171e; --ink-2:#1b1f28; --ink-3:#232936;
+    --line:#323a4a; --bone:#e9e4d8; --bone-dim:#a39e93;
+    --brass:#e0a96d; --brass-deep:#b9824a; --ok:#7fb59a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%, #1d2230 0, transparent 60%), var(--ink);
+    color:var(--bone); font-family:"Hanken Grotesk",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 64px}
+
+  header.top{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+  .eyebrow{font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:700}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(1.4rem,4vw,2rem);margin:.35rem 0 0;letter-spacing:-.015em}
+  .lead{color:var(--bone-dim);font-size:.9rem;margin:.45rem 0 0;max-width:56ch;text-wrap:pretty}
+
+  #chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+  #chips button{
+    font:inherit;font-weight:600;font-size:.84rem;color:var(--bone-dim);
+    background:var(--ink-2);border:1px solid var(--line);border-radius:11px;
+    padding:10px 15px;min-height:44px;cursor:pointer;display:flex;align-items:center;gap:8px;
+    transition:color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  #chips button:hover{color:var(--bone)}
+  #chips button[aria-pressed="true"]{border-color:var(--brass);color:var(--bone);background:var(--ink-3)}
+  #chips button .swatch{width:11px;height:11px;border-radius:4px;background:var(--brass);flex:none}
+
+  #stage{position:relative}
+  .dir-panel[hidden]{display:none}
+  .dir-panel{animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .dir-card{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .dir-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .dir-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.1rem;line-height:1.15}
+  .dir-mood{font-size:.74rem;color:var(--bone-dim);margin-top:2px}
+  .dir-tag{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:5px 9px;border-radius:99px;white-space:nowrap;background:var(--ink-3);color:var(--bone-dim);border:1px solid var(--line)}
+  .dir-body{padding:20px 18px}
+  .dir-why{display:flex;gap:9px;align-items:flex-start;padding:13px 18px;border-top:1px solid var(--line);background:rgba(255,255,255,.015);font-size:.82rem;color:var(--bone-dim)}
+  .dir-why b{color:var(--bone);font-weight:600}
+
+  /* ───────── barra comandi: palette + dispositivo ───────── */
+  .tb{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:0 0 16px;padding:12px 14px;background:var(--ink-2);border:1px solid var(--line);border-radius:14px}
+  .tb-g{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tb-l{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--bone-dim);font-weight:700}
+  .pal{display:flex;width:44px;height:44px;padding:0;background:var(--ink-3);border:2px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .15s ease,border-color .15s ease}
+  .pal:hover{transform:translateY(-2px)}
+  .pal i{flex:1}
+  .pal[aria-pressed="true"]{border-color:var(--brass)}
+  #palName{font-size:.86rem;font-weight:600;min-width:9ch}
+  .seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{font:inherit;font-size:.82rem;font-weight:600;min-height:44px;padding:0 16px;background:var(--ink-3);color:var(--bone-dim);border:0;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--brass);color:#1a1206}
+
+  /* ───────── palette (variabili sul palco, condivise da tutte le direzioni) ───────── */
+  #stage[data-pal="0"]{--bg:#F2EADB;--ink:#2A2520;--mut:#6B6153;--surf:#E8DDC8;--a1:#8A5A3C;--on1:#F7F0E3;--a2:#C9A66B;--on2:#2A2520;--a3:#5E6C52;--on3:#F7F0E3;--a4:#E2CFA6;--on4:#2A2520}
+  #stage[data-pal="1"]{--bg:#E9E6DF;--ink:#1D2125;--mut:#5A5F64;--surf:#DAD6CC;--a1:#1D2125;--on1:#E9E6DF;--a2:#A8A090;--on2:#1D2125;--a3:#7F8C85;--on3:#121619;--a4:#CFC9BA;--on4:#1D2125}
+  #stage[data-pal="2"]{--bg:#FFFFFF;--ink:#0C2A2A;--mut:#3B6666;--surf:#E9FBFD;--a1:#FF69B4;--on1:#2A0A1A;--a2:#069494;--on2:#021212;--a3:#AEF4FA;--on3:#0C2A2A;--a4:#FFD0E8;--on4:#3A0F26}
+  #stage[data-pal="3"]{--bg:#FBF5FC;--ink:#2F2450;--mut:#655A85;--surf:#F3E4F1;--a1:#B298E7;--on1:#231744;--a2:#B8E3E9;--on2:#231744;--a3:#F5B8D5;--on3:#3A0F26;--a4:#F9BEDD;--on4:#3A0F26}
+  #stage[data-pal="4"]{--bg:#F2F0EF;--ink:#1E2A30;--mut:#566066;--surf:#E3E0DE;--a1:#245F73;--on1:#F2F0EF;--a2:#733E24;--on2:#F6EDE7;--a3:#BBBDBC;--on3:#1E2A30;--a4:#DCD3CB;--on4:#1E2A30}
+  #stage[data-pal="5"]{--bg:#F7F5E6;--ink:#2D2A3B;--mut:#5C5870;--surf:#E3F2EE;--a1:#81D8D0;--on1:#0F2E2B;--a2:#D99E82;--on2:#2B160B;--a3:#AE82D9;--on3:#1D1030;--a4:#D7D982;--on4:#2D2A3B}
+  #stage[data-pal="6"]{--bg:#260A18;--ink:#F4E7D1;--mut:#C7AE96;--surf:#3A1129;--a1:#DAA520;--on1:#260A18;--a2:#8E4585;--on2:#FFF1DC;--a3:#2E6F40;--on3:#F4E7D1;--a4:#660033;--on4:#F4E7D1}
+
+  /* ───────── cornice dispositivo ───────── */
+  .dev{position:relative;container-type:inline-size;margin:0 auto;background:var(--bg);color:var(--ink);overflow:hidden;
+    --rule:color-mix(in srgb,var(--ink) 16%,transparent);transition:background .4s ease,color .4s ease}
+  #stage[data-view="m"] .dev{width:390px;max-width:100%;height:720px;border-radius:30px;border:8px solid #0b0d12}
+  #stage[data-view="d"] .dev{width:100%;height:660px;border-radius:12px;border:1px solid var(--line)}
+  .scr{height:100%;overflow:auto}
+  .d1{--fd:'Young Serif',serif;--fb:'Archivo',sans-serif;font-family:var(--fb)}
+  .d2{--fd:'Bricolage Grotesque',sans-serif;--fb:'Spectral',serif;font-family:var(--fb)}
+  .d3{--fd:'Hedvig Letters Serif',serif;--fb:'Sora',sans-serif;font-family:var(--fb)}
+  .dev button{font-family:inherit}
+
+  /* tag per tipo: il colore ha un ruolo (poesia / racconto / pensiero / altro) */
+  .tg{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:4px}
+  .c1{background:var(--a1);color:var(--on1)} .c2{background:var(--a2);color:var(--on2)}
+  .c3{background:var(--a3);color:var(--on3)} .c4{background:var(--a4);color:var(--on4)}
+  .f1{fill:var(--a1)} .f2{fill:var(--a2)} .f3{fill:var(--a3)} .f4{fill:var(--a4)}
+  .art{display:block;width:100%;height:100%}
+
+  /* rivelazioni */
+  .rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .rv.in{opacity:1;transform:none}
+  .rvo{opacity:0}.rvo.in{opacity:1}
+  .ln{display:block;opacity:0;transform:translateY(8px);transition:opacity .7s ease,transform .7s ease;transition-delay:calc(var(--i,0)*110ms)}
+  .in .ln{opacity:1;transform:none}
+  .ln.br{height:1em}
+
+  /* ───────── lettore (overlay, sfondo bloccato) ───────── */
+  .ov{position:absolute;inset:0;background:var(--bg);color:var(--ink);overflow:auto;z-index:20;transform:translateY(102%);visibility:hidden;
+    transition:transform .5s cubic-bezier(.2,.8,.2,1),visibility 0s .5s}
+  .dev.open .ov{transform:none;visibility:visible;transition:transform .5s cubic-bezier(.2,.8,.2,1),visibility 0s}
+  .rd-bar{position:sticky;top:0;display:block;height:4px;margin-bottom:-4px;z-index:3}
+  .rd-bar b{display:block;height:100%;width:0;background:var(--a1)}
+  .rd-x{position:sticky;top:12px;z-index:3;display:flex;align-items:center;width:max-content;margin:12px 16px 0;min-height:44px;padding:0 16px;font-size:.86rem;font-weight:600;
+    background:var(--surf);color:var(--ink);border:1px solid var(--rule);border-radius:8px;cursor:pointer}
+  .rd-x:hover{background:var(--a4);color:var(--on4)}
+  .rd-in{max-width:620px;margin:0 auto;padding:18px 22px 90px}
+  .rd-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.8rem;color:var(--mut)}
+  .rd-t{font-family:var(--fd);font-weight:400;font-size:2.1rem;line-height:1.08;margin:.55rem 0 1.4rem;letter-spacing:-.01em}
+  .d2 .rd-t{font-weight:700;font-size:2.4rem;letter-spacing:-.025em}
+  .dev h2.rd-t{margin:.7rem 0 1.6rem;font-size:2.2rem}
+  .dev.d2 h2.rd-t{font-size:2.5rem}
+  .rd-x:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .rd-poem{font-family:var(--fd);font-size:1.3rem;line-height:1.7}
+  .d2 .rd-poem{font-family:var(--fb);font-style:italic;font-size:1.45rem}
+  .rd-img{height:170px;border-radius:6px;overflow:hidden;margin:0 0 22px}
+  .rd-p{font-family:var(--fb);font-size:1.06rem;line-height:1.75;margin:0 0 1.1em;text-wrap:pretty}
+  .rd-p:first-of-type::first-letter{float:left;font-family:var(--fd);font-size:3.1em;line-height:.82;padding:.06em .08em 0 0;color:var(--ink)}
+  .rd-q{margin:0;font-family:var(--fd);font-size:1.6rem;line-height:1.35;padding-left:18px;border-left:4px solid var(--a1)}
+  .rd-list{margin:16px 0 0;padding:0;list-style:none;counter-reset:l}
+  .rd-list li{counter-increment:l;display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--rule);font-size:1.05rem;line-height:1.5}
+  .rd-list li::before{content:counter(l,decimal-leading-zero);font-family:var(--fd);color:var(--mut);flex:none}
+  .rd-end{text-align:center;letter-spacing:.6em;color:var(--mut);margin:36px 0 0}
+  .dev.open .scr{overflow:hidden}
+
+  /* ───────── D1 · Il Quaderno (feed unico + filtri) ───────── */
+  .d1-wrap{max-width:1000px;margin:0 auto;padding:24px 20px 56px}
+  .d1-eyebrow{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);font-weight:600}
+  .d1 h2{font-family:var(--fd);font-weight:400;font-size:2.1rem;line-height:1.05;margin:.35rem 0 .6rem;letter-spacing:-.01em}
+  .d1-brand p{font-size:.92rem;color:var(--mut);margin:0 0 16px;max-width:34ch;text-wrap:pretty}
+  .d1-filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .d1-filters button{font-size:.82rem;font-weight:600;min-height:44px;padding:0 14px;border-radius:6px;background:transparent;color:var(--ink);border:1px solid var(--rule);cursor:pointer;transition:background .2s ease,color .2s ease}
+  .d1-filters button:hover{background:var(--surf)}
+  .d1-filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .d1-rnd{font-size:.86rem;font-weight:700;min-height:44px;padding:0 18px;background:var(--a1);color:var(--on1);border:0;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .d1-rnd span{display:inline-block;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .d1-rnd:hover span{transform:rotate(180deg)}
+  .d1-side{margin-bottom:8px}
+  .d1-item{border-top:1px solid var(--rule);padding:28px 0 30px}
+  .d1-meta{display:flex;align-items:center;gap:10px;font-size:.78rem;color:var(--mut);margin-bottom:12px}
+  .d1-item h3{margin:0 0 14px;font-family:var(--fd);font-weight:400;font-size:1.55rem;line-height:1.15}
+  .d1-tt{all:unset;cursor:pointer;display:block}
+  .d1-tt:focus-visible{outline:2px solid var(--a1);outline-offset:4px}
+  .hl{background:linear-gradient(var(--a4),var(--a4)) 0 90%/0% 40% no-repeat;transition:background-size .45s cubic-bezier(.2,.8,.2,1)}
+  .d1-tt:hover .hl,.d1-tt:focus-visible .hl{background-size:100% 40%}
+  .d1-poem{font-family:var(--fd);font-size:1.1rem;line-height:1.7;padding-left:16px;border-left:3px solid var(--a1)}
+  .d1-img{height:120px;border-radius:4px;overflow:hidden;margin-bottom:14px}
+  .d1-item p{margin:0 0 12px;line-height:1.65;font-size:1rem;text-wrap:pretty}
+  .d1-more{font-size:.86rem;font-weight:700;min-height:44px;padding:0;background:none;border:0;border-bottom:2px solid var(--a1);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center}
+  .d1-q{margin:0;font-family:var(--fd);font-size:1.4rem;line-height:1.35}
+  .d1-q::before{content:"\201C";display:block;font-size:3.2rem;line-height:.6;color:var(--a1);margin-bottom:.2em}
+  @container (min-width:720px){
+    .d1-wrap{display:grid;grid-template-columns:250px 1fr;gap:56px;padding:44px 40px 70px}
+    .d1-side{position:sticky;top:44px;align-self:start}
+    .d1 h2{font-size:2.7rem}
+    .d1-feed{max-width:560px}
+    .d1-item:first-child{border-top:0;padding-top:0}
+    .d1-filters{flex-direction:column;align-items:flex-start;margin-bottom:18px}
+  }
+
+  /* ───────── D2 · Le Stanze (pannelli che si espandono) ───────── */
+  .d2s{display:flex;flex-direction:column;overflow:hidden}
+  .d2-top{flex:none;display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 18px;border-bottom:1px solid var(--rule)}
+  .d2-top b{font-family:var(--fd);font-size:1.05rem;letter-spacing:-.01em}
+  .d2-top span{font-size:.74rem;color:var(--mut)}
+  .d2-rooms{flex:1;min-height:0;display:flex;flex-direction:column}
+  .d2-room{flex:0 0 68px;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:flex .55s cubic-bezier(.2,.8,.2,1);border-top:1px solid rgba(0,0,0,.14)}
+  .d2-room:first-child{border-top:0}
+  .d2-room.open{flex:1 1 0}
+  .d2-room[data-s="1"]{background:var(--a1);color:var(--on1)}
+  .d2-room[data-s="2"]{background:var(--a3);color:var(--on3)}
+  .d2-room[data-s="3"]{background:var(--a2);color:var(--on2)}
+  .d2-room[data-s="4"]{background:var(--a4);color:var(--on4)}
+  .d2-head{flex:none;display:flex;align-items:center;gap:14px;width:100%;min-height:68px;padding:0 18px;background:none;border:0;color:inherit;text-align:left;cursor:pointer}
+  .d2-head:focus-visible{outline:2px solid currentColor;outline-offset:-4px}
+  .d2-head .n{font:600 .76rem var(--fd);opacity:.75}
+  .d2-head .t{flex:1;font-family:var(--fd);font-weight:700;font-size:2rem;letter-spacing:-.025em;line-height:1}
+  .d2-head .c{font-size:.82rem;opacity:.8}
+  .d2-body{flex:1;min-height:0;overflow:auto;padding:0 18px 18px;opacity:0;transform:translateY(10px);transition:opacity .4s ease .2s,transform .4s ease .2s}
+  .d2-room.open .d2-body{opacity:1;transform:none}
+  .d2-room:not(.open) .d2-body{visibility:hidden}
+  .d2-lab{margin:0 0 6px;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;opacity:.75}
+  .d2-last{margin:0 0 8px;font-family:var(--fd);font-weight:700;font-size:1.6rem;line-height:1.1;letter-spacing:-.02em}
+  .d2-snip{margin:0 0 16px;font-style:italic;font-size:1.05rem;line-height:1.55;max-width:42ch;text-wrap:pretty}
+  .d2-list{list-style:none;margin:0;padding:0}
+  .d2-list button{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;min-height:48px;padding:0;background:none;border:0;border-top:1px solid currentColor;color:inherit;font-size:1.02rem;text-align:left;cursor:pointer;transition:padding .25s ease}
+  .d2-list button:hover{padding-left:10px}
+  .d2-list em{font-size:.78rem;opacity:.75;font-style:normal;flex:none}
+  @container (min-width:720px){
+    .d2-rooms{flex-direction:row}
+    .d2-room{flex:0 0 104px;flex-direction:row;border-top:0;border-left:1px solid rgba(0,0,0,.14)}
+    .d2-room:first-child{border-left:0}
+    .d2-room.open{flex:1 1 0}
+    .d2-head{flex:none;flex-direction:column;align-items:center;justify-content:flex-start;width:104px;height:100%;min-height:0;padding:20px 0;gap:18px}
+    .d2-head .t{flex:1;font-size:3rem;writing-mode:vertical-rl;transform:rotate(180deg)}
+    .d2-head .c{writing-mode:vertical-rl;transform:rotate(180deg)}
+    .d2-body{flex:1 0 360px;padding:34px 34px 30px 6px}
+    .d2-last{font-size:2.3rem}
+  }
+
+  /* ───────── D3 · La Bacheca (carte sparse e trascinabili) ───────── */
+  .d3{padding:26px 18px 56px;min-height:100%}
+  .d3-eyebrow{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);font-weight:600}
+  .d3 h2{font-family:var(--fd);font-weight:400;font-size:2.5rem;line-height:1;margin:.4rem 0 0;letter-spacing:-.02em}
+  .d3-sc{display:block;width:210px;height:22px;margin:4px 0 12px}
+  .d3-sc path{stroke:var(--a1);stroke-width:4;stroke-linecap:round;fill:none;stroke-dasharray:300;stroke-dashoffset:300;animation:draw 1.3s .3s forwards ease-out}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .d3-sub{font-size:.9rem;color:var(--mut);margin:0 0 16px;max-width:36ch;line-height:1.55}
+  .d3-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .d3-rnd{font-size:.86rem;font-weight:600;min-height:44px;padding:0 18px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;cursor:pointer;transition:transform .15s ease}
+  .d3-rnd:hover{transform:translateY(-2px) rotate(-1.5deg)}
+  .d3-hint{display:none;font-size:.78rem;color:var(--mut)}
+  .d3-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 14px;align-items:start;margin-top:30px}
+  .d3-card{position:relative;display:block;text-align:left;padding:0;border:1px solid rgba(0,0,0,.1);border-radius:6px;cursor:pointer;overflow:visible;color:inherit;
+    margin-top:var(--oy,0px);transform:translate(var(--dx,0px),var(--dy,0px)) rotate(var(--r,0deg)) scale(var(--s,1));
+    transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .6s ease calc(var(--k,0)*70ms),box-shadow .3s ease;
+    box-shadow:0 12px 18px -14px rgba(0,0,0,.45);touch-action:pan-y;user-select:none}
+  .d3-card:hover,.d3-card:focus-visible{--r:0deg;--s:1.04;z-index:4;box-shadow:0 18px 24px -14px rgba(0,0,0,.5)}
+  .d3-card:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+  .d3-card.drag{transition:none;--s:1.06;--r:0deg;z-index:6;cursor:grabbing}
+  .d3-card[data-s="1"]{background:var(--a1);color:var(--on1)}
+  .d3-card[data-s="2"]{background:var(--a3);color:var(--on3)}
+  .d3-card[data-s="3"]{background:var(--a2);color:var(--on2)}
+  .d3-card[data-s="4"]{background:var(--a4);color:var(--on4)}
+  .d3-fl{display:block;animation:bob 5s ease-in-out infinite alternate;animation-delay:calc(var(--k,0)*-1.1s)}
+  @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+  .d3-pic{display:block;height:74px;overflow:hidden;border-radius:5px 5px 0 0}
+  .d3-txt{display:block;padding:14px 14px 16px}
+  .d3-k{display:block;white-space:nowrap;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;opacity:.8;margin-bottom:8px}
+  .d3-tt{display:block;font-family:var(--fd);font-size:1.22rem;line-height:1.14;margin-bottom:8px}
+  .d3-sn{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;font-size:.8rem;line-height:1.55;opacity:.92}
+  @container (min-width:720px){
+    .d3{padding:44px 40px 70px}
+    .d3 h2{font-size:4rem}
+    .d3-sc{width:300px;height:26px}
+    .d3-hint{display:block}
+    .d3-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:26px 22px}
+    .d3-card:active{cursor:grabbing}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .d3-sc path{stroke-dashoffset:0!important}
+    .rv,.rvo,.ln{opacity:1!important;transform:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Blog personale · 3 direzioni</div>
+    <h1 id="mockTitle">Poesie, mini racconti, pensieri</h1>
+    <p class="lead">Testi, titoli e date sono d'esempio, e il nome "Appunti a margine" è provvisorio. Cambia <b>palette</b> e <b>vista</b> qui sotto, poi tocca i testi per leggerli.</p>
+  </header>
+
+  <nav id="chips" role="tablist" aria-label="Direzioni"></nav>
+
+  <div class="tb" id="tb">
+    <div class="tb-g"><span class="tb-l">Palette</span><span id="pals" class="tb-g"></span><span id="palName"></span></div>
+    <div class="tb-g"><span class="tb-l">Vista</span>
+      <div class="seg" id="seg"><button type="button" data-v="m" aria-pressed="true">Mobile</button><button type="button" data-v="d" aria-pressed="false">Desktop</button></div>
+    </div>
+  </div>
+
+  <main id="stage" data-pal="0" data-view="m">
+    <div id="panels">
+
+      <section class="dir-panel" data-name="Il Quaderno" data-mood="editoriale · diario cronologico · alla Kinfolk" data-why="Un solo flusso che si legge come un diario: i filtri ordinano senza spezzare, le poesie si svelano verso per verso." data-role="">
+        <div class="dev d1" data-d="1"></div>
+      </section>
+
+      <section class="dir-panel" data-name="Le Stanze" data-mood="poster a colori · ogni genere ha la sua stanza · alla Pentagram" data-why="Il colore diventa il menu: tocchi una stanza (poesie, racconti...) e si apre, senza pagine da cercare." data-role="" hidden>
+        <div class="dev d2" data-d="2"></div>
+      </section>
+
+      <section class="dir-panel" data-name="La Bacheca" data-mood="collage tattile · frammenti sparsi · alla zine d'artista" data-why="I testi sono carte vive che galleggiano: sfogli a caso, trascini, ti perdi. Il blog diventa un luogo, non un elenco." data-role="" hidden>
+        <div class="dev d3" data-d="3"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ── Scocca generica: chip auto-costruiti dai pannelli, uno visibile alla volta ──
+(function(){
+  const panelsBox = document.getElementById('panels');
+  const panels = [...panelsBox.querySelectorAll('.dir-panel')];
+  const chips = document.getElementById('chips');
+
+  panels.forEach(p=>{
+    const inner = p.innerHTML;
+    const role = p.dataset.role || '';
+    const tag = role ? `<span class="dir-tag" data-role="${role}">${role}</span>` : `<span class="dir-tag">Direzione</span>`;
+    p.innerHTML = `
+      <div class="dir-card">
+        <div class="dir-head">
+          <div>
+            <div class="dir-name">${p.dataset.name||'Direzione'}</div>
+            <div class="dir-mood">${p.dataset.mood||''}</div>
+          </div>${tag}
+        </div>
+        <div class="dir-body">${inner}</div>
+        ${p.dataset.why ? `<div class="dir-why">✶&nbsp;<span><b>Perché:</b> ${p.dataset.why}</span></div>` : ``}
+      </div>`;
+  });
+
+  function show(i){
+    panels.forEach((p,j)=>p.toggleAttribute('hidden', j!==i));
+    [...chips.children].forEach((c,j)=>c.setAttribute('aria-pressed', j===i));
+  }
+
+  panels.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-pressed', i===0 ? 'true':'false');
+    b.innerHTML = `<span class="swatch"></span>${p.dataset.name || ('Direzione '+(i+1))}`;
+    b.addEventListener('click', ()=>show(i));
+    chips.appendChild(b);
+  });
+
+  show(0);
+})();
+</script>
+
+<script>
+// ── Blog: dati finti, palette, vista, tre direzioni, lettore ──
+(function(){
+  const stage = document.getElementById('stage');
+  const chips = document.getElementById('chips');
+
+  // Testi d'esempio (finti). Riga vuota = pausa tra strofe.
+  const T = [
+    {id:1,tipo:'poesia',titolo:'Settembre in cucina',data:'12 ott',min:1,
+      righe:['Il caffè sale piano,','come una promessa','che nessuno ha fatto.','','Fuori la luce cambia casa','e io resto,','con le mani tiepide','e un\'estate che non so dove mettere.']},
+    {id:2,tipo:'racconto',titolo:'L\'ultimo posto in fondo',data:'8 ott',min:3,img:0,
+      par:['Ogni sera, alle 18:40, il tram si svuotava e restava solo lei, all\'ultimo posto in fondo, con una busta di arance sulle ginocchia e un sorriso che cambiava di mano a ogni fermata.',
+           'Nessuno sapeva dove scendesse. Il bigliettaio diceva «al capolinea», il ragazzo con le cuffie diceva «mai», e io, che prendevo quel tram da undici mesi, non avevo mai avuto il coraggio di voltarmi.',
+           'Una sera il tram frenò più forte del solito e le arance rotolarono giù per il corridoio, fino ai miei piedi. Ne raccolsi una. Era tiepida, come se qualcuno la stesse tenendo in mano da sempre.',
+           '«Tienila» disse. «Domani ti dico dove scendo.» Il giorno dopo sono salito un\'ora prima, solo per assicurarmi che il tram esistesse ancora.']},
+    {id:3,tipo:'pensiero',titolo:'Restare e partire',data:'5 ott',min:1,
+      testo:'Scrivere è l\'unico modo che conosco per restare fermo e partire insieme.'},
+    {id:4,tipo:'poesia',titolo:'Conta fino a tre',data:'29 set',min:1,
+      righe:['Uno: respira.','Due: non rispondere.','Tre: guarda come l\'acqua','trova sempre la strada','senza chiedere il permesso','a nessuno.']},
+    {id:5,tipo:'altro',titolo:'Suoni d\'autunno',data:'27 set',min:2,img:1,
+      intro:'Cinque suoni che per me sono già novembre. Se li senti, anche tu sai che è cambiata stagione.',
+      lista:['Un pianoforte in una stanza vuota','La voce di mia nonna, registrata al telefono','La pioggia sul tetto del garage','Il rumore della caffettiera alle sei','Un treno lontano, di notte']},
+    {id:6,tipo:'racconto',titolo:'Quarantadue passi',data:'20 set',min:2,img:2,
+      par:['Da casa mia al mare sono quarantadue passi, ma solo se non ti fermi a guardare nessuno. Io mi fermo sempre.',
+           'Per questo ci metto un\'ora, e per questo ormai mi conoscono tutti sul lungomare: il signore del giornale, i bambini con il secchiello, il cane che fa finta di non vedermi.']},
+    {id:7,tipo:'pensiero',titolo:'Il rumore delle cose non dette',data:'14 set',min:1,
+      testo:'Le cose non dette fanno più rumore di quelle gridate. Solo che nessuno ce lo insegna, e restiamo a chiedere silenzio.'}
+  ];
+  const LBL = {poesia:'Poesie',racconto:'Racconti',pensiero:'Pensieri',altro:'Altro'};
+  const TAG = {poesia:'Poesia',racconto:'Racconto',pensiero:'Pensiero',altro:'Altro'};
+  const COL = {poesia:1,racconto:3,pensiero:2,altro:4};   // slot palette per tipo
+
+  const tag = t => `<span class="tg c${COL[t.tipo]}">${TAG[t.tipo]}</span>`;
+  const lines = t => t.righe.map((r,i)=> r==='' ? `<span class="ln br"></span>` : `<span class="ln" style="--i:${i}">${r}</span>`).join('');
+  const cut = (s,n) => s.length>n ? s.slice(0,n).replace(/\s+\S*$/,'')+'…' : s;
+  const snip = t => t.tipo==='poesia' ? t.righe.filter(Boolean).slice(0,2).join(' / ')
+                  : t.tipo==='racconto' ? cut(t.par[0],110)
+                  : t.tipo==='pensiero' ? cut(t.testo,110) : cut(t.intro,110);
+
+  // Illustrazioni finte generate con i colori della palette
+  function art(seed){
+    const v = seed%3;
+    const s = [
+      `<rect width="120" height="80" class="f2"/><circle cx="86" cy="30" r="22" class="f4"/><path d="M0 80V54Q38 14 78 54V80Z" class="f1"/><rect x="78" y="62" width="42" height="18" class="f3"/>`,
+      `<rect width="120" height="80" class="f3"/><circle cx="44" cy="40" r="26" class="f1"/><circle cx="72" cy="40" r="26" class="f4" style="mix-blend-mode:multiply"/><rect y="68" width="120" height="12" class="f2"/>`,
+      `<rect width="120" height="80" class="f4"/><path d="M0 80A60 60 0 0 1 120 80Z" class="f2"/><path d="M20 80A40 40 0 0 1 100 80Z" class="f1"/><path d="M40 80A20 20 0 0 1 80 80Z" class="f3"/>`
+    ][v];
+    return `<svg class="art" viewBox="0 0 120 80" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${s}</svg>`;
+  }
+
+  // ───── Direzione 1: Il Quaderno ─────
+  function r1(){
+    const feed = T.map(t=>{
+      let b='';
+      if(t.tipo==='poesia') b=`<div class="d1-poem">${lines(t)}</div>`;
+      else if(t.tipo==='racconto') b=`<div class="d1-img">${art(t.img)}</div><p>${cut(t.par[0],170)}</p><button class="d1-more" type="button" data-open="${t.id}">Continua a leggere →</button>`;
+      else if(t.tipo==='pensiero') b=`<blockquote class="d1-q">${t.testo}</blockquote>`;
+      else b=`<div class="d1-img">${art(t.img)}</div><p>${t.intro}</p><button class="d1-more" type="button" data-open="${t.id}">Apri la lista →</button>`;
+      return `<article class="d1-item rv" data-tipo="${t.tipo}">
+        <div class="d1-meta">${tag(t)}<span>${t.data} · ${t.min} min</span></div>
+        <h3><button class="d1-tt" type="button" data-open="${t.id}"><span class="hl">${t.titolo}</span></button></h3>${b}</article>`;
+    }).join('');
+    const f = [['tutti','Tutti'],['poesia','Poesie'],['racconto','Racconti'],['pensiero','Pensieri'],['altro','Altro']]
+      .map(([k,l],i)=>`<button type="button" data-f="${k}" aria-pressed="${i===0}">${l}</button>`).join('');
+    return `<div class="scr"><div class="d1-wrap">
+      <aside class="d1-side"><div class="d1-brand"><span class="d1-eyebrow">nome provvisorio</span><h2>Appunti a margine</h2><p>Poesie, mini racconti e pensieri sparsi, scritti quando capita.</p></div>
+        <div class="d1-filters" role="group" aria-label="Filtra per tipo">${f}</div>
+        <button class="d1-rnd" type="button" data-rnd><span>↻</span>Sorprendimi</button></aside>
+      <main class="d1-feed">${feed}</main></div></div>`;
+  }
+
+  // ───── Direzione 2: Le Stanze ─────
+  function r2(){
+    const rooms = ['poesia','racconto','pensiero','altro'].map((k,i)=>{
+      const L = T.filter(t=>t.tipo===k), last = L[0];
+      return `<section class="d2-room${i===0?' open':''}" data-s="${i+1}">
+        <button class="d2-head" type="button" aria-expanded="${i===0}"><span class="n">0${i+1}</span><span class="t">${LBL[k]}</span><span class="c">${L.length} ${L.length===1?'testo':'testi'}</span></button>
+        <div class="d2-body"><p class="d2-lab">Ultimo pubblicato</p><h3 class="d2-last">${last.titolo}</h3><p class="d2-snip">${snip(last)}</p>
+          <ul class="d2-list">${L.map(t=>`<li><button type="button" data-open="${t.id}"><span>${t.titolo}</span><em>${t.data}</em></button></li>`).join('')}</ul></div>
+      </section>`;
+    }).join('');
+    return `<div class="d2-top"><b>Appunti a margine</b><span>nome provvisorio</span></div><div class="d2-rooms">${rooms}</div>`;
+  }
+
+  // ───── Direzione 3: La Bacheca ─────
+  const ROT=[-3,2.5,-1.5,3,-2.5,1.5,-3.5], OFF=[0,26,8,34,4,22,12];
+  function r3(){
+    const cards = T.map((t,i)=>{
+      const pic = (t.tipo==='racconto'||t.tipo==='altro') ? `<span class="d3-pic">${art(t.img)}</span>` : '';
+      return `<button class="d3-card rvo" type="button" data-open="${t.id}" data-s="${COL[t.tipo]}" style="--r:${ROT[i]}deg;--oy:${OFF[i]}px;--k:${i}">
+        <span class="d3-fl">${pic}<span class="d3-txt"><span class="d3-k">${TAG[t.tipo]} · ${t.data}</span><span class="d3-tt">${t.titolo}</span><span class="d3-sn">${snip(t)}</span></span></span></button>`;
+    }).join('');
+    return `<div class="scr"><div class="d3">
+      <span class="d3-eyebrow">nome provvisorio</span><h2>Appunti a margine</h2>
+      <svg class="d3-sc" viewBox="0 0 240 24" aria-hidden="true"><path d="M4 15C40 4 80 22 120 11S200 19 236 8"/></svg>
+      <p class="d3-sub">Frammenti di poesie, racconti e pensieri. Scegline uno a caso, o lasciati sorprendere.</p>
+      <div class="d3-row"><button class="d3-rnd" type="button" data-rnd>Sorprendimi</button><span class="d3-hint">Trascina le carte, tocca per leggere.</span></div>
+      <div class="d3-grid">${cards}</div></div></div>`;
+  }
+
+  // Overlay lettore, comune a tutte le direzioni
+  const OV = `<div class="ov" role="dialog" aria-modal="true" aria-label="Lettura"></div>`;
+  const renders = {1:r1,2:r2,3:r3};
+  document.querySelectorAll('.dev[data-d]').forEach(dev=>{
+    const n = dev.dataset.d;
+    dev.innerHTML = (n==='2' ? `<div class="scr d2s">${renders[n]()}</div>` : renders[n]()) + OV;
+  });
+
+  function readBody(t){
+    if(t.tipo==='poesia') return `<div class="rd-poem">${lines(t)}</div>`;
+    if(t.tipo==='racconto') return `<div class="rd-img">${art(t.img)}</div>` + t.par.map(p=>`<p class="rd-p">${p}</p>`).join('');
+    if(t.tipo==='pensiero') return `<blockquote class="rd-q">${t.testo}</blockquote>`;
+    return `<div class="rd-img">${art(t.img)}</div><p class="rd-p">${t.intro}</p><ol class="rd-list">${t.lista.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+  }
+  function openR(dev,id){
+    const t = T.find(x=>x.id==id); if(!t) return;
+    const ov = dev.querySelector('.ov'), scr = dev.querySelector('.scr');
+    ov.innerHTML = `<i class="rd-bar"><b></b></i><button class="rd-x" type="button">← Torna ai testi</button>
+      <div class="rd-in"><div class="rd-meta">${tag(t)}<span>${t.data} · ${t.min} min di lettura</span></div>
+      <h2 class="rd-t">${t.titolo}</h2>${readBody(t)}<p class="rd-end">· · ·</p></div>`;
+    const bar = ov.querySelector('.rd-bar b');
+    ov.onscroll = () => { const m = ov.scrollHeight-ov.clientHeight; bar.style.width = (m>0 ? ov.scrollTop/m*100 : 0)+'%'; };
+    ov.scrollTop = 0;
+    dev._from = document.activeElement;
+    dev.classList.add('open'); scr.inert = true;
+    requestAnimationFrame(()=>{ ov.querySelector('.rd-in').classList.add('in'); ov.querySelector('.rd-x').focus({preventScroll:true}); });
+  }
+  function closeR(dev){
+    if(!dev.classList.contains('open')) return;
+    dev.classList.remove('open'); dev.querySelector('.scr').inert = false;
+    if(dev._from && dev._from.focus) dev._from.focus({preventScroll:true});
+  }
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.dev.open').forEach(closeR); });
+
+  // Rivelazione allo scroll (dentro la cornice)
+  document.querySelectorAll('.dev .scr').forEach(scr=>{
+    const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }),{root:scr,threshold:.15});
+    scr.querySelectorAll('.rv,.rvo').forEach(el=>io.observe(el));
+  });
+
+  // Click: apre lettura, chiude, sorprendimi, filtri, stanze
+  document.querySelectorAll('.dev').forEach(dev=>{
+    dev.addEventListener('click',e=>{
+      const o = e.target.closest('[data-open]');
+      if(o){ if(o.dataset.moved) return; openR(dev,o.dataset.open); return; }
+      if(e.target.closest('.rd-x')){ closeR(dev); return; }
+      if(e.target.closest('[data-rnd]')){ openR(dev, T[Math.floor(Math.random()*T.length)].id); return; }
+      const f = e.target.closest('[data-f]');
+      if(f){
+        dev.querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed', b===f));
+        dev.querySelectorAll('.d1-item').forEach(it=>{
+          const ok = f.dataset.f==='tutti' || it.dataset.tipo===f.dataset.f;
+          it.hidden = !ok; it.classList.remove('in');
+          if(ok) requestAnimationFrame(()=>requestAnimationFrame(()=>it.classList.add('in')));
+        });
+        dev.querySelector('.scr').scrollTo({top:0});
+        return;
+      }
+      const h = e.target.closest('.d2-head');
+      if(h){ openRoom(dev,h.parentElement); }
+    });
+  });
+  function openRoom(dev,room){
+    dev.querySelectorAll('.d2-room').forEach(r=>{
+      const on = r===room; r.classList.toggle('open',on); r.querySelector('.d2-head').setAttribute('aria-expanded',on);
+    });
+  }
+  // Desktop: la stanza si apre anche al passaggio del mouse
+  document.querySelectorAll('.d2').forEach(dev=>{
+    dev.querySelectorAll('.d2-room').forEach(r=>r.addEventListener('mouseenter',()=>{ if(dev.clientWidth>=700 && !dev.classList.contains('open')) openRoom(dev,r); }));
+  });
+
+  // Bacheca: trascinamento carte (solo vista larga; click = apri)
+  document.querySelectorAll('.d3').forEach(root=>{
+    const dev = root.closest('.dev');
+    root.addEventListener('pointerdown',e=>{
+      const c = e.target.closest('.d3-card');
+      if(!c || dev.clientWidth<700 || e.button!==0) return;
+      const sx=e.clientX, sy=e.clientY;
+      const bx=parseFloat(c.style.getPropertyValue('--dx'))||0, by=parseFloat(c.style.getPropertyValue('--dy'))||0;
+      let moved=false; c.setPointerCapture(e.pointerId);
+      const mv=ev=>{
+        const dx=ev.clientX-sx, dy=ev.clientY-sy;
+        if(!moved && Math.hypot(dx,dy)>6){ moved=true; c.classList.add('drag'); }
+        if(moved){ c.style.setProperty('--dx',(bx+dx)+'px'); c.style.setProperty('--dy',(by+dy)+'px'); }
+      };
+      const up=()=>{
+        c.removeEventListener('pointermove',mv); c.removeEventListener('pointerup',up); c.removeEventListener('pointercancel',up);
+        c.classList.remove('drag');
+        if(moved){ c.dataset.moved='1'; setTimeout(()=>delete c.dataset.moved,80); }
+      };
+      c.addEventListener('pointermove',mv); c.addEventListener('pointerup',up); c.addEventListener('pointercancel',up);
+    });
+  });
+
+  // ───── Barra comandi: palette e vista ─────
+  const PAL = [
+    ['Carta',['#8A5A3C','#C9A66B','#5E6C52','#E2CFA6']],
+    ['Lino e inchiostro',['#1D2125','#A8A090','#7F8C85','#CFC9BA']],
+    ['Bubblegum pop',['#FF69B4','#069494','#AEF4FA','#FFD0E8']],
+    ['Cotton candy',['#B298E7','#B8E3E9','#F5B8D5','#F9BEDD']],
+    ['Terra e acciaio',['#245F73','#733E24','#BBBDBC','#DCD3CB']],
+    ['Retro calm',['#81D8D0','#D99E82','#AE82D9','#D7D982']],
+    ['Autunno (scuro)',['#DAA520','#8E4585','#2E6F40','#660033']]
+  ];
+  const pals = document.getElementById('pals'), palName = document.getElementById('palName');
+  PAL.forEach(([n,c],i)=>{
+    const b = document.createElement('button');
+    b.type='button'; b.className='pal'; b.title=n; b.setAttribute('aria-label','Palette '+n);
+    b.innerHTML = c.map(x=>`<i style="background:${x}"></i>`).join('');
+    b.addEventListener('click',()=>setPal(i));
+    pals.appendChild(b);
+  });
+  function setPal(i){
+    stage.dataset.pal = i; palName.textContent = PAL[i][0];
+    [...pals.children].forEach((b,j)=>b.setAttribute('aria-pressed', j===i));
+    try{ localStorage.setItem('blog-mock-pal', i); }catch(_){}
+  }
+  function setView(v){
+    stage.dataset.view = v;
+    document.querySelectorAll('#seg button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.v===v));
+    try{ localStorage.setItem('blog-mock-view', v); }catch(_){}
+  }
+  document.querySelectorAll('#seg button').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.v)));
+
+  // Stato iniziale: #direzione-palette-vista (es. #2-3-d) oppure ultimo scelto
+  let d=1,p=0,v='m';
+  try{ p=+localStorage.getItem('blog-mock-pal')||0; v=localStorage.getItem('blog-mock-view')||'m'; }catch(_){}
+  const m = location.hash.match(/^#(\d)-(\d)-([md])(?:-o(\d))?$/);
+  if(m){ d=+m[1]; p=+m[2]; v=m[3]; }
+  setPal(Math.min(p,PAL.length-1)); setView(v==='d'?'d':'m');
+  if(d>1 && chips.children[d-1]) chips.children[d-1].click();
+  if(m && m[4]) openR(document.querySelector('.dev[data-d="'+d+'"]'), m[4]);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  viewer-template.html · scocca del visualizzatore di direzioni (skill `mockup`)
+  ─────────────────────────────────────────────────────────────────────────────
+  SCOCCA FISSA, CONTENUTO VARIABILE.
+  La skill sostituisce SOLO il contenuto di <div id="panels"> con i 3/4 pannelli
+  reali. Ogni direzione è un <section class="dir-panel" data-name data-mood data-why>
+  che contiene SOLO il design di anteprima: la barra-titolo (nome+mood) e la riga
+  "perché" sono disegnate automaticamente dallo script qui sotto.
+  I chip in #chips sono generati automaticamente, uno per pannello.
+  NON modificare la scocca o lo script: cambia solo #panels (e <title>).
+-->
+<title>Animazioni di lettura · teloscrivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171e; --ink-2:#1b1f28; --ink-3:#232936;
+    --line:#323a4a; --bone:#e9e4d8; --bone-dim:#a39e93;
+    --brass:#e0a96d; --brass-deep:#b9824a; --ok:#7fb59a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%, #1d2230 0, transparent 60%), var(--ink);
+    color:var(--bone); font-family:"Hanken Grotesk",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 64px}
+
+  header.top{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+  .eyebrow{font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:700}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(1.4rem,4vw,2rem);margin:.35rem 0 0;letter-spacing:-.015em}
+  .lead{color:var(--bone-dim);font-size:.9rem;margin:.45rem 0 0;max-width:52ch}
+
+  /* chip bar */
+  #chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+  #chips button{
+    font:inherit;font-weight:600;font-size:.84rem;color:var(--bone-dim);
+    background:var(--ink-2);border:1px solid var(--line);border-radius:11px;
+    padding:10px 15px;min-height:44px;cursor:pointer;display:flex;align-items:center;gap:8px;
+    transition:color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  #chips button:hover{color:var(--bone)}
+  #chips button[aria-pressed="true"]{border-color:var(--brass);color:var(--bone);background:var(--ink-3)}
+  #chips button .swatch{width:11px;height:11px;border-radius:4px;background:var(--brass);flex:none}
+
+  /* palco */
+  #stage{position:relative}
+  .dir-panel[hidden]{display:none}
+  .dir-panel{animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .dir-card{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .dir-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .dir-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.1rem;line-height:1.15}
+  .dir-mood{font-size:.74rem;color:var(--bone-dim);margin-top:2px}
+  .dir-tag{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:5px 9px;border-radius:99px;white-space:nowrap;background:var(--ink-3);color:var(--bone-dim);border:1px solid var(--line)}
+  .dir-tag[data-role="Attuale"]{background:rgba(224,169,109,.16);color:var(--brass);border-color:var(--brass-deep)}
+  .dir-tag[data-role="Variante +"]{background:rgba(127,181,154,.14);color:var(--ok);border-color:#3f5a4f}
+  .dir-body{padding:20px 18px}
+  .dir-why{display:flex;gap:9px;align-items:flex-start;padding:13px 18px;border-top:1px solid var(--line);background:rgba(255,255,255,.015);font-size:.82rem;color:var(--bone-dim)}
+  .dir-why b{color:var(--bone);font-weight:600}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+
+  /* ───────── stili di esempio dei pannelli (la skill li sostituisce) ───────── */
+  .demo-nav{display:flex;gap:8px;align-items:center;font-size:.7rem;color:var(--bone-dim);margin-bottom:14px}
+  .demo-dot{width:8px;height:8px;border-radius:99px;background:var(--line)}
+  .demo-h{margin:0 0 8px;line-height:1.05}
+  .demo-p{margin:0 0 16px;font-size:.86rem;color:var(--bone-dim)}
+  .demo-btn{font:inherit;font-weight:700;font-size:.82rem;border:0;border-radius:9px;padding:11px 16px;min-height:44px;cursor:pointer;transition:transform .12s ease, filter .12s ease}
+  .demo-btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+  .t-edit .demo-h{font-family:"Bodoni Moda",serif;font-weight:500;font-size:1.7rem;color:#f1ece1}
+  .t-edit .demo-btn{background:#e9e4d8;color:#181818}
+  .t-retro{background:linear-gradient(180deg,#241a12,#1b1f28);margin:-20px -18px;padding:20px 18px;border-radius:0}
+  .t-retro .demo-h{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:500;font-size:1.7rem;color:#f0c98a}
+  .t-retro .demo-btn{background:#d98b3f;color:#1a1206}
+  .t-tech .demo-h{font-family:"Hanken Grotesk";font-weight:700;letter-spacing:-.02em;font-size:1.6rem;color:#dfe7f2}
+  .t-tech .demo-btn{background:#5b7fb0;color:#0c1118}
+
+  @font-face{font-family:"Fibonacci";src:url(../assets/fonts/fibonacci.ttf)}
+  .slowl{display:inline-flex;align-items:center;gap:8px;margin-top:12px;min-height:44px;font-size:.84rem;color:var(--bone-dim);cursor:pointer}
+  .slowl input{width:20px;height:20px;accent-color:#FD6E88}
+  .stagewrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .ph{--navy:#072D59;--seal:#DBF2FC;--pink:#FD6E88;position:relative;width:300px;height:560px;border-radius:28px;overflow:hidden;isolation:isolate;color:var(--seal);border:1px solid rgba(219,242,252,.22);background:radial-gradient(80% 36% at 50% 0,rgba(253,110,136,.2),transparent 72%),var(--navy)}
+  .home{position:absolute;inset:0;padding:20px 18px;transform-origin:50% 50%}
+  .logo{font:400 22px/1 Fibonacci,sans-serif;margin:6px 0 22px}.logo i{color:var(--pink);font-style:normal}
+  .row{display:block;width:100%;min-height:64px;text-align:left;padding:12px 4px;border:0;border-bottom:1px solid rgba(219,242,252,.18);background:none;color:inherit;font:inherit;cursor:pointer}
+  .rtt{display:inline-block;font:400 26px/1 Fibonacci,sans-serif;white-space:nowrap}
+  .rmt{display:block;margin-top:7px;font:600 10.5px "Hanken Grotesk",sans-serif;letter-spacing:.14em;color:rgba(219,242,252,.62)}
+  .rdp{position:absolute;inset:0;z-index:4;visibility:hidden;background:radial-gradient(70% 38% at 50% 0,rgba(253,110,136,.22),transparent 72%),var(--navy)}
+  .rin{padding:12px 20px}
+  .rback{min-height:44px;padding:0 12px;margin-left:-12px;border:0;background:none;color:var(--seal);font:600 12px "Hanken Grotesk",sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+  .rcap{margin:46px 0 14px;font:600 10.5px "Hanken Grotesk",sans-serif;letter-spacing:.16em;color:var(--pink)}
+  .rbig{margin:0 0 22px;font-weight:400}
+  .rbig .w{display:inline-block;overflow:hidden;padding-bottom:.14em;margin-bottom:-.14em;vertical-align:top}
+  .m,.clone{display:inline-block;font:400 44px/1 Fibonacci,sans-serif;white-space:nowrap}
+  .clone{position:absolute;z-index:6;transform-origin:0 0;pointer-events:none}
+  .rtxt{margin:0;font:300 16px/1.8 "Hanken Grotesk",sans-serif}.rtxt span{display:block}
+  .bands{position:absolute;inset:0;z-index:7;pointer-events:none}
+  .band{position:absolute;left:0;right:0;background:var(--pink);transform:scaleX(0);transform-origin:left}
+  .ctl{display:flex;gap:10px}
+  .ctl button{min-height:44px;padding:0 22px;border-radius:11px;border:1px solid var(--line);background:var(--ink-3);color:var(--bone);font:600 .84rem "Hanken Grotesk",sans-serif;cursor:pointer}
+  .ctl button:hover{border-color:var(--brass)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">teloscrivo · animazioni</div>
+    <h1 id="mockTitle">Aperture e chiusure della lettura</h1>
+    <p class="lead">3 aperture e 3 chiusure. Tocca una riga (o Apri), poi Indietro (o Chiudi). Testi e titoli sono finti, servono solo a vedere il movimento.</p>
+    <label class="slowl"><input type="checkbox" id="slow"> Rallenta x3 per vedere bene</label>
+  </header>
+
+  <nav id="chips" role="tablist" aria-label="Direzioni"></nav>
+
+  <main id="stage">
+    <div id="panels">
+<section class="dir-panel" data-name="Apertura A: foglio che sale" data-mood="iOS sheet · profondita" data-why="La home si scurisce e arretra, il foglio sale dal basso: capisci subito che c'e' un livello sopra e che si puo' tornare giu'." data-role=""><div class="stagewrap">
+<div class="ph" data-open="sheet" data-close="fade">
+  <div class="home"><div class="logo">teloscrivo<i>.</i></div><button type="button" class="row" data-t="Sale" data-m="POESIA · 14 SET"><span class="rtt">Sale</span><span class="rmt">POESIA · 14 SET</span></button><button type="button" class="row" data-t="Luce bassa" data-m="POESIA · 9 SET"><span class="rtt">Luce bassa</span><span class="rmt">POESIA · 9 SET</span></button><button type="button" class="row" data-t="Il treno" data-m="RACCONTO · 2 SET"><span class="rtt">Il treno</span><span class="rmt">RACCONTO · 2 SET</span></button><button type="button" class="row" data-t="Ritorno" data-m="TESTO · 28 AGO"><span class="rtt">Ritorno</span><span class="rmt">TESTO · 28 AGO</span></button></div>
+  <div class="rdp" aria-hidden="true"><div class="rin">
+    <button type="button" class="rback">&larr; Indietro</button>
+    <p class="rcap"></p><h4 class="rbig"></h4>
+    <p class="rtxt"><span>Una riga di prova, scritta piano.</span><span>Poi un&rsquo;altra, per vedere il ritmo.</span><span>E una terza che chiude il giro.</span></p>
+  </div></div>
+</div>
+<div class="ctl"><button type="button" data-do="open">Apri</button><button type="button" data-do="close">Chiudi</button></div>
+</div></section>
+<section class="dir-panel" data-name="Apertura B: righe di quaderno" data-mood="wipe a strisce · carta" data-why="Sette strisce rosa spazzano lo schermo e scoprono il testo: e' il gesto di girare pagina, con il rosa come firma." data-role="" hidden><div class="stagewrap">
+<div class="ph" data-open="bands" data-close="fade">
+  <div class="home"><div class="logo">teloscrivo<i>.</i></div><button type="button" class="row" data-t="Sale" data-m="POESIA · 14 SET"><span class="rtt">Sale</span><span class="rmt">POESIA · 14 SET</span></button><button type="button" class="row" data-t="Luce bassa" data-m="POESIA · 9 SET"><span class="rtt">Luce bassa</span><span class="rmt">POESIA · 9 SET</span></button><button type="button" class="row" data-t="Il treno" data-m="RACCONTO · 2 SET"><span class="rtt">Il treno</span><span class="rmt">RACCONTO · 2 SET</span></button><button type="button" class="row" data-t="Ritorno" data-m="TESTO · 28 AGO"><span class="rtt">Ritorno</span><span class="rmt">TESTO · 28 AGO</span></button></div>
+  <div class="rdp" aria-hidden="true"><div class="rin">
+    <button type="button" class="rback">&larr; Indietro</button>
+    <p class="rcap"></p><h4 class="rbig"></h4>
+    <p class="rtxt"><span>Una riga di prova, scritta piano.</span><span>Poi un&rsquo;altra, per vedere il ritmo.</span><span>E una terza che chiude il giro.</span></p>
+  </div></div>
+</div>
+<div class="ctl"><button type="button" data-do="open">Apri</button><button type="button" data-do="close">Chiudi</button></div>
+</div></section>
+<section class="dir-panel" data-name="Apertura C: il titolo vola" data-mood="elemento condiviso · editoriale" data-why="Il titolo della riga che tocchi ingrandisce e diventa il titolo della pagina: l'occhio non si perde mai." data-role="" hidden><div class="stagewrap">
+<div class="ph" data-open="morph" data-close="fade">
+  <div class="home"><div class="logo">teloscrivo<i>.</i></div><button type="button" class="row" data-t="Sale" data-m="POESIA · 14 SET"><span class="rtt">Sale</span><span class="rmt">POESIA · 14 SET</span></button><button type="button" class="row" data-t="Luce bassa" data-m="POESIA · 9 SET"><span class="rtt">Luce bassa</span><span class="rmt">POESIA · 9 SET</span></button><button type="button" class="row" data-t="Il treno" data-m="RACCONTO · 2 SET"><span class="rtt">Il treno</span><span class="rmt">RACCONTO · 2 SET</span></button><button type="button" class="row" data-t="Ritorno" data-m="TESTO · 28 AGO"><span class="rtt">Ritorno</span><span class="rmt">TESTO · 28 AGO</span></button></div>
+  <div class="rdp" aria-hidden="true"><div class="rin">
+    <button type="button" class="rback">&larr; Indietro</button>
+    <p class="rcap"></p><h4 class="rbig"></h4>
+    <p class="rtxt"><span>Una riga di prova, scritta piano.</span><span>Poi un&rsquo;altra, per vedere il ritmo.</span><span>E una terza che chiude il giro.</span></p>
+  </div></div>
+</div>
+<div class="ctl"><button type="button" data-do="open">Apri</button><button type="button" data-do="close">Chiudi</button></div>
+</div></section>
+<section class="dir-panel" data-name="Chiusura A: foglio che scende" data-mood="iOS sheet · inverso" data-why="Simmetrica all'apertura A: il foglio scende e la home torna luminosa." data-role="" hidden><div class="stagewrap">
+<div class="ph" data-open="fade" data-close="sheet">
+  <div class="home"><div class="logo">teloscrivo<i>.</i></div><button type="button" class="row" data-t="Sale" data-m="POESIA · 14 SET"><span class="rtt">Sale</span><span class="rmt">POESIA · 14 SET</span></button><button type="button" class="row" data-t="Luce bassa" data-m="POESIA · 9 SET"><span class="rtt">Luce bassa</span><span class="rmt">POESIA · 9 SET</span></button><button type="button" class="row" data-t="Il treno" data-m="RACCONTO · 2 SET"><span class="rtt">Il treno</span><span class="rmt">RACCONTO · 2 SET</span></button><button type="button" class="row" data-t="Ritorno" data-m="TESTO · 28 AGO"><span class="rtt">Ritorno</span><span class="rmt">TESTO · 28 AGO</span></button></div>
+  <div class="rdp" aria-hidden="true"><div class="rin">
+    <button type="button" class="rback">&larr; Indietro</button>
+    <p class="rcap"></p><h4 class="rbig"></h4>
+    <p class="rtxt"><span>Una riga di prova, scritta piano.</span><span>Poi un&rsquo;altra, per vedere il ritmo.</span><span>E una terza che chiude il giro.</span></p>
+  </div></div>
+</div>
+<div class="ctl"><button type="button" data-do="open">Apri</button><button type="button" data-do="close">Chiudi</button></div>
+</div></section>
+<section class="dir-panel" data-name="Chiusura B: si richiude sulla riga" data-mood="collasso · rimpicciolimento" data-why="La pagina si restringe fino alla riga da cui eri partito e si spegne: sai dove sei tornato." data-role="" hidden><div class="stagewrap">
+<div class="ph" data-open="fade" data-close="collapse">
+  <div class="home"><div class="logo">teloscrivo<i>.</i></div><button type="button" class="row" data-t="Sale" data-m="POESIA · 14 SET"><span class="rtt">Sale</span><span class="rmt">POESIA · 14 SET</span></button><button type="button" class="row" data-t="Luce bassa" data-m="POESIA · 9 SET"><span class="rtt">Luce bassa</span><span class="rmt">POESIA · 9 SET</span></button><button type="button" class="row" data-t="Il treno" data-m="RACCONTO · 2 SET"><span class="rtt">Il treno</span><span class="rmt">RACCONTO · 2 SET</span></button><button type="button" class="row" data-t="Ritorno" data-m="TESTO · 28 AGO"><span class="rtt">Ritorno</span><span class="rmt">TESTO · 28 AGO</span></button></div>
+  <div class="rdp" aria-hidden="true"><div class="rin">
+    <button type="button" class="rback">&larr; Indietro</button>
+    <p class="rcap"></p><h4 class="rbig"></h4>
+    <p class="rtxt"><span>Una riga di prova, scritta piano.</span><span>Poi un&rsquo;altra, per vedere il ritmo.</span><span>E una terza che chiude il giro.</span></p>
+  </div></div>
+</div>
+<div class="ctl"><button type="button" data-do="open">Apri</button><button type="button" data-do="close">Chiudi</button></div>
+</div></section>
+<section class="dir-panel" data-name="Chiusura C: il titolo torna a casa" data-mood="elemento condiviso · inverso" data-why="Il titolo grande rimpicciolisce e torna nella sua riga: chiude il cerchio aperto dall'apertura C." data-role="" hidden><div class="stagewrap">
+<div class="ph" data-open="fade" data-close="morph">
+  <div class="home"><div class="logo">teloscrivo<i>.</i></div><button type="button" class="row" data-t="Sale" data-m="POESIA · 14 SET"><span class="rtt">Sale</span><span class="rmt">POESIA · 14 SET</span></button><button type="button" class="row" data-t="Luce bassa" data-m="POESIA · 9 SET"><span class="rtt">Luce bassa</span><span class="rmt">POESIA · 9 SET</span></button><button type="button" class="row" data-t="Il treno" data-m="RACCONTO · 2 SET"><span class="rtt">Il treno</span><span class="rmt">RACCONTO · 2 SET</span></button><button type="button" class="row" data-t="Ritorno" data-m="TESTO · 28 AGO"><span class="rtt">Ritorno</span><span class="rmt">TESTO · 28 AGO</span></button></div>
+  <div class="rdp" aria-hidden="true"><div class="rin">
+    <button type="button" class="rback">&larr; Indietro</button>
+    <p class="rcap"></p><h4 class="rbig"></h4>
+    <p class="rtxt"><span>Una riga di prova, scritta piano.</span><span>Poi un&rsquo;altra, per vedere il ritmo.</span><span>E una terza che chiude il giro.</span></p>
+  </div></div>
+</div>
+<div class="ctl"><button type="button" data-do="open">Apri</button><button type="button" data-do="close">Chiudi</button></div>
+</div></section>
+</div>
+  </main>
+</div>
+
+<script>
+// ── Scocca generica: chip auto-costruiti dai pannelli, uno visibile alla volta ──
+(function(){
+  const panelsBox = document.getElementById('panels');
+  const panels = [...panelsBox.querySelectorAll('.dir-panel')];
+  const chips = document.getElementById('chips');
+
+  // Disegna la chrome (barra nome+mood, riga "perché") dentro ogni pannello dai data-*
+  panels.forEach(p=>{
+    const inner = p.innerHTML;
+    const role = p.dataset.role || '';
+    const tag = role ? `<span class="dir-tag" data-role="${role}">${role}</span>` : `<span class="dir-tag">Direzione</span>`;
+    p.innerHTML = `
+      <div class="dir-card">
+        <div class="dir-head">
+          <div>
+            <div class="dir-name">${p.dataset.name||'Direzione'}</div>
+            <div class="dir-mood">${p.dataset.mood||''}</div>
+          </div>${tag}
+        </div>
+        <div class="dir-body">${inner}</div>
+        ${p.dataset.why ? `<div class="dir-why">✶&nbsp;<span><b>Perché:</b> ${p.dataset.why}</span></div>` : ``}
+      </div>`;
+  });
+
+  function show(i){
+    panels.forEach((p,j)=>p.toggleAttribute('hidden', j!==i));
+    [...chips.children].forEach((c,j)=>c.setAttribute('aria-pressed', j===i));
+  }
+
+  panels.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-pressed', i===0 ? 'true':'false');
+    b.innerHTML = `<span class="swatch"></span>${p.dataset.name || ('Direzione '+(i+1))}`;
+    b.addEventListener('click', ()=>show(i));
+    chips.appendChild(b);
+  });
+
+  show(0);
+
+  // Esempio di interazione "viva ma leggera" con dato finto in localStorage.
+  // (La skill può riusare lo stesso pattern data-save nei pannelli reali.)
+  document.addEventListener('click', e=>{
+    const btn = e.target.closest('[data-save]');
+    if(!btn) return;
+    const on = btn.dataset.on === '1';
+    btn.dataset.on = on ? '0':'1';
+    btn.textContent = on ? 'Salva' : 'Salvato ✓';
+    try{ localStorage.setItem('mockup-demo-saved', on ? '0':'1'); }catch(_){}
+  });
+})();
+</script>
+<script>
+(function(){
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const EASE='cubic-bezier(.2,.8,.2,1)',INOUT='cubic-bezier(.65,0,.25,1)';
+  const slow=()=>document.getElementById('slow').checked?3:1;
+  const D=ms=>reduce?1:ms*slow();
+  const sleep=ms=>new Promise(r=>setTimeout(r,D(ms)));
+  const rel=(el,ph)=>{const a=el.getBoundingClientRect(),b=ph.getBoundingClientRect();return{x:a.left-b.left,y:a.top-b.top,w:a.width,h:a.height};};
+  const A=(ph,el,kf,o)=>{const a=el.animate(kf,{fill:'both',easing:EASE,...o,duration:D(o.duration),delay:D(o.delay||0)});(ph._an=ph._an||[]).push(a);return a.finished;};
+  const q=(ph,s)=>ph.querySelector(s);
+  function rise(ph,ov,d){
+    const m=q(ov,'.rbig .m');if(m)A(ph,m,[{transform:'translateY(112%)'},{transform:'none'}],{duration:850,delay:d});
+    [q(ov,'.rcap'),...ov.querySelectorAll('.rtxt span')].forEach((e,i)=>A(ph,e,[{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:600,delay:d+120+i*110}));
+  }
+  const OPEN={
+    fade(ph,row,ov){return A(ph,ov,[{opacity:0,transform:'translateY(3%)'},{opacity:1,transform:'none'}],{duration:400});},
+    sheet(ph,row,ov){
+      A(ph,q(ph,'.home'),[{transform:'scale(1)',filter:'brightness(1)'},{transform:'scale(.92)',filter:'brightness(.5)'}],{duration:650});
+      rise(ph,ov,380);
+      return A(ph,ov,[{transform:'translateY(100%)',borderRadius:'28px 28px 0 0'},{transform:'none',borderRadius:'0px'}],{duration:700});
+    },
+    async bands(ph,row,ov){
+      const N=7,layer=document.createElement('div');layer.className='bands';ph.append(layer);ov.style.visibility='hidden';
+      const bs=[];for(let i=0;i<N;i++){const b=document.createElement('div');b.className='band';b.style.top=(i*100/N)+'%';b.style.height=(100/N+.6)+'%';layer.append(b);bs.push(b);}
+      await Promise.all(bs.map((b,i)=>A(ph,b,[{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:380,delay:i*55,easing:INOUT})));
+      ov.style.visibility='visible';bs.forEach(b=>b.style.transformOrigin='right');
+      rise(ph,ov,200);
+      await Promise.all(bs.map((b,i)=>A(ph,b,[{transform:'scaleX(1)'},{transform:'scaleX(0)'}],{duration:420,delay:i*55,easing:INOUT})));
+      layer.remove();
+    },
+    async morph(ph,row,ov){
+      const big=q(ov,'.rbig .m'),rt=q(row,'.rtt'),a=rel(rt,ph);
+      const f=A(ph,ov,[{opacity:0},{opacity:1}],{duration:500,delay:100});
+      const b=rel(big,ph),clone=big.cloneNode(true);clone.className='clone';clone.style.left=b.x+'px';clone.style.top=b.y+'px';ph.append(clone);
+      big.style.opacity=0;rt.style.opacity=0;
+      [...ph.querySelectorAll('.row')].filter(r=>r!==row).forEach((r,i)=>A(ph,r,[{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-8px)'}],{duration:350,delay:200+i*50}));
+      [q(ov,'.rcap'),...ov.querySelectorAll('.rtxt span')].forEach((e,i)=>A(ph,e,[{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:600,delay:520+i*110}));
+      await A(ph,clone,[{transform:`translate(${a.x-b.x}px,${a.y-b.y}px) scale(${a.h/b.h})`},{transform:'none'}],{duration:700,easing:INOUT});
+      big.style.opacity=1;clone.remove();await f;
+    }
+  };
+  const CLOSE={
+    fade(ph,row,ov){return A(ph,ov,[{opacity:1,transform:'none'},{opacity:0,transform:'translateY(3%)'}],{duration:350});},
+    sheet(ph,row,ov){
+      A(ph,q(ph,'.home'),[{transform:'scale(.92)',filter:'brightness(.5)'},{transform:'scale(1)',filter:'brightness(1)'}],{duration:550});
+      return A(ph,ov,[{transform:'none',borderRadius:'0px'},{transform:'translateY(100%)',borderRadius:'28px 28px 0 0'}],{duration:550,easing:INOUT});
+    },
+    async collapse(ph,row,ov){
+      const r=rel(row,ph),W=ph.clientWidth,H=ph.clientHeight;
+      A(ph,q(ov,'.rin'),[{opacity:1},{opacity:0}],{duration:180});
+      await A(ph,ov,[{clipPath:'inset(0px 0px 0px 0px round 0px)'},{clipPath:`inset(${r.y}px ${W-r.x-r.w}px ${H-r.y-r.h}px ${r.x}px round 12px)`}],{duration:620,delay:120,easing:INOUT});
+      await A(ph,ov,[{opacity:1},{opacity:0}],{duration:220});
+    },
+    async morph(ph,row,ov){
+      const big=q(ov,'.rbig .m'),rt=q(row,'.rtt'),a=rel(rt,ph),b=rel(big,ph),clone=big.cloneNode(true);
+      clone.className='clone';clone.style.left=b.x+'px';clone.style.top=b.y+'px';ph.append(clone);
+      big.style.opacity=0;rt.style.opacity=0;
+      [q(ov,'.rcap'),...ov.querySelectorAll('.rtxt span')].forEach((e,i)=>A(ph,e,[{opacity:1},{opacity:0}],{duration:200,delay:i*40}));
+      [...ph.querySelectorAll('.row')].filter(r=>r!==row).forEach((r,i)=>A(ph,r,[{opacity:0,transform:'translateY(-8px)'},{opacity:1,transform:'none'}],{duration:400,delay:300+i*60}));
+      A(ph,ov,[{opacity:1},{opacity:0}],{duration:450,delay:300});
+      await A(ph,clone,[{transform:'none'},{transform:`translate(${a.x-b.x}px,${a.y-b.y}px) scale(${a.h/b.h})`}],{duration:650,delay:150,easing:INOUT});
+      rt.style.opacity=1;clone.remove();
+    }
+  };
+  function reset(ph){
+    (ph._an||[]).forEach(a=>a.cancel());ph._an=[];
+    ph.querySelectorAll('.clone,.bands').forEach(e=>e.remove());
+    ph.querySelectorAll('[style]').forEach(e=>{if(e.classList.contains('rdp')||e.closest('.rdp')||e.classList.contains('row')||e.classList.contains('rtt')||e.classList.contains('home'))e.removeAttribute('style');});
+  }
+  async function open(ph,row){
+    if(ph._busy||ph._open)return;ph._busy=true;
+    const ov=q(ph,'.rdp');
+    q(ov,'.rcap').textContent=row.dataset.m;
+    q(ov,'.rbig').innerHTML='<span class="w"><span class="m"></span></span>';q(ov,'.rbig .m').textContent=row.dataset.t;
+    ph._row=row;ov.style.visibility='visible';ov.setAttribute('aria-hidden','false');
+    await OPEN[ph.dataset.open](ph,row,ov);
+    ph._open=true;ph._busy=false;
+  }
+  async function close(ph){
+    if(ph._busy||!ph._open)return;ph._busy=true;
+    const ov=q(ph,'.rdp');
+    await CLOSE[ph.dataset.close](ph,ph._row,ov);
+    reset(ph);ov.setAttribute('aria-hidden','true');ph._open=false;ph._busy=false;
+  }
+  document.addEventListener('click',e=>{
+    const ph=e.target.closest('.dir-panel')&&e.target.closest('.dir-panel').querySelector('.ph');if(!ph)return;
+    const row=e.target.closest('.row');
+    if(row)return open(ph,row);
+    if(e.target.closest('.rback'))return close(ph);
+    const d=e.target.closest('[data-do]');
+    if(d)return d.dataset.do==='open'?open(ph,q(ph,'.row')):close(ph);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog personale · sito</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;600;700&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root{--k-bg:#14171e;--k-2:#1b1f28;--k-3:#232936;--k-line:#323a4a;--k-text:#e9e4d8;--k-dim:#a39e93;--k-acc:#e0a96d}
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0}
+  body{background:var(--k-bg);color:var(--k-text);font-family:"Hanken Grotesk",sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1000px;margin:0 auto;padding:16px 18px 24px}
+  .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .top b{font-weight:700}.top span{font-size:.8rem;color:var(--k-dim)}
+
+  /* barra comandi del mockup */
+  .tb{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin-bottom:14px;padding:10px 12px;background:var(--k-2);border:1px solid var(--k-line);border-radius:14px}
+  .tb-g{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tb-l{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--k-dim);font-weight:700}
+  .pal{display:flex;width:44px;height:44px;padding:0;background:var(--k-3);border:2px solid var(--k-line);border-radius:10px;overflow:hidden;cursor:pointer}
+  .pal i{flex:1}.pal[aria-pressed="true"]{border-color:var(--k-acc)}
+  #palName{font-size:.86rem;font-weight:600;min-width:12ch}
+  .seg{display:flex;border:1px solid var(--k-line);border-radius:10px;overflow:hidden}
+  .seg button,.tb-btn{font:inherit;font-size:.82rem;font-weight:600;min-height:44px;padding:0 16px;background:var(--k-3);color:var(--k-dim);border:0;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--k-acc);color:#1a1206}
+  .tb-btn{border:1px solid var(--k-line);border-radius:10px;color:var(--k-text)}
+
+  /* ───────── palette del sito ───────── */
+  #stage[data-pal="0"]{--bg:#14100F;--ink:#F3EBDD;--mut:#B9AC9B;--surf:#211A18;--r1:#D7263D;--o1:#FFF6EC;--r2:#F4B6B0;--o2:#2A0E10;--r3:#F3EBDD;--o3:#14100F;--r4:#6B1226;--o4:#F3EBDD}
+  #stage[data-pal="1"]{--bg:#101A2E;--ink:#FDEBDD;--mut:#A9B3C9;--surf:#19253F;--r1:#FFB38A;--o1:#2A1408;--r2:#9DB4E8;--o2:#0E1A33;--r3:#FF6F61;--o3:#2A0A07;--r4:#FDEBDD;--o4:#101A2E}
+  #stage[data-pal="2"]{--bg:#F4EFE6;--ink:#101820;--mut:#55606B;--surf:#E8E1D3;--r1:#1F3FFF;--o1:#FFFFFF;--r2:#F6D55C;--o2:#101820;--r3:#F2A7C3;--o3:#101820;--r4:#1F5B45;--o4:#F4EFE6}
+
+  /* ───────── cornice (shell) e sito ───────── */
+  .shell{position:relative;container-type:inline-size;overflow:hidden;margin:0 auto;background:var(--bg);color:var(--ink);
+    --fd:'Bricolage Grotesque',sans-serif;--fb:'Spectral',serif;--rule:color-mix(in srgb,var(--ink) 18%,transparent);
+    font-family:var(--fb)}
+  body.ready .shell{transition:background .4s ease,color .4s ease}
+  #stage[data-view="m"] .shell{width:390px;max-width:100%;height:min(780px,calc(100vh - 150px));border-radius:30px;border:8px solid #0b0d12}
+  #stage[data-view="d"] .shell{width:100%;height:calc(100vh - 150px);min-height:560px;border-radius:12px;border:1px solid var(--k-line)}
+  .site{height:100%;overflow-y:auto;overflow-x:hidden}
+  .shell a{color:inherit}
+  .shell :focus-visible{outline:2px solid var(--r1);outline-offset:3px}
+
+  .hd{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px;min-height:60px;background:var(--bg);border-bottom:1px solid var(--rule)}
+  .brand{white-space:nowrap;font-family:var(--fd);font-weight:800;font-size:1.02rem;letter-spacing:-.02em;text-decoration:none;display:flex;align-items:center;min-height:44px}
+  .nav{display:flex;align-items:center;gap:2px}
+  .nav a{white-space:nowrap;display:flex;align-items:center;min-height:44px;padding:0 10px;font-family:var(--fd);font-weight:600;font-size:.88rem;text-decoration:none;position:relative}
+  .nav a::after{content:"";position:absolute;left:10px;right:10px;bottom:9px;height:2px;background:var(--r1);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .nav a:hover::after,.nav a[aria-current]::after{transform:scaleX(1)}
+  @container (max-width:430px){.brand{font-size:.92rem}.nav a{padding:0 7px;font-size:.82rem}.nav a::after{left:7px;right:7px}.hd{padding:0 10px}}
+  .ico{display:flex;align-items:center;justify-content:center;width:44px;height:44px}
+  .ico svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;transition:transform .3s ease}
+  .ico:hover svg{transform:rotate(-12deg) scale(1.12)}
+
+  .tg{display:inline-block;font-family:var(--fd);font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:4px;white-space:nowrap}
+  .c1{background:var(--r1);color:var(--o1)}.c2{background:var(--r2);color:var(--o2)}.c3{background:var(--r3);color:var(--o3)}.c4{background:var(--r4);color:var(--o4)}
+  .f1{fill:var(--r1)}.f2{fill:var(--r2)}.f3{fill:var(--r3)}.f4{fill:var(--r4)}
+  .art{display:block;width:100%;height:100%}
+
+  /* HERO */
+  .hero{position:relative;padding:44px 20px 40px}
+  .kick{font-family:var(--fd);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--mut);margin:0 0 18px}
+  .hero-t{position:relative;z-index:2;margin:0;font-family:var(--fd);font-weight:800;font-size:clamp(2.4rem,11cqw,6.6rem);line-height:.96;letter-spacing:-.04em}
+  .hw{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em}
+  .hw>span{display:inline-block}
+  .hero-bot{display:flex;flex-direction:column;gap:22px;margin-top:26px}
+  .hero-s{margin:0 0 18px;font-size:1.12rem;line-height:1.55;max-width:34ch;color:var(--mut);text-wrap:pretty}
+  .btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;font-family:var(--fd);font-weight:700;font-size:.95rem;border:0;border-radius:6px;background:var(--r1);color:var(--o1);cursor:pointer;text-decoration:none}
+  .btn span{display:inline-block;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .btn:hover span{transform:translateY(4px)}
+  .shapes{position:relative;height:170px;width:100%}
+  .shp{position:absolute}
+  .shp i{display:block;width:100%;height:100%}
+  .s1{width:130px;height:130px;left:6%;top:10px}.s1 i{background:var(--r1);border-radius:50%}
+  .s2{width:150px;height:75px;left:34%;top:76px}.s2 i{background:var(--r3);border-radius:150px 150px 0 0}
+  .s3{width:90px;height:90px;left:62%;top:6px}.s3 i{background:var(--r2);border-radius:14px}
+  .s4{width:46px;height:46px;left:82%;top:92px}.s4 i{background:var(--r4);border-radius:50%;border:3px solid var(--ink)}
+  .marq{overflow:hidden;border-block:1px solid var(--rule);padding:14px 0;background:var(--surf)}
+  .marq-in{display:flex;width:max-content;animation:mq 34s linear infinite;font-family:var(--fd);font-weight:700;font-size:1.5rem;letter-spacing:-.02em;white-space:nowrap}
+  .marq-in span{padding:0 18px}.marq-in em{font-style:normal;color:var(--r1)}
+  @keyframes mq{to{transform:translateX(-50%)}}
+
+  /* STANZE */
+  .sec-h{padding:56px 20px 22px}
+  .sec-h h2{margin:0;font-family:var(--fd);font-weight:800;font-size:clamp(2rem,7cqw,4rem);letter-spacing:-.035em;line-height:1}
+  .sec-h p{margin:10px 0 0;color:var(--mut);font-size:1.02rem;max-width:44ch}
+  .rooms{height:600px;display:flex;flex-direction:column}
+  .room{flex:0 0 68px;min-height:0;overflow:hidden;display:flex;flex-direction:column;transition:flex .55s cubic-bezier(.2,.8,.2,1);border-top:1px solid rgba(0,0,0,.16)}
+  .room.open{flex:1 1 0}
+  .room[data-s="1"]{background:var(--r1);color:var(--o1)}.room[data-s="2"]{background:var(--r2);color:var(--o2)}
+  .room[data-s="3"]{background:var(--r3);color:var(--o3)}.room[data-s="4"]{background:var(--r4);color:var(--o4)}
+  .room-h{flex:none;display:flex;align-items:center;gap:14px;width:100%;min-height:68px;padding:0 20px;background:none;border:0;color:inherit;text-align:left;cursor:pointer;font-family:inherit}
+  .room-h:focus-visible{outline-offset:-4px;outline-color:currentColor}
+  .room-h .n{font:700 .76rem var(--fd);opacity:.75}
+  .room-h .t{flex:1;font-family:var(--fd);font-weight:800;font-size:2rem;letter-spacing:-.03em;line-height:1}
+  .room-h .c{font-size:.84rem;opacity:.85}
+  .room-b{flex:1;min-height:0;overflow:auto;padding:0 20px 20px;opacity:0;transform:translateY(10px);transition:opacity .4s ease .2s,transform .4s ease .2s}
+  .room.open .room-b{opacity:1;transform:none}
+  .room:not(.open) .room-b{visibility:hidden}
+  .room-lab{margin:0 0 6px;font-family:var(--fd);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:.8}
+  .room-last{margin:0 0 8px;font-family:var(--fd);font-weight:800;font-size:1.6rem;line-height:1.08;letter-spacing:-.025em}
+  .room-sn{margin:0 0 14px;font-style:italic;font-size:1.06rem;line-height:1.5;max-width:40ch}
+  .enter{display:inline-flex;align-items:center;min-height:44px;font-family:var(--fd);font-weight:700;border-bottom:2px solid currentColor;text-decoration:none}
+  @container (min-width:720px){
+    .rooms{flex-direction:row;height:620px}
+    .room{flex:0 0 108px;flex-direction:row;border-top:0;border-left:1px solid rgba(0,0,0,.16)}
+    .room:first-child{border-left:0}.room.open{flex:1 1 0}
+    .room-h{flex:none;flex-direction:column;justify-content:flex-start;align-items:center;width:108px;height:100%;min-height:0;padding:22px 0;gap:18px}
+    .room-h .t{font-size:3.4rem;writing-mode:vertical-rl;transform:rotate(180deg)}
+    .room-h .c{writing-mode:vertical-rl;transform:rotate(180deg)}
+    .room-b{flex:1 0 380px;padding:38px 38px 34px 8px}
+    .room-last{font-size:2.6rem}
+  }
+
+  /* RIGHE TESTI */
+  .row{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"n tt" "n meta";gap:2px 16px;align-items:center;padding:16px 20px;min-height:72px;border-top:1px solid var(--rule);text-decoration:none;overflow:hidden;color:var(--ink)}
+  .row::before{content:"";position:absolute;inset:0;background:var(--rc);transform:scaleY(0);transform-origin:bottom;transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+  .row>*{position:relative}
+  .row:hover,.row:focus-visible{color:var(--oc)}
+  .row:hover::before,.row:focus-visible::before{transform:scaleY(1)}
+  .row .n{grid-area:n;font:700 .8rem var(--fd);opacity:.6}
+  .row .tt{grid-area:tt;font-family:var(--fd);font-weight:700;font-size:1.35rem;letter-spacing:-.02em;line-height:1.12;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .row:hover .tt{transform:translateX(8px)}
+  .row .meta{grid-area:meta;display:flex;align-items:center;gap:10px;font-size:.84rem}
+  .row .meta em{font-style:normal;opacity:.75}
+  .row .ex{display:none}
+  .rows{border-bottom:1px solid var(--rule)}
+  @container (min-width:720px){
+    .row{grid-template-columns:48px 1fr auto;grid-template-areas:"n tt meta";padding:22px 40px;gap:0 24px}
+    .row .tt{font-size:1.9rem}
+    .sec-h{padding:72px 40px 28px}.hero{padding:64px 40px 56px}
+  }
+
+  /* PAGINA STANZA */
+  .st-hero{padding:44px 20px 36px}
+  .st-hero .kick{color:inherit;opacity:.75}
+  .st-hero h1{margin:0;font-family:var(--fd);font-weight:800;font-size:clamp(3rem,18cqw,11rem);line-height:.9;letter-spacing:-.05em}
+  .st-hero p{margin:16px 0 0;font-size:1.15rem;max-width:34ch}
+  .more{padding:48px 20px 20px}
+  .more-l{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .more-l a{display:inline-flex;align-items:center;min-height:48px;padding:0 20px;font-family:var(--fd);font-weight:700;border-radius:6px;text-decoration:none}
+
+  /* PAGINA TESTO */
+  .prog{position:absolute;left:0;top:0;height:4px;width:0;background:var(--r1);z-index:30}
+  .rd{max-width:640px;margin:0 auto;padding:30px 22px 40px}
+  .back{display:inline-flex;align-items:center;min-height:44px;font-family:var(--fd);font-weight:700;font-size:.9rem;text-decoration:none;margin-bottom:10px}
+  .rd-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.86rem;color:var(--mut)}
+  .rd h1{margin:.7rem 0 1.6rem;font-family:var(--fd);font-weight:800;font-size:clamp(2.2rem,9cqw,4rem);line-height:1;letter-spacing:-.035em}
+  .rd-img{height:190px;border-radius:6px;overflow:hidden;margin:0 0 26px}
+  .rd-poem{font-style:italic;font-size:1.5rem;line-height:1.7}
+  .rd-poem .ln{display:block}.rd-poem .ln.br{height:1em}
+  .rd-p{font-size:1.15rem;line-height:1.8;margin:0 0 1.15em;text-wrap:pretty}
+  .rd-p:first-of-type::first-letter{float:left;font-family:var(--fd);font-weight:800;font-size:3.4em;line-height:.82;padding:.06em .1em 0 0}
+  .rd-q{margin:0;font-size:1.7rem;line-height:1.4;font-style:italic;padding-left:18px;border-left:4px solid var(--r1)}
+  .rd-list{margin:16px 0 0;padding:0;list-style:none;counter-reset:l}
+  .rd-list li{counter-increment:l;display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--rule);font-size:1.15rem}
+  .rd-list li::before{content:counter(l,decimal-leading-zero);font:700 .85rem var(--fd);color:var(--mut);padding-top:.3em}
+  .next{display:block;margin:30px 0 0;padding:26px 22px;border-radius:8px;text-decoration:none;position:relative;overflow:hidden}
+  .next small{display:block;font-family:var(--fd);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.7rem;opacity:.8}
+  .next b{display:block;margin-top:6px;font-family:var(--fd);font-weight:800;font-size:1.7rem;letter-spacing:-.025em;line-height:1.1;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+  .next:hover b{transform:translateX(10px)}
+
+  /* CHI SONO */
+  .about{max-width:680px;margin:0 auto;padding:44px 22px 30px}
+  .about h1{margin:0 0 20px;font-family:var(--fd);font-weight:800;font-size:clamp(2.6rem,12cqw,5.5rem);line-height:.95;letter-spacing:-.04em}
+  .about p{font-size:1.15rem;line-height:1.75;color:var(--mut);margin:0 0 1em}
+  .soc{list-style:none;margin:22px 0 0;padding:0}
+  .soc a{display:flex;justify-content:space-between;align-items:center;min-height:60px;border-top:1px solid var(--rule);text-decoration:none;font-family:var(--fd);font-weight:700;font-size:1.3rem}
+
+  /* FOOTER */
+  .ft{margin-top:60px;padding:48px 20px 34px;background:var(--surf)}
+  .ft-k{margin:0 0 10px;font-family:var(--fd);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--mut)}
+  .ft-big{display:block;font-family:var(--fd);font-weight:800;font-size:clamp(2.4rem,12cqw,6.5rem);letter-spacing:-.04em;line-height:1.02;text-decoration:none;padding:4px 0}
+  .ft-big span{display:inline-block;color:var(--r1);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .ft-big:hover span{transform:translate(8px,-8px) rotate(8deg)}
+  .ft-c{margin:30px 0 0;font-size:.84rem;color:var(--mut)}
+  @container (min-width:720px){.ft{padding:70px 40px 44px}.more{padding:64px 40px 20px}.st-hero{padding:64px 40px 44px}}
+
+  /* sipario, intro, cursore, avanzamento */
+  .wipe{position:absolute;inset:0;z-index:40;display:none;pointer-events:none}
+  .intro{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:var(--bg)}
+  .intro-bars{position:absolute;inset:0;display:flex}
+  .bar{flex:1;transform:scaleY(0)}
+  .bar:nth-child(1){background:var(--r1)}.bar:nth-child(2){background:var(--r2)}.bar:nth-child(3){background:var(--r3)}.bar:nth-child(4){background:var(--r4)}
+  .intro-in{position:relative;padding:0 22px;width:100%}
+  .intro-t{margin:0;font-family:var(--fd);font-weight:800;font-size:clamp(2.7rem,15cqw,9rem);line-height:.95;letter-spacing:-.045em}
+  .intro-w{display:block;overflow:hidden;padding-bottom:.1em}
+  .ch{display:inline-block}
+  .intro-line{height:3px;background:var(--r1);margin:22px 0 14px}
+  .intro-s{margin:0;font-family:var(--fd);font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--mut)}
+  .intro-skip{position:absolute;right:16px;bottom:16px;z-index:2;min-height:44px;padding:0 18px;font-family:var(--fd);font-weight:700;font-size:.85rem;background:transparent;color:var(--ink);border:1.5px solid var(--ink);border-radius:6px;cursor:pointer}
+  .cur{position:absolute;left:0;top:0;width:16px;height:16px;margin:-8px 0 0 -8px;border:1.5px solid var(--ink);border-radius:50%;pointer-events:none;z-index:60;opacity:0;transition:width .25s ease,height .25s ease,margin .25s ease,background .25s ease,opacity .3s ease}
+  .cur.on{opacity:.9}
+  .cur.big{width:46px;height:46px;margin:-23px 0 0 -23px;background:color-mix(in srgb,var(--r1) 30%,transparent)}
+  @media (hover:none),(pointer:coarse){.cur{display:none}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><b>Mockup 02 · il sito intero</b><span>Testi, nome e link sono segnaposto. Naviga: home, stanza, testo, chi sono.</span></div>
+
+  <div class="tb">
+    <div class="tb-g"><span class="tb-l">Palette</span><span id="pals" class="tb-g"></span><span id="palName"></span></div>
+    <div class="tb-g"><span class="tb-l">Vista</span>
+      <div class="seg" id="seg"><button type="button" data-v="m" aria-pressed="false">Mobile</button><button type="button" data-v="d" aria-pressed="true">Desktop</button></div>
+    </div>
+    <button class="tb-btn" id="again" type="button">↻ Rivedi intro</button>
+  </div>
+
+  <main id="stage" data-pal="0" data-view="d">
+    <div class="shell" id="shell">
+      <div class="site" id="site"><div id="view"></div></div>
+      <div class="prog" id="prog"></div>
+      <div class="wipe" id="wipe"></div>
+      <div class="intro" id="intro">
+        <div class="intro-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        <div class="intro-in" id="introIn">
+          <h2 class="intro-t" aria-label="Appunti a margine"><span class="intro-w" aria-hidden="true">Appunti</span><span class="intro-w" aria-hidden="true">a margine</span></h2>
+          <div class="intro-line"></div>
+          <p class="intro-s">poesie · racconti · pensieri</p>
+        </div>
+        <button class="intro-skip" id="skip" type="button">Salta ›</button>
+      </div>
+      <div class="cur" id="cur"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  gsap.registerPlugin(ScrollTrigger);
+  const $ = (s,r=document)=>r.querySelector(s), $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+  const stage=$('#stage'), shell=$('#shell'), site=$('#site'), view=$('#view'), wipe=$('#wipe'), intro=$('#intro'), prog=$('#prog'), cur=$('#cur');
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  ScrollTrigger.defaults({scroller:site});
+  if(new URLSearchParams(location.search).has('test')) gsap.ticker.lagSmoothing(0);   // solo per i test automatici
+
+  // ── Dati finti ──
+  const T=[
+    {id:1,tipo:'poesia',titolo:'Settembre in cucina',data:'12 ott',min:1,righe:['Il caffè sale piano,','come una promessa','che nessuno ha fatto.','','Fuori la luce cambia casa','e io resto,','con le mani tiepide','e un\'estate che non so dove mettere.']},
+    {id:2,tipo:'racconto',titolo:'L\'ultimo posto in fondo',data:'8 ott',min:3,img:0,par:['Ogni sera, alle 18:40, il tram si svuotava e restava solo lei, all\'ultimo posto in fondo, con una busta di arance sulle ginocchia e un sorriso che cambiava di mano a ogni fermata.','Nessuno sapeva dove scendesse. Il bigliettaio diceva «al capolinea», il ragazzo con le cuffie diceva «mai», e io, che prendevo quel tram da undici mesi, non avevo mai avuto il coraggio di voltarmi.','Una sera il tram frenò più forte del solito e le arance rotolarono giù per il corridoio, fino ai miei piedi. Ne raccolsi una. Era tiepida, come se qualcuno la stesse tenendo in mano da sempre.','«Tienila» disse. «Domani ti dico dove scendo.» Il giorno dopo sono salito un\'ora prima, solo per assicurarmi che il tram esistesse ancora.']},
+    {id:3,tipo:'pensiero',titolo:'Restare e partire',data:'5 ott',min:1,testo:'Scrivere è l\'unico modo che conosco per restare fermo e partire insieme.'},
+    {id:4,tipo:'poesia',titolo:'Conta fino a tre',data:'29 set',min:1,righe:['Uno: respira.','Due: non rispondere.','Tre: guarda come l\'acqua','trova sempre la strada','senza chiedere il permesso','a nessuno.']},
+    {id:5,tipo:'altro',titolo:'Suoni d\'autunno',data:'27 set',min:2,img:1,intro:'Cinque suoni che per me sono già novembre. Se li senti, anche tu sai che è cambiata stagione.',lista:['Un pianoforte in una stanza vuota','La voce di mia nonna, registrata al telefono','La pioggia sul tetto del garage','Il rumore della caffettiera alle sei','Un treno lontano, di notte']},
+    {id:6,tipo:'racconto',titolo:'Quarantadue passi',data:'20 set',min:2,img:2,par:['Da casa mia al mare sono quarantadue passi, ma solo se non ti fermi a guardare nessuno. Io mi fermo sempre.','Per questo ci metto un\'ora, e per questo ormai mi conoscono tutti sul lungomare: il signore del giornale, i bambini con il secchiello, il cane che fa finta di non vedermi.']},
+    {id:7,tipo:'pensiero',titolo:'Il rumore delle cose non dette',data:'14 set',min:1,testo:'Le cose non dette fanno più rumore di quelle gridate. Solo che nessuno ce lo insegna, e restiamo a chiedere silenzio.'}
+  ];
+  const ORDER=['poesia','racconto','pensiero','altro'];
+  const SLOT={poesia:1,racconto:2,pensiero:3,altro:4};
+  const LBL={poesia:'Poesie',racconto:'Racconti',pensiero:'Pensieri',altro:'Altro'};
+  const TAG={poesia:'Poesia',racconto:'Racconto',pensiero:'Pensiero',altro:'Altro'};
+  const DESC={poesia:'Versi brevi, di giorni normali.',racconto:'Storie piccole, da leggere su un tram.',pensiero:'Frasi che non stanno ferme.',altro:'Liste, suoni, cose che non so dove mettere.'};
+  const IG='https://www.instagram.com/';   // SEGNAPOSTO: sostituire con il tuo profilo quando lo crei
+  const IGSVG='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg>';
+
+  const tag=t=>`<span class="tg c${SLOT[t.tipo]}">${TAG[t.tipo]}</span>`;
+  const lines=t=>t.righe.map(r=>r===''?'<span class="ln br"></span>':`<span class="ln">${r}</span>`).join('');
+  const cut=(s,n)=>s.length>n?s.slice(0,n).replace(/\s+\S*$/,'')+'…':s;
+  const snip=t=>t.tipo==='poesia'?t.righe.filter(Boolean).slice(0,2).join(' / '):t.tipo==='racconto'?cut(t.par[0],110):t.tipo==='pensiero'?cut(t.testo,110):cut(t.intro,110);
+  const art=s=>{const v=s%3;const g=[
+    '<rect width="120" height="80" class="f2"/><circle cx="86" cy="30" r="22" class="f3"/><path d="M0 80V54Q38 14 78 54V80Z" class="f1"/><rect x="78" y="62" width="42" height="18" class="f4"/>',
+    '<rect width="120" height="80" class="f3"/><circle cx="44" cy="40" r="26" class="f1"/><circle cx="76" cy="40" r="26" class="f2"/><rect y="68" width="120" height="12" class="f4"/>',
+    '<rect width="120" height="80" class="f4"/><path d="M0 80A60 60 0 0 1 120 80Z" class="f2"/><path d="M20 80A40 40 0 0 1 100 80Z" class="f1"/><path d="M40 80A20 20 0 0 1 80 80Z" class="f3"/>'][v];
+    return `<svg class="art" viewBox="0 0 120 80" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${g}</svg>`;};
+  const row=(t,i,ex)=>`<a class="row" href="#/testo/${t.id}" style="--rc:var(--r${SLOT[t.tipo]});--oc:var(--o${SLOT[t.tipo]})"><span class="n">${String(i+1).padStart(2,'0')}</span><span class="tt">${t.titolo}</span><span class="meta">${tag(t)}<em>${t.data} · ${t.min} min</em></span></a>`;
+
+  const header=cur_=>`<header class="hd"><a class="brand" href="#/">Appunti a margine</a>
+    <nav class="nav" aria-label="Principale"><a href="#/" data-go="rooms">Stanze</a><a href="#/chi"${cur_==='chi'?' aria-current="page"':''}>Chi sono</a>
+    <a class="ico" href="${IG}" target="_blank" rel="noopener" aria-label="Instagram (link da collegare)">${IGSVG}</a>
+    <!-- TikTok: quando l'account esiste, aggiungi qui un'altra icona con il suo link -->
+    </nav></header>`;
+  const footer=()=>`<footer class="ft"><p class="ft-k">Seguimi</p>
+    <a class="ft-big" href="${IG}" target="_blank" rel="noopener">Instagram <span>↗</span></a>
+    <!-- TikTok: togli il commento quando l'account esiste: <a class="ft-big" href="…">TikTok <span>↗</span></a> -->
+    <p class="ft-c">© Appunti a margine (nome provvisorio) · il link Instagram è un segnaposto</p></footer>`;
+
+  // ── Pagine ──
+  let ctx=null, pageIn=()=>{};
+  function setup(fn){ ctx&&ctx.revert(); ScrollTrigger.getAll().forEach(t=>t.kill()); ctx=gsap.context(fn,view); }
+  function reveals(){ if(reduce) return; gsap.utils.toArray('[data-rv]',view).forEach(el=>gsap.from(el,{y:34,opacity:0,duration:.8,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 92%',once:true}})); }
+
+  function pageHome(arg,withIntro){
+    const rooms=ORDER.map((k,i)=>{const L=T.filter(t=>t.tipo===k),l=L[0];
+      return `<section class="room${i===0?' open':''}" data-s="${i+1}"><button class="room-h" type="button" aria-expanded="${i===0}"><span class="n">0${i+1}</span><span class="t">${LBL[k]}</span><span class="c">${L.length} ${L.length===1?'testo':'testi'}</span></button>
+        <div class="room-b"><p class="room-lab">Ultimo pubblicato</p><h3 class="room-last">${l.titolo}</h3><p class="room-sn">${snip(l)}</p><a class="enter" href="#/stanza/${k}">Entra nella stanza →</a></div></section>`;}).join('');
+    const mq=['Poesie','Racconti','Pensieri','Altro'].map(w=>`<span>${w}</span><span><em>✶</em></span>`).join('');
+    view.innerHTML=header('home')+`
+      <section class="hero"><p class="kick">Blog personale</p>
+        <h1 class="hero-t" id="heroT">${'Poesie, racconti e pensieri scritti quando capita.'.split(' ').map(w=>`<span class="hw"><span>${w}</span></span>`).join(' ')}</h1>
+        <div class="hero-bot"><div><p class="hero-s" id="heroS">Un posto per le cose che scrivo e non so dove mettere. Entra, scegli una stanza.</p><button class="btn" id="heroB" type="button" data-go="rooms">Entra nelle stanze <span>↓</span></button></div>
+          <div class="shapes" aria-hidden="true"><div class="shp s1" data-d="30"><i></i></div><div class="shp s2" data-d="-22"><i></i></div><div class="shp s3" data-d="18"><i></i></div><div class="shp s4" data-d="-36"><i></i></div></div></div></section>
+      <div class="marq" aria-hidden="true"><div class="marq-in">${mq+mq+mq+mq}</div></div>
+      <div class="sec-h" id="rooms" data-rv><h2>Le stanze</h2><p>Ogni genere ha la sua stanza. Toccane una per aprirla.</p></div>
+      <div class="rooms" data-rv>${rooms}</div>
+      <div class="sec-h" data-rv><h2>Ultimi testi</h2></div>
+      <div class="rows" data-rv>${T.slice(0,5).map((t,i)=>row(t,i)).join('')}</div>`+footer();
+    setup(()=>{
+      if(reduce){ pageIn=()=>{}; return; }
+      gsap.set('.hw>span',{yPercent:115}); gsap.set(['#heroS','#heroB','.kick'],{opacity:0,y:18}); gsap.set('.shp',{opacity:0,scale:.6});
+      pageIn=()=>{ const tl=gsap.timeline();
+        tl.to('.kick',{opacity:1,y:0,duration:.6}).to('.hw>span',{yPercent:0,duration:1,stagger:.07,ease:'power4.out'},'-=.4')
+          .to(['#heroS','#heroB'],{opacity:1,y:0,duration:.7,stagger:.1,ease:'power3.out'},'-=.6')
+          .to('.shp',{opacity:1,scale:1,duration:.9,stagger:.1,ease:'back.out(1.6)'},'-=.8'); return tl; };
+      // fluttuazione continua + parallasse col mouse
+      $$('.shp').forEach((s,i)=>{ gsap.to($('i',s),{y:i%2?-14:14,rotate:i%2?-8:8,duration:3+i*.7,repeat:-1,yoyo:true,ease:'sine.inOut'}); });
+      gsap.to('.s3 i',{rotate:360,duration:26,repeat:-1,ease:'none'});
+      reveals();
+    });
+    if(reduce) pageIn=()=>{};
+    else if(!withIntro) pageIn();
+  }
+
+  function pageStanza(k,withIntro){
+    if(!ORDER.includes(k)) k='poesia'; const s=SLOT[k], L=T.filter(t=>t.tipo===k), others=ORDER.filter(x=>x!==k);
+    view.innerHTML=header('stanza')+`<section class="st-hero" style="background:var(--r${s});color:var(--o${s})"><p class="kick">Stanza ${String(s).padStart(2,'0')} · ${L.length} ${L.length===1?'testo':'testi'}</p><h1 id="stT">${LBL[k]}</h1><p>${DESC[k]}</p></section>
+      <div class="rows">${L.map((t,i)=>row(t,i)).join('')}</div>
+      <div class="more" data-rv><h2 style="margin:0;font-family:var(--fd);font-weight:800;font-size:1.6rem;letter-spacing:-.02em">Altre stanze</h2><div class="more-l">${others.map(o=>`<a href="#/stanza/${o}" style="background:var(--r${SLOT[o]});color:var(--o${SLOT[o]})">${LBL[o]}</a>`).join('')}</div></div>`+footer();
+    setup(()=>{ if(!reduce){ pageIn=()=>gsap.from('#stT,.st-hero p',{yPercent:60,opacity:0,duration:.9,stagger:.1,ease:'power4.out'}); reveals(); } });
+    if(!reduce) pageIn();
+  }
+
+  function pageTesto(id){
+    const t=T.find(x=>x.id==id)||T[0], nx=T[(T.indexOf(t)+1)%T.length], s=SLOT[nx.tipo];
+    let b='';
+    if(t.tipo==='poesia') b=`<div class="rd-poem">${lines(t)}</div>`;
+    else if(t.tipo==='racconto') b=`<div class="rd-img">${art(t.img)}</div>`+t.par.map(p=>`<p class="rd-p">${p}</p>`).join('');
+    else if(t.tipo==='pensiero') b=`<blockquote class="rd-q">${t.testo}</blockquote>`;
+    else b=`<div class="rd-img">${art(t.img)}</div><p class="rd-p">${t.intro}</p><ol class="rd-list">${t.lista.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+    view.innerHTML=header('testo')+`<article class="rd"><a class="back" href="#/stanza/${t.tipo}">← ${LBL[t.tipo]}</a>
+      <div class="rd-meta">${tag(t)}<span>${t.data} · ${t.min} min di lettura</span></div><h1 id="rdT">${t.titolo}</h1>${b}
+      <a class="next" href="#/testo/${nx.id}" style="background:var(--r${s});color:var(--o${s})"><small>Prossimo testo</small><b>${nx.titolo} →</b></a></article>`+footer();
+    setup(()=>{ if(!reduce){ pageIn=()=>{ gsap.from('#rdT',{yPercent:40,opacity:0,duration:.8,ease:'power4.out'}); gsap.from('.rd-poem .ln,.rd-p,.rd-q,.rd-list li',{opacity:0,y:16,duration:.8,stagger:.12,delay:.3,ease:'power2.out'}); }; } });
+    if(!reduce) pageIn();
+  }
+
+  function pageChi(){
+    view.innerHTML=header('chi')+`<section class="about"><h1 id="chT">Chi scrive</h1>
+      <p>Qui ci sarà la tua presentazione: due o tre righe su chi sei, perché scrivi e cosa trovi in queste stanze. Per ora è un segnaposto.</p>
+      <ul class="soc"><li><a href="${IG}" target="_blank" rel="noopener">Instagram <span>↗</span></a></li>
+        <!-- TikTok: aggiungi qui un <li> quando l'account esiste -->
+        <li><a href="#/stanza/poesia">Leggi le poesie <span>→</span></a></li></ul></section>`+footer();
+    setup(()=>{ if(!reduce){ pageIn=()=>gsap.from('#chT,.about p,.soc li',{yPercent:30,opacity:0,duration:.8,stagger:.1,ease:'power3.out'}); } });
+    if(!reduce) pageIn();
+  }
+
+  // ── Router con sipario ──
+  const route=()=>{const [,p,a]=location.hash.slice(1).split('/');return {p:p||'home',a};};
+  function render(withIntro){ const {p,a}=route(); site.scrollTop=0; prog.style.width='0';
+    ({home:pageHome,stanza:pageStanza,testo:pageTesto,chi:pageChi}[p]||pageHome)(a,withIntro); ScrollTrigger.refresh(); }
+  function navigate(){
+    if(reduce){ render(false); return; }
+    const {p,a}=route(); const col=p==='stanza'?`var(--r${SLOT[a]||1})`:p==='testo'?`var(--r${SLOT[(T.find(x=>x.id==a)||T[0]).tipo]})`:'var(--r1)';
+    gsap.set(wipe,{display:'block',background:col,yPercent:100});
+    gsap.to(wipe,{yPercent:0,duration:.45,ease:'power3.inOut',onComplete:()=>{ render(false); gsap.to(wipe,{yPercent:-100,duration:.55,delay:.05,ease:'power3.inOut',onComplete:()=>gsap.set(wipe,{display:'none'})}); }});
+  }
+  window.addEventListener('hashchange',navigate);
+  site.addEventListener('scroll',()=>{ if(route().p==='testo'){ const m=site.scrollHeight-site.clientHeight; prog.style.width=(m>0?site.scrollTop/m*100:0)+'%'; } });
+
+  // ── Intro ──
+  function playIntro(){
+    if(reduce){ render(false); return; }
+    const words=$$('.intro-w',intro);
+    if(!words[0].querySelector('.ch')) words.forEach(w=>{ w.innerHTML=[...w.textContent].map(c=>`<span class="ch">${c===' '?'&nbsp;':c}</span>`).join(''); });
+    gsap.set(intro,{display:'flex',background:'var(--bg)'}); gsap.set('.bar',{scaleY:0,transformOrigin:'50% 100%'}); gsap.set('#introIn',{opacity:1,y:0});
+    render(true);
+    const tl=gsap.timeline({onComplete:()=>{ gsap.set(intro,{display:'none'}); try{sessionStorage.setItem('intro-vista','1');}catch(_){} }});
+    $('#skip').onclick=()=>tl.progress(1);
+    tl.from('.ch',{yPercent:120,rotate:7,duration:.9,stagger:.035,ease:'power4.out'})
+      .from('.intro-line',{scaleX:0,transformOrigin:'left',duration:.8,ease:'power3.inOut'},'-=.5')
+      .from('.intro-s',{opacity:0,y:12,duration:.6},'-=.4')
+      .to('#introIn',{opacity:0,y:-24,duration:.4,delay:.55})
+      .to('.bar',{scaleY:1,duration:.55,stagger:.09,ease:'power3.inOut'})
+      .set(intro,{background:'transparent'})
+      .set('.bar',{transformOrigin:'50% 0%'})
+      .to('.bar',{scaleY:0,duration:.6,stagger:.09,ease:'power3.inOut'},'+=.05')
+      .add(()=>pageIn(),'-=.55');
+  }
+
+  // ── Cursore e parallasse (solo mouse) ──
+  if(!reduce && matchMedia('(hover:hover) and (pointer:fine)').matches){
+    const qx=gsap.quickTo(cur,'x',{duration:.35,ease:'power3'}), qy=gsap.quickTo(cur,'y',{duration:.35,ease:'power3'});
+    shell.addEventListener('mousemove',e=>{
+      const r=shell.getBoundingClientRect(); qx(e.clientX-r.left); qy(e.clientY-r.top); cur.classList.add('on');
+      const nx=(e.clientX-r.left)/r.width-.5, ny=(e.clientY-r.top)/r.height-.5;
+      $$('.shp').forEach(s=>gsap.to(s,{x:nx*+s.dataset.d*2,y:ny*+s.dataset.d*2,duration:.9,ease:'power2.out',overwrite:'auto'}));
+    });
+    shell.addEventListener('mouseover',e=>cur.classList.toggle('big',!!e.target.closest('a,button')));
+    shell.addEventListener('mouseleave',()=>cur.classList.remove('on'));
+  }
+
+  // ── Click: stanze che si aprono, scroll alle stanze ──
+  function openRoom(room){ $$('.room',view).forEach(r=>{const on=r===room;r.classList.toggle('open',on);$('.room-h',r).setAttribute('aria-expanded',on);}); }
+  view.addEventListener('click',e=>{
+    const h=e.target.closest('.room-h'); if(h){ openRoom(h.parentElement); return; }
+    const g=e.target.closest('[data-go="rooms"]');
+    if(g){ e.preventDefault(); if(route().p!=='home'){ location.hash='#/'; return; } site.scrollTo({top:$('#rooms',view).offsetTop-60,behavior:reduce?'auto':'smooth'}); }
+  });
+  view.addEventListener('mouseover',e=>{ const r=e.target.closest('.room'); if(r&&shell.clientWidth>=720&&!r.classList.contains('open')) openRoom(r); });
+
+  // ── Barra comandi mockup ──
+  const PAL=[['Inchiostro e ciliegia',['#14100F','#D7263D','#F4B6B0','#F3EBDD','#6B1226']],['Notte e pesca',['#101A2E','#FFB38A','#9DB4E8','#FF6F61','#FDEBDD']],['Carta e cobalto',['#F4EFE6','#1F3FFF','#F6D55C','#F2A7C3','#1F5B45']]];
+  const pals=$('#pals'), pn=$('#palName');
+  PAL.forEach(([n,c],i)=>{ const b=document.createElement('button'); b.type='button'; b.className='pal'; b.title=n; b.setAttribute('aria-label','Palette '+n); b.innerHTML=c.map(x=>`<i style="background:${x}"></i>`).join(''); b.onclick=()=>setPal(i); pals.appendChild(b); });
+  function setPal(i){ stage.dataset.pal=i; pn.textContent=PAL[i][0]; [...pals.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i)); try{localStorage.setItem('blog2-pal',i);}catch(_){} }
+  function setView(v){ stage.dataset.view=v; $$('#seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v)); setTimeout(()=>ScrollTrigger.refresh(),450); }
+  $$('#seg button').forEach(b=>b.onclick=()=>setView(b.dataset.v));
+  $('#again').onclick=()=>{ try{sessionStorage.removeItem('intro-vista');}catch(_){} if(location.hash!=='#/'&&location.hash!==''){ history.replaceState(null,'',location.pathname+location.search+'#/'); } playIntro(); };
+
+  // stato iniziale: ?p=palette&v=m|d&intro=0
+  const q=new URLSearchParams(location.search); let p0=+(q.get('p')||0); try{ if(!q.has('p')) p0=+localStorage.getItem('blog2-pal')||0; }catch(_){}
+  setPal(Math.min(Math.max(p0,0),2)); setView(q.get('v')==='m'?'m':'d');
+  let seen=false; try{ seen=sessionStorage.getItem('intro-vista')==='1'; }catch(_){}
+  const wantIntro = q.get('intro')==='1' || (q.get('intro')!=='0' && !seen);
+  if(route().p==='home' && wantIntro) playIntro(); else render(false);
+  setTimeout(()=>document.body.classList.add('ready'),600);
+})();
+</script>
+</body>
+</html>

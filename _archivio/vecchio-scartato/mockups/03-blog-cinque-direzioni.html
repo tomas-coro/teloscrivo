@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  viewer-template.html · scocca del visualizzatore di direzioni (skill `mockup`)
+  ─────────────────────────────────────────────────────────────────────────────
+  SCOCCA FISSA, CONTENUTO VARIABILE.
+  La skill sostituisce SOLO il contenuto di <div id="panels"> con i 3/4 pannelli
+  reali. Ogni direzione è un <section class="dir-panel" data-name data-mood data-why>
+  che contiene SOLO il design di anteprima: la barra-titolo (nome+mood) e la riga
+  "perché" sono disegnate automaticamente dallo script qui sotto.
+  I chip in #chips sono generati automaticamente, uno per pannello.
+  NON modificare la scocca o lo script: cambia solo #panels (e <title>).
+-->
+<title>Blog - 5 direzioni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171e; --ink-2:#1b1f28; --ink-3:#232936;
+    --line:#323a4a; --bone:#e9e4d8; --bone-dim:#a39e93;
+    --brass:#e0a96d; --brass-deep:#b9824a; --ok:#7fb59a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%, #1d2230 0, transparent 60%), var(--ink);
+    color:var(--bone); font-family:"Hanken Grotesk",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 64px}
+
+  header.top{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+  .eyebrow{font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:700}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(1.4rem,4vw,2rem);margin:.35rem 0 0;letter-spacing:-.015em}
+  .lead{color:var(--bone-dim);font-size:.9rem;margin:.45rem 0 0;max-width:52ch}
+
+  /* chip bar */
+  #chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+  #chips button{
+    font:inherit;font-weight:600;font-size:.84rem;color:var(--bone-dim);
+    background:var(--ink-2);border:1px solid var(--line);border-radius:11px;
+    padding:10px 15px;min-height:44px;cursor:pointer;display:flex;align-items:center;gap:8px;
+    transition:color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  #chips button:hover{color:var(--bone)}
+  #chips button[aria-pressed="true"]{border-color:var(--brass);color:var(--bone);background:var(--ink-3)}
+  #chips button .swatch{width:11px;height:11px;border-radius:4px;background:var(--brass);flex:none}
+
+  /* palco */
+  #stage{position:relative}
+  .dir-panel[hidden]{display:none}
+  .dir-panel{animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .dir-card{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .dir-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .dir-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.1rem;line-height:1.15}
+  .dir-mood{font-size:.74rem;color:var(--bone-dim);margin-top:2px}
+  .dir-tag{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:5px 9px;border-radius:99px;white-space:nowrap;background:var(--ink-3);color:var(--bone-dim);border:1px solid var(--line)}
+  .dir-tag[data-role="Attuale"]{background:rgba(224,169,109,.16);color:var(--brass);border-color:var(--brass-deep)}
+  .dir-tag[data-role="Variante +"]{background:rgba(127,181,154,.14);color:var(--ok);border-color:#3f5a4f}
+  .dir-body{padding:20px 18px}
+  .dir-why{display:flex;gap:9px;align-items:flex-start;padding:13px 18px;border-top:1px solid var(--line);background:rgba(255,255,255,.015);font-size:.82rem;color:var(--bone-dim)}
+  .dir-why b{color:var(--bone);font-weight:600}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+
+  /* ───────── stili di esempio dei pannelli (la skill li sostituisce) ───────── */
+  .demo-nav{display:flex;gap:8px;align-items:center;font-size:.7rem;color:var(--bone-dim);margin-bottom:14px}
+  .demo-dot{width:8px;height:8px;border-radius:99px;background:var(--line)}
+  .demo-h{margin:0 0 8px;line-height:1.05}
+  .demo-p{margin:0 0 16px;font-size:.86rem;color:var(--bone-dim)}
+  .demo-btn{font:inherit;font-weight:700;font-size:.82rem;border:0;border-radius:9px;padding:11px 16px;min-height:44px;cursor:pointer;transition:transform .12s ease, filter .12s ease}
+  .demo-btn:hover{transform:translateY(-2px);filter:brightness(1.07)}
+  .t-edit .demo-h{font-family:"Bodoni Moda",serif;font-weight:500;font-size:1.7rem;color:#f1ece1}
+  .t-edit .demo-btn{background:#e9e4d8;color:#181818}
+  .t-retro{background:linear-gradient(180deg,#241a12,#1b1f28);margin:-20px -18px;padding:20px 18px;border-radius:0}
+  .t-retro .demo-h{font-family:"Bodoni Moda",serif;font-style:italic;font-weight:500;font-size:1.7rem;color:#f0c98a}
+  .t-retro .demo-btn{background:#d98b3f;color:#1a1206}
+  .t-tech .demo-h{font-family:"Hanken Grotesk";font-weight:700;letter-spacing:-.02em;font-size:1.6rem;color:#dfe7f2}
+  .t-tech .demo-btn{background:#5b7fb0;color:#0c1118}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Direzioni a confronto</div>
+    <h1 id="mockTitle">Blog personale - 5 direzioni</h1>
+    <p class="lead">Tocca un nome in alto per cambiare direzione. Ogni tile mostra l'estetica, un'interazione viva e il <b>perché</b>.</p>
+  </header>
+
+  <nav id="chips" role="tablist" aria-label="Direzioni"></nav>
+
+  <main id="stage">
+    <div id="panels">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Libre+Franklin:wght@400;500;600&family=Special+Elite&family=Courier+Prime:wght@400;700&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Hedvig+Letters+Serif&family=Spectral:ital,wght@0,400;1,400&family=Gloock&display=swap" rel="stylesheet">
+<style>
+/* ===== comune a tutte le direzioni ===== */
+.vt{display:flex;gap:8px;margin:0 0 14px;align-items:center}
+.vt span{font-size:.72rem;color:var(--bone-dim);letter-spacing:.12em;text-transform:uppercase;margin-right:4px}
+.vt button{font:600 .82rem "Hanken Grotesk",sans-serif;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--ink-2);color:var(--bone-dim);cursor:pointer}
+.vt button[aria-pressed="true"]{border-color:var(--brass);color:var(--bone);background:var(--ink-3)}
+.frame{container-type:inline-size;position:relative;height:640px;overflow:hidden;margin:0 auto;border-radius:22px;border:1px solid var(--line)}
+.frame.is-m{width:375px;max-width:100%}
+.frame.is-d{width:100%}
+.screen{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain}
+.screen[hidden]{display:none}
+.frame a,.frame button{-webkit-tap-highlight-color:transparent}
+.frame .it{display:flex;text-decoration:none;color:inherit;cursor:pointer}
+.frame .back{font:inherit;cursor:pointer}
+.frame *{min-width:0}
+.hint{margin:10px auto 0;font-size:.74rem;color:var(--bone-dim);text-align:center}
+
+/* ===== 1 · RIVISTA ===== */
+.d1{background:#f7f6f2;color:#15130f;font-family:"Newsreader",serif;font-size:17px;border-color:#cfcdc6}
+.d1 .mast{padding:26px 18px 6px;text-align:center;border-bottom:4px double #15130f}
+.d1 .kick{font:600 10px/1.3 "Hanken Grotesk",sans-serif;letter-spacing:.22em;text-transform:uppercase}
+.d1 .mast h2{font:italic 500 clamp(34px,11cqi,60px)/1 "Bodoni Moda",serif;margin:12px 0 8px;letter-spacing:-.01em}
+.d1 .nv{display:flex;flex-wrap:wrap;justify-content:center;gap:0 2px}
+.d1 .nv button{font:600 11px "Hanken Grotesk",sans-serif;letter-spacing:.1em;text-transform:uppercase;background:none;border:0;color:inherit;min-height:44px;padding:0 6px;cursor:pointer}
+.d1 .nv button[aria-current="true"]{color:#b3261e;text-decoration:underline;text-underline-offset:6px}
+.d1 .body{padding:18px 18px 8px}
+.d1 .feat{padding-bottom:18px;border-bottom:1px solid #15130f}
+.d1 .feat h3{font:italic 500 clamp(28px,8.5cqi,46px)/1.05 "Bodoni Moda",serif;margin:8px 0 10px}
+.d1 .feat p{font-style:italic;font-size:19px;line-height:1.45;margin:0 0 12px}
+.d1 .go{font:600 11px "Hanken Grotesk",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#b3261e;background:none;border:0;border-bottom:1px solid #b3261e;min-height:44px;padding:0;cursor:pointer}
+.d1 .idx{display:flex;flex-direction:column}
+.d1 .it{align-items:baseline;gap:12px;min-height:60px;padding:12px 0;border-bottom:1px solid #cfcdc6;transition:transform .25s ease}
+.d1 .it:hover{transform:translateX(6px)}
+.d1 .it .n{font:italic 500 18px "Bodoni Moda",serif;color:#8a867c;width:26px;flex:none;transition:color .2s}
+.d1 .it:hover .n{color:#b3261e}
+.d1 .it .tx{flex:1}
+.d1 .it .k{display:block;font:600 10px "Hanken Grotesk",sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#6d695f}
+.d1 .it .t{font-size:21px;line-height:1.2;background:linear-gradient(#15130f,#15130f) 0 100%/0 1px no-repeat;transition:background-size .35s ease}
+.d1 .it:hover .t{background-size:100% 1px}
+.d1 .it .m{font:12px "Hanken Grotesk",sans-serif;color:#6d695f;white-space:nowrap}
+.d1 .foot{display:flex;justify-content:space-between;gap:12px;padding:14px 18px 22px;font:600 11px "Hanken Grotesk",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.d1 .foot a{color:inherit;display:inline-flex;align-items:center;min-height:44px}
+.d1 .bar{position:sticky;top:0;height:3px;z-index:3}
+.d1 .bar i{display:block;height:100%;width:0;background:#b3261e}
+.d1 .back{background:none;border:0;font:600 11px "Hanken Grotesk",sans-serif;letter-spacing:.16em;text-transform:uppercase;min-height:44px;padding:0 18px;color:#15130f}
+.d1 .rd{padding:6px 18px 40px}
+.d1 .rd h2{font:italic 500 clamp(32px,10cqi,56px)/1.02 "Bodoni Moda",serif;margin:10px 0 8px}
+.d1 .by{font:12px "Hanken Grotesk",sans-serif;color:#6d695f;margin:0 0 22px}
+.d1 .poem{font-size:20px;line-height:1.65}
+.d1 .poem p{margin:0 0 1.2em}
+.d1 .ini{float:left;font:italic 500 66px/.78 "Bodoni Moda",serif;color:#b3261e;padding:8px 8px 0 0}
+.d1 .mg{margin:26px 0 0;padding-left:14px;border-left:2px solid #b3261e;font-style:italic;font-size:16px;line-height:1.5;color:#3d3a33}
+.d1 .mg b{display:block;font:600 10px "Hanken Grotesk",sans-serif;letter-spacing:.18em;text-transform:uppercase;font-style:normal;color:#b3261e;margin-bottom:4px}
+@container (min-width:700px){
+  .d1 .body{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;padding:30px 40px 10px}
+  .d1 .feat{border-bottom:0;border-right:1px solid #15130f;padding:0 40px 0 0}
+  .d1 .feat p{font-size:22px}
+  .d1 .rd{display:grid;grid-template-columns:minmax(0,1fr) 220px;column-gap:50px;padding:6px 60px 50px}
+  .d1 .rd>.kick,.d1 .rd>h2,.d1 .rd>.by{grid-column:1/-1}
+  .d1 .mg{margin:0;align-self:start}
+  .d1 .foot{padding:14px 40px 26px}
+  .d1 .back{padding:0 40px}
+}
+
+/* ===== 2 · LUME (notte, lampada che segue il dito) ===== */
+.d2{background:#0c0f17;color:#8e93a6;font-family:"Cormorant",serif;border-color:#252b3b}
+.d2 .lit{--x:50%;--y:50%;background:radial-gradient(circle 190px at var(--x) var(--y),#f8ebc9 0,#d9ccae 35%,#8e93a6 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.d2 .head{padding:34px 22px 10px}
+.d2 .lab{font:500 10px/1.3 "Libre Franklin",sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#b79f6e}
+.d2 .head h2{font:italic 300 clamp(40px,13cqi,76px)/.98 "Cormorant",serif;margin:14px 0 12px;color:#f3e7cc}
+.d2 .head p{font:italic 400 19px/1.4 "Cormorant",serif;margin:0 0 6px;max-width:30ch}
+.d2 .nv{display:flex;flex-wrap:wrap;gap:0 4px;padding:6px 12px}
+.d2 .nv button{font:500 11px "Libre Franklin",sans-serif;letter-spacing:.16em;text-transform:uppercase;background:none;border:0;color:#8e93a6;min-height:44px;padding:0 10px;cursor:pointer;transition:color .2s}
+.d2 .nv button:hover{color:#f3e7cc}
+.d2 .nv button[aria-current="true"]{color:#f3e7cc;box-shadow:inset 0 -2px #b79f6e}
+.d2 .list{padding:8px 22px 10px}
+.d2 .it{flex-direction:column;justify-content:center;gap:2px;min-height:76px;padding:14px 0;border-top:1px solid #1f2535}
+.d2 .it .k{font:500 10px "Libre Franklin",sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#b79f6e}
+.d2 .it .t{font:italic 300 clamp(28px,8.5cqi,44px)/1.1 "Cormorant",serif;display:block}
+.d2 .it .m{font:12px "Libre Franklin",sans-serif;color:#6e7488}
+.d2 .foot{padding:14px 22px 30px;font:500 11px "Libre Franklin",sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.d2 .foot a{color:#b79f6e;display:inline-flex;align-items:center;min-height:44px;margin-right:18px}
+.d2 .back{background:none;border:0;color:#b79f6e;font:500 11px "Libre Franklin",sans-serif;letter-spacing:.18em;text-transform:uppercase;min-height:44px;padding:0 22px}
+.d2 .rd{padding:10px 26px 70px}
+.d2 .rd h2{font:italic 300 clamp(40px,12.5cqi,72px)/1 "Cormorant",serif;margin:12px 0 28px;display:block}
+.d2 .rd p{font:italic 400 clamp(22px,6.4cqi,30px)/1.5 "Cormorant",serif;margin:0 0 1.6em}
+.d2 .s-read:not([hidden]) .rd p,.d2 .s-read:not([hidden]) .rd h2{animation:rise 1.1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*.32s)}
+@keyframes rise{from{opacity:0;transform:translateY(12px);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@container (min-width:700px){
+  .d2 .home{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
+  .d2 .head{padding:60px 20px 30px 50px;position:sticky;top:0;align-self:start}
+  .d2 .list{padding:60px 50px 10px 20px}
+  .d2 .foot{grid-column:1/-1;padding:10px 50px 34px}
+  .d2 .rd{max-width:640px;margin:0 auto;padding:20px 20px 120px}
+  .d2 .back{padding:0 50px}
+}
+
+/* ===== 3 · DATTILOSCRITTO (zine fotocopiato) ===== */
+.d3{background:#dedbd3;color:#1a1a1a;font-family:"Courier Prime",monospace;border-color:#1a1a1a;border-width:2px}
+.d3::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.12;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.d3 .sheet{padding:22px 18px 6px}
+.d3 .top{display:flex;justify-content:space-between;gap:10px;font-size:12px;border-bottom:2px solid #1a1a1a;padding-bottom:8px}
+.d3 h2{font:400 clamp(26px,8.6cqi,50px)/1.05 "Special Elite",serif;letter-spacing:.02em;margin:16px 0 4px;text-transform:uppercase}
+.d3 .sub{font-size:13px;margin:0 0 14px}
+.d3 .nv{display:flex;flex-wrap:wrap;gap:0 4px;margin:0 -8px 6px}
+.d3 .nv button{font:700 12px "Courier Prime",monospace;text-transform:uppercase;background:none;border:0;min-height:44px;padding:0 8px;cursor:pointer;color:#1a1a1a}
+.d3 .nv button[aria-current="true"]{background:#1a1a1a;color:#dedbd3}
+.d3 .it{align-items:baseline;gap:8px;min-height:52px;padding:8px;border-bottom:1px dashed #1a1a1a88}
+.d3 .it .n{font-weight:700}
+.d3 .it .t{font-size:16px;font-weight:700}
+.d3 .it .k{font-size:11px;text-transform:uppercase;display:block;opacity:.75}
+.d3 .it .dots{flex:1;border-bottom:2px dotted #1a1a1a;transform:translateY(-4px);min-width:12px}
+.d3 .it .m{font-size:12px;white-space:nowrap}
+.d3 .it:hover{background:#1a1a1a;color:#dedbd3}
+.d3 .it:hover .dots{border-color:#dedbd3}
+.d3 .stamp{display:inline-block;font:700 11px "Courier Prime",monospace;letter-spacing:.1em;color:#c7381f;border:2px solid #c7381f;padding:1px 5px;transform:rotate(-5deg);margin-left:6px;vertical-align:middle}
+.d3 .it:hover .stamp{color:#ff8b72;border-color:#ff8b72}
+.d3 .side{margin:18px 18px 8px;padding:14px;background:#efece4;border:1px solid #1a1a1a;box-shadow:4px 4px 0 #1a1a1a;font-size:14px;line-height:1.45}
+.d3 .side b{font-family:"Special Elite",serif;display:block;margin-bottom:4px}
+.d3 .s2{transform:rotate(-1deg);margin-top:8px}
+.d3 .foot{padding:12px 18px 26px;font-size:12px}
+.d3 .foot a{color:inherit;display:inline-flex;align-items:center;min-height:44px;margin-right:18px;text-decoration:underline}
+.d3 .back{background:none;border:0;border-bottom:2px solid #1a1a1a;margin:10px 18px 0;font:700 12px "Courier Prime",monospace;text-transform:uppercase;min-height:44px;padding:0;color:#1a1a1a}
+.d3 .rd{padding:12px 20px 60px}
+.d3 .rd h2{margin:6px 0 4px;font-size:clamp(26px,8cqi,44px)}
+.d3 .typed{font-size:clamp(16px,4.5cqi,24px);line-height:1.7;margin-top:18px;min-height:380px}
+.d3 .typed .c{visibility:hidden}
+.d3 .typed .c.on{visibility:visible}
+.d3 .typed s{text-decoration-thickness:2px;color:#c7381f}
+.d3 .typed .cur::after{content:"";display:inline-block;width:.6em;height:1.05em;background:#1a1a1a;vertical-align:text-bottom;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.d3 .tools{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.d3 .tools button{font:700 12px "Courier Prime",monospace;text-transform:uppercase;min-height:44px;padding:0 14px;border:2px solid #1a1a1a;background:transparent;color:#1a1a1a;cursor:pointer}
+.d3 .tools button:hover{background:#1a1a1a;color:#dedbd3}
+@container (min-width:700px){
+  .d3 .sheet{padding:30px 44px 6px}
+  .d3 .home{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);column-gap:30px;align-items:start}
+  .d3 .side{grid-column:2;grid-row:1;align-self:start;margin:150px 44px 0 0;transform:rotate(1.2deg)}
+  .d3 .s2{align-self:end;margin:0 44px 30px 0;transform:rotate(-1deg)}
+  .d3 .foot{grid-column:1/-1;grid-row:2;padding:12px 44px 26px}
+  .d3 .rd{max-width:680px;margin:0 auto;padding:12px 20px 80px}
+}
+
+/* ===== 4 · CARATTERE (la parola e' l'immagine) ===== */
+.d4{background:#143026;color:#efe8dc;font-family:"Hedvig Letters Serif",serif;border-color:#2c5242}
+.d4 .head{padding:26px 18px 6px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.d4 .head b{font:600 13px "Bricolage Grotesque",sans-serif;letter-spacing:.04em}
+.d4 .nv{display:flex;flex-wrap:wrap;gap:0 2px;padding:0 8px 6px}
+.d4 .nv button{font:500 13px "Bricolage Grotesque",sans-serif;background:none;border:0;color:#9fb5a8;min-height:44px;padding:0 10px;cursor:pointer}
+.d4 .nv button[aria-current="true"]{color:#f2a79b}
+.d4 .nv button:hover{color:#efe8dc}
+.d4 .list{padding:6px 18px 10px}
+.d4 .it{flex-direction:column;justify-content:center;min-height:84px;padding:12px 0;border-top:1px solid #2c5242}
+.d4 .it .k{font:500 11px "Bricolage Grotesque",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#f2a79b}
+.d4 .it .t{font:300 clamp(30px,10cqi,62px)/1.02 "Bricolage Grotesque",sans-serif;font-stretch:80%;transition:font-weight .35s ease,font-stretch .35s ease,color .25s}
+.d4 .it:hover .t{font-weight:760;font-stretch:100%;color:#f2a79b}
+.d4 .it .m{font:12px "Bricolage Grotesque",sans-serif;color:#9fb5a8;margin-top:2px}
+.d4 .foot{padding:14px 18px 28px;font:500 13px "Bricolage Grotesque",sans-serif}
+.d4 .foot a{color:#f2a79b;display:inline-flex;align-items:center;min-height:44px;margin-right:18px}
+.d4 .back{background:none;border:0;color:#f2a79b;font:500 13px "Bricolage Grotesque",sans-serif;min-height:44px;padding:0 18px}
+.d4 .rd{padding:8px 18px 220px}
+.d4 .rd .k{font:500 11px "Bricolage Grotesque",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#f2a79b;margin-bottom:26px}
+.d4 .ln{white-space:nowrap;font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(22px,6.3cqi,54px);line-height:1.18;--k:0;font-weight:calc(220 + var(--k)*580);font-stretch:calc(78% + var(--k)*22%);opacity:calc(.42 + var(--k)*.58);color:color-mix(in srgb,#f2a79b calc(var(--k)*100%),#efe8dc)}
+.d4 .gap{height:1.1em}
+.d4 .nt{margin-top:60px;font:italic 400 15px/1.5 "Hedvig Letters Serif",serif;color:#9fb5a8;max-width:34ch}
+@container (min-width:700px){
+  .d4 .head{padding:34px 48px 8px}
+  .d4 .nv{padding:0 38px 10px}
+  .d4 .list{padding:10px 48px 10px}
+  .d4 .foot{padding:14px 48px 30px}
+  .d4 .rd{padding:10px 60px 240px}
+  .d4 .back{padding:0 48px}
+}
+
+/* ===== 5 · CAPITOLI (la pagina cambia luce mentre leggi) ===== */
+.d5{--bg:#eef1ee;--fg:#1d2330;--mut:#5d6a7a;background:#eef1ee;color:#1d2330;font-family:"Spectral",serif;border-color:#c5cbc6}
+.d5 .s-read{background:var(--bg);color:var(--fg);transition:color .5s ease}
+.d5 .head{padding:30px 20px 8px}
+.d5 .lab{font:600 11px "Hanken Grotesk",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#5d6a7a}
+.d5 .head h2{font:400 clamp(38px,12cqi,72px)/1 "Gloock",serif;margin:12px 0 10px;letter-spacing:-.01em}
+.d5 .head p{font-style:italic;font-size:18px;line-height:1.4;margin:0;max-width:34ch;color:#3a4352}
+.d5 .nv{display:flex;flex-wrap:wrap;gap:0 4px;padding:6px 10px}
+.d5 .nv button{font:600 12px "Hanken Grotesk",sans-serif;background:none;border:0;color:#5d6a7a;min-height:44px;padding:0 10px;cursor:pointer}
+.d5 .nv button[aria-current="true"]{color:#1d2330;box-shadow:inset 0 -2px #1d2330}
+.d5 .list{padding:6px 20px 10px}
+.d5 .it{align-items:baseline;gap:14px;min-height:64px;padding:14px 0;border-top:1px solid #c5cbc6;transition:padding .25s}
+.d5 .it:hover{padding-left:8px}
+.d5 .it .h{font:700 13px "Hanken Grotesk",sans-serif;font-variant-numeric:tabular-nums;color:#5d6a7a;width:44px;flex:none}
+.d5 .it .k{font:600 10px "Hanken Grotesk",sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#5d6a7a;display:block}
+.d5 .it .t{font:400 23px/1.2 "Gloock",serif}
+.d5 .foot{padding:14px 20px 28px;font:600 12px "Hanken Grotesk",sans-serif}
+.d5 .foot a{color:#1d2330;display:inline-flex;align-items:center;min-height:44px;margin-right:18px}
+.d5 .clock{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg);color:var(--fg);padding:0 20px;min-height:48px;border-bottom:1px solid color-mix(in srgb,var(--fg) 25%,transparent);transition:color .5s ease}
+.d5 .back{background:none;border:0;color:inherit;font:600 12px "Hanken Grotesk",sans-serif;min-height:44px;padding:0}
+.d5 .lbl{font:600 12px "Hanken Grotesk",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);transition:color .5s ease}
+.d5 .rd{padding:0 22px 40px}
+.d5 .rd h2{font:400 clamp(34px,10cqi,60px)/1.04 "Gloock",serif;margin:34px 0 10px}
+.d5 .rd .by{font:12px "Hanken Grotesk",sans-serif;color:var(--mut);margin:0 0 20px}
+.d5 .mom{min-height:420px;padding:36px 0 10px}
+.d5 .mom .tm{font:700 11px "Hanken Grotesk",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);margin-bottom:16px}
+.d5 .mom p{font-size:clamp(19px,5.4cqi,24px);line-height:1.65;margin:0 0 1.1em}
+.d5 .rv{opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s ease}
+.d5 .rv.in{opacity:1;transform:none}
+@container (min-width:700px){
+  .d5 .home{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
+  .d5 .head{padding:60px 20px 30px 50px}
+  .d5 .list{padding:56px 50px 10px 20px}
+  .d5 .foot{grid-column:1/-1;padding:10px 50px 30px}
+  .d5 .clock{padding:0 50px}
+  .d5 .rd{max-width:640px;margin:0 auto;padding:0 20px 50px}
+}
+</style>
+
+<!-- ============ 1 ============ -->
+<section class="dir-panel" data-name="Rivista letteraria" data-mood="carta bianca, rosso inchiostro · alla Paris Review / Granta" data-why="Tipografia da rivista vera: indice numerato, capolettera e nota a margine (il nome stesso del blog). Serio, ma si anima con la linea di lettura e le sottolineature che si disegnano." data-role="">
+  <div class="vt"><span>Vista</span><button type="button" data-v="m" aria-pressed="true">Mobile</button><button type="button" data-v="d" aria-pressed="false">Desktop</button></div>
+  <div class="frame d1 is-m">
+    <div class="screen s-home">
+      <header class="mast"><div class="kick">Numero 01 · Novembre 2026</div><h2>Appunti a margine</h2>
+        <nav class="nv" aria-label="Sezioni"><button type="button" data-f="tutto" aria-current="true">Tutto</button><button type="button" data-f="poesie">Poesie</button><button type="button" data-f="racconti">Racconti</button><button type="button" data-f="pensieri">Pensieri</button><button type="button" data-f="altro">Altro</button></nav></header>
+      <div class="body">
+        <article class="feat"><div class="kick">In evidenza · Poesia</div><h3>Il treno delle sei</h3><p>Alle sei il treno non arriva. Arriva il rumore del treno, che è un'altra cosa.</p><button type="button" class="go" data-open>Leggi la poesia →</button></article>
+        <div class="idx">
+          <a href="#" class="it" data-open data-c="poesie"><span class="n">01</span><span class="tx"><span class="k">Poesia</span><span class="t">Il treno delle sei</span></span><span class="m">2 min</span></a>
+          <a href="#" class="it" data-open data-c="racconti"><span class="n">02</span><span class="tx"><span class="k">Racconto</span><span class="t">La signora del terzo piano</span></span><span class="m">6 min</span></a>
+          <a href="#" class="it" data-open data-c="pensieri"><span class="n">03</span><span class="tx"><span class="k">Pensiero</span><span class="t">Sul perdere le chiavi</span></span><span class="m">1 min</span></a>
+          <a href="#" class="it" data-open data-c="altro"><span class="n">04</span><span class="tx"><span class="k">Altro</span><span class="t">Finestre di novembre</span></span><span class="m">foto</span></a>
+        </div>
+      </div>
+      <footer class="foot"><a href="#">Chi sono</a><a href="#">Instagram ↗</a></footer>
+    </div>
+    <div class="screen s-read" hidden>
+      <div class="bar"><i></i></div>
+      <button type="button" class="back" data-back>← Indice</button>
+      <article class="rd">
+        <div class="kick">Poesia · 2 min</div><h2>Il treno delle sei</h2><p class="by">di Tomas · 2 novembre 2026</p>
+        <div class="poem">
+          <p><span class="ini">A</span>lle sei il treno non arriva.<br>Arriva il rumore del treno,<br>che è un'altra cosa:<br>una promessa fatta al ferro<br>da chi non è mai partito.</p>
+          <p>Io resto sul binario<br>con le mani in tasca<br>e il nome di qualcuno<br>che non ricordo<br>di aver perso.</p>
+        </div>
+        <aside class="mg"><b>A margine</b>Scritta aspettando un treno in ritardo, che poi era in orario: ero io a essere arrivato prima.</aside>
+      </article>
+    </div>
+  </div>
+  <p class="hint">Tocca un testo per leggerlo · barra rossa = quanto hai letto</p>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="dir-panel" data-name="Lume" data-mood="notte blu, luce di lampada · alla Fiddleblack / lettura a lume di candela" data-why="Il testo e' al buio e lo illumini mentre leggi (col dito o col mouse, o scorrendo). Trasforma il leggere in un gesto: un'anima vera senza forme che ballano." data-role="" hidden>
+  <div class="vt"><span>Vista</span><button type="button" data-v="m" aria-pressed="true">Mobile</button><button type="button" data-v="d" aria-pressed="false">Desktop</button></div>
+  <div class="frame d2 is-m">
+    <div class="screen s-home"><div class="home">
+      <header class="head"><div class="lab">Poesie · racconti · pensieri</div><h2>Appunti a margine</h2><p>Un blog da leggere a luce bassa.</p>
+        <nav class="nv" aria-label="Sezioni" style="padding-left:0"><button type="button" data-f="tutto" aria-current="true">Tutto</button><button type="button" data-f="poesie">Poesie</button><button type="button" data-f="racconti">Racconti</button><button type="button" data-f="pensieri">Pensieri</button><button type="button" data-f="altro">Altro</button></nav></header>
+      <div class="list">
+        <a href="#" class="it" data-open data-c="poesie"><span class="k">Poesia · 2 min</span><span class="t lit">Il treno delle sei</span></a>
+        <a href="#" class="it" data-open data-c="racconti"><span class="k">Racconto · 6 min</span><span class="t lit">La signora del terzo piano</span></a>
+        <a href="#" class="it" data-open data-c="pensieri"><span class="k">Pensiero · 1 min</span><span class="t lit">Sul perdere le chiavi</span></a>
+        <a href="#" class="it" data-open data-c="altro"><span class="k">Altro · foto</span><span class="t lit">Finestre di novembre</span></a>
+      </div>
+      <footer class="foot"><a href="#">Chi sono</a><a href="#">Instagram ↗</a></footer>
+    </div></div>
+    <div class="screen s-read" hidden>
+      <button type="button" class="back" data-back>← Torna</button>
+      <article class="rd">
+        <div class="lab" style="font:500 10px 'Libre Franklin',sans-serif;letter-spacing:.26em;text-transform:uppercase;color:#b79f6e">Poesia · 2 min</div>
+        <h2 class="lit" style="--i:0">Il treno delle sei</h2>
+        <p class="lit" style="--i:1">Alle sei il treno non arriva.<br>Arriva il rumore del treno,<br>che è un'altra cosa:<br>una promessa fatta al ferro<br>da chi non è mai partito.</p>
+        <p class="lit" style="--i:2">Io resto sul binario<br>con le mani in tasca<br>e il nome di qualcuno<br>che non ricordo<br>di aver perso.</p>
+      </article>
+    </div>
+  </div>
+  <p class="hint">Muovi il mouse o scorri: la luce segue la lettura</p>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="dir-panel" data-name="Dattiloscritto" data-mood="carta fotocopiata, inchiostro nero, timbro rosso · alla zine / macchina da scrivere" data-why="La poesia si scrive davanti a te, con le correzioni cancellate in rosso. Ha anima perche' mostra il fare, non solo il risultato. Look 'indie' senza essere un giocattolo." data-role="" hidden>
+  <div class="vt"><span>Vista</span><button type="button" data-v="m" aria-pressed="true">Mobile</button><button type="button" data-v="d" aria-pressed="false">Desktop</button></div>
+  <div class="frame d3 is-m">
+    <div class="screen s-home"><div class="home">
+      <div class="sheet">
+        <div class="top"><span>FOGLIO N. 01</span><span>02.11.2026</span></div>
+        <h2>Appunti a margine</h2><p class="sub">poesie, racconti e pensieri battuti a macchina</p>
+        <nav class="nv" aria-label="Sezioni"><button type="button" data-f="tutto" aria-current="true">Tutto</button><button type="button" data-f="poesie">Poesie</button><button type="button" data-f="racconti">Racconti</button><button type="button" data-f="pensieri">Pensieri</button><button type="button" data-f="altro">Altro</button></nav>
+        <a href="#" class="it" data-open data-c="poesie"><span class="n">01</span><span><span class="k">Poesia</span><span class="t">Il treno delle sei</span><span class="stamp">NUOVO</span></span><span class="dots"></span><span class="m">p.2</span></a>
+        <a href="#" class="it" data-open data-c="racconti"><span class="n">02</span><span><span class="k">Racconto</span><span class="t">La signora del terzo piano</span></span><span class="dots"></span><span class="m">p.5</span></a>
+        <a href="#" class="it" data-open data-c="pensieri"><span class="n">03</span><span><span class="k">Pensiero</span><span class="t">Sul perdere le chiavi</span></span><span class="dots"></span><span class="m">p.9</span></a>
+        <a href="#" class="it" data-open data-c="altro"><span class="n">04</span><span><span class="k">Altro</span><span class="t">Finestre di novembre</span></span><span class="dots"></span><span class="m">p.10</span></a>
+      </div>
+      <aside class="side"><b>Nota dell'autore</b>Scrivo di notte e correggo di giorno. Qui trovi le versioni con i ripensamenti ancora visibili.</aside>
+      <aside class="side s2"><b>Ultimo pensiero</b>Perdere le chiavi è il modo in cui la casa ci ricorda che esiste.</aside>
+      <footer class="foot"><a href="#">Chi sono</a><a href="#">Instagram ↗</a></footer>
+    </div></div>
+    <div class="screen s-read" hidden>
+      <button type="button" class="back" data-back>← indice</button>
+      <article class="rd">
+        <div style="font-size:12px;text-transform:uppercase">Poesia · 2 min</div>
+        <h2>Il treno delle sei</h2>
+        <div class="typed"><div class="src" hidden>Alle sei il treno non arriva.<br>Arriva il rumore del <s>vagone</s> treno,<br>che è un'altra cosa:<br>una promessa fatta al ferro<br>da chi non è mai partito.<br><br>Io resto sul binario<br>con le mani in tasca<br>e il nome di qualcuno<br>che non ricordo<br>di aver perso.</div><div class="out" aria-live="polite"></div></div>
+        <div class="tools"><button type="button" data-replay>Riscrivi</button><button type="button" data-skip>Mostra tutto</button></div>
+      </article>
+    </div>
+  </div>
+  <p class="hint">Apri la poesia: si scrive da sola, con la correzione in rosso</p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="dir-panel" data-name="Carattere" data-mood="verde bottiglia, rosa antico · la parola come immagine, alla Poetry Foundation" data-why="Tipografia espressiva: ogni verso e' enorme e la riga che stai leggendo si fa piu' spessa e rosa. Nessuna illustrazione, nessun elemento in movimento a caso: si muove solo il testo." data-role="" hidden>
+  <div class="vt"><span>Vista</span><button type="button" data-v="m" aria-pressed="true">Mobile</button><button type="button" data-v="d" aria-pressed="false">Desktop</button></div>
+  <div class="frame d4 is-m">
+    <div class="screen s-home">
+      <div class="head"><b>Appunti a margine</b><b style="color:#f2a79b">01</b></div>
+      <nav class="nv" aria-label="Sezioni"><button type="button" data-f="tutto" aria-current="true">Tutto</button><button type="button" data-f="poesie">Poesie</button><button type="button" data-f="racconti">Racconti</button><button type="button" data-f="pensieri">Pensieri</button><button type="button" data-f="altro">Altro</button></nav>
+      <div class="list">
+        <a href="#" class="it" data-open data-c="poesie"><span class="k">Poesia</span><span class="t">Il treno delle sei</span><span class="m">2 min · 2 nov</span></a>
+        <a href="#" class="it" data-open data-c="racconti"><span class="k">Racconto</span><span class="t">La signora del terzo piano</span><span class="m">6 min · 28 ott</span></a>
+        <a href="#" class="it" data-open data-c="pensieri"><span class="k">Pensiero</span><span class="t">Sul perdere le chiavi</span><span class="m">1 min · 21 ott</span></a>
+        <a href="#" class="it" data-open data-c="altro"><span class="k">Altro</span><span class="t">Finestre di novembre</span><span class="m">foto · 15 ott</span></a>
+      </div>
+      <footer class="foot"><a href="#">Chi sono</a><a href="#">Instagram ↗</a></footer>
+    </div>
+    <div class="screen s-read" hidden>
+      <button type="button" class="back" data-back>← Indice</button>
+      <article class="rd">
+        <div class="k">Poesia · Il treno delle sei</div>
+        <div class="ln">Alle sei</div><div class="ln">il treno non arriva.</div>
+        <div class="ln">Arriva il rumore</div><div class="ln">del treno,</div><div class="ln">che è un'altra cosa:</div>
+        <div class="ln">una promessa</div><div class="ln">fatta al ferro</div><div class="ln">da chi non è mai</div><div class="ln">partito.</div>
+        <div class="gap"></div>
+        <div class="ln">Io resto sul binario</div><div class="ln">con le mani in tasca</div><div class="ln">e il nome di qualcuno</div><div class="ln">che non ricordo</div><div class="ln">di aver perso.</div>
+        <p class="nt">Scorri: il verso al centro dello schermo prende corpo.</p>
+      </article>
+    </div>
+  </div>
+  <p class="hint">Scorri la poesia: il verso al centro diventa spesso e rosa</p>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="dir-panel" data-name="Capitoli" data-mood="mattina, pomeriggio, sera · alla lettura lunga editoriale" data-why="Per i racconti: la pagina cambia luce col passare della storia (mattina chiara, pomeriggio dorato, sera blu). Un'esperienza di lettura che non e' solo testo fermo, ma resta sobria." data-role="" hidden>
+  <div class="vt"><span>Vista</span><button type="button" data-v="m" aria-pressed="true">Mobile</button><button type="button" data-v="d" aria-pressed="false">Desktop</button></div>
+  <div class="frame d5 is-m">
+    <div class="screen s-home"><div class="home">
+      <header class="head"><div class="lab">Diario di poesie, racconti e pensieri</div><h2>Appunti a margine</h2><p>Testi brevi, letti con calma.</p>
+        <nav class="nv" aria-label="Sezioni" style="padding-left:0"><button type="button" data-f="tutto" aria-current="true">Tutto</button><button type="button" data-f="poesie">Poesie</button><button type="button" data-f="racconti">Racconti</button><button type="button" data-f="pensieri">Pensieri</button><button type="button" data-f="altro">Altro</button></nav></header>
+      <div class="list">
+        <a href="#" class="it" data-open data-c="racconti"><span class="h">07:40</span><span><span class="k">Racconto · 6 min</span><span class="t">La signora del terzo piano</span></span></a>
+        <a href="#" class="it" data-open data-c="poesie"><span class="h">18:05</span><span><span class="k">Poesia · 2 min</span><span class="t">Il treno delle sei</span></span></a>
+        <a href="#" class="it" data-open data-c="pensieri"><span class="h">23:12</span><span><span class="k">Pensiero · 1 min</span><span class="t">Sul perdere le chiavi</span></span></a>
+        <a href="#" class="it" data-open data-c="altro"><span class="h">15:30</span><span><span class="k">Altro · foto</span><span class="t">Finestre di novembre</span></span></a>
+      </div>
+      <footer class="foot"><a href="#">Chi sono</a><a href="#">Instagram ↗</a></footer>
+    </div></div>
+    <div class="screen s-read" hidden>
+      <div class="clock"><button type="button" class="back" data-back>← Indice</button><span class="lbl">Mattina · 07:40</span></div>
+      <article class="rd">
+        <h2>La signora del terzo piano</h2><p class="by">Racconto · di Tomas · 6 min</p>
+        <section class="mom" data-m="0"><div class="tm rv">Mattina</div>
+          <p class="rv">La signora del terzo piano annaffia le piante alle sette e quaranta, né prima né dopo. Lo so perché l'acqua mi cade sul davanzale, sempre nello stesso punto, come un orologio che non ha mai imparato a fermarsi.</p>
+          <p class="rv">Oggi però ha annaffiato anche il vaso vuoto.</p></section>
+        <section class="mom" data-m="1"><div class="tm rv">Pomeriggio</div>
+          <p class="rv">Verso le tre ho bussato. Ha aperto con un cucchiaio in mano, senza spiegare perché. Dentro c'era odore di basilico e di una radio accesa da molto tempo.</p>
+          <p class="rv">«Entra», ha detto, «tanto la zuppa è per due.»</p></section>
+        <section class="mom" data-m="2"><div class="tm rv">Sera</div>
+          <p class="rv">Il vaso vuoto era per il marito, che non c'è più da tre anni. Annaffiarlo è il suo modo di non dirlo. Io ho portato il pane.</p>
+          <p class="rv">Ora, alle sette e quaranta, l'acqua mi cade ancora sul davanzale. E io non sposto più il vaso.</p></section>
+      </article>
+    </div>
+  </div>
+  <p class="hint">Scorri il racconto: la luce della pagina passa da mattina a sera</p>
+</section>
+    </div>
+  </main>
+</div>
+
+<script>
+// ── Scocca generica: chip auto-costruiti dai pannelli, uno visibile alla volta ──
+(function(){
+  const panelsBox = document.getElementById('panels');
+  const panels = [...panelsBox.querySelectorAll('.dir-panel')];
+  const chips = document.getElementById('chips');
+
+  // Disegna la chrome (barra nome+mood, riga "perché") dentro ogni pannello dai data-*
+  panels.forEach(p=>{
+    const inner = p.innerHTML;
+    const role = p.dataset.role || '';
+    const tag = role ? `<span class="dir-tag" data-role="${role}">${role}</span>` : `<span class="dir-tag">Direzione</span>`;
+    p.innerHTML = `
+      <div class="dir-card">
+        <div class="dir-head">
+          <div>
+            <div class="dir-name">${p.dataset.name||'Direzione'}</div>
+            <div class="dir-mood">${p.dataset.mood||''}</div>
+          </div>${tag}
+        </div>
+        <div class="dir-body">${inner}</div>
+        ${p.dataset.why ? `<div class="dir-why">✶&nbsp;<span><b>Perché:</b> ${p.dataset.why}</span></div>` : ``}
+      </div>`;
+  });
+
+  function show(i){
+    panels.forEach((p,j)=>p.toggleAttribute('hidden', j!==i));
+    [...chips.children].forEach((c,j)=>c.setAttribute('aria-pressed', j===i));
+  }
+
+  panels.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-pressed', i===0 ? 'true':'false');
+    b.innerHTML = `<span class="swatch"></span>${p.dataset.name || ('Direzione '+(i+1))}`;
+    b.addEventListener('click', ()=>show(i));
+    chips.appendChild(b);
+  });
+
+  show(0);
+
+  // Esempio di interazione "viva ma leggera" con dato finto in localStorage.
+  // (La skill può riusare lo stesso pattern data-save nei pannelli reali.)
+  document.addEventListener('click', e=>{
+    const btn = e.target.closest('[data-save]');
+    if(!btn) return;
+    const on = btn.dataset.on === '1';
+    btn.dataset.on = on ? '0':'1';
+    btn.textContent = on ? 'Salva' : 'Salvato ✓';
+    try{ localStorage.setItem('mockup-demo-saved', on ? '0':'1'); }catch(_){}
+  });
+})();
+</script>
+<script>
+// ── Comportamenti delle 5 direzioni (parte DOPO la scocca, che ricostruisce i pannelli) ──
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+  const frames = $$('.frame');
+
+  function go(f, which){
+    const h=f.querySelector('.s-home'), r=f.querySelector('.s-read');
+    h.hidden = which==='read'; r.hidden = which!=='read';
+    (which==='read'?r:h).scrollTop = 0;
+    f.dispatchEvent(new CustomEvent('screen',{detail:which}));
+  }
+  const cur = f => f.querySelector('.s-read').hidden ? 'home' : 'read';
+
+  // click: apri / indietro / vista / filtro
+  document.addEventListener('click', e=>{
+    const o=e.target.closest('[data-open]');
+    if(o){ e.preventDefault(); go(o.closest('.frame'),'read'); return; }
+    const b=e.target.closest('[data-back]');
+    if(b){ go(b.closest('.frame'),'home'); return; }
+    const v=e.target.closest('[data-v]');
+    if(v){
+      const p=v.closest('.dir-panel'), f=p.querySelector('.frame');
+      f.classList.toggle('is-m', v.dataset.v==='m'); f.classList.toggle('is-d', v.dataset.v==='d');
+      $$('[data-v]',p).forEach(x=>x.setAttribute('aria-pressed', x===v));
+      f.dispatchEvent(new CustomEvent('screen',{detail:cur(f)}));
+      return;
+    }
+    const fl=e.target.closest('[data-f]');
+    if(fl){
+      const f=fl.closest('.frame'), k=fl.dataset.f;
+      $$('[data-f]',f).forEach(x=>x.setAttribute('aria-current', x===fl));
+      $$('.it',f).forEach(it=>{ it.hidden = !(k==='tutto' || it.dataset.c===k); });
+      $$('.it',f).forEach(it=>{ it.style.display = it.hidden ? 'none' : ''; });
+    }
+  });
+
+  // ── 1 · barra di lettura ──
+  $$('.d1').forEach(f=>{
+    const r=f.querySelector('.s-read'), bar=r.querySelector('.bar i');
+    const upd=()=>{ const m=r.scrollHeight-r.clientHeight; bar.style.width = (m>0? r.scrollTop/m*100:0)+'%'; };
+    r.addEventListener('scroll',upd); f.addEventListener('screen',()=>setTimeout(upd,30));
+  });
+
+  // ── 2 · lampada ──
+  $$('.d2').forEach(f=>{
+    const lamp=(scr)=>{
+      const sr=scr.getBoundingClientRect();
+      $$('.lit',scr).forEach(el=>{
+        const r=el.getBoundingClientRect(); let x,y;
+        if(scr._px!=null){ x=scr._px-r.left; y=scr._py-r.top; }
+        else { x=r.width/2; y=sr.top+sr.height*.42-r.top; }
+        el.style.setProperty('--x',x+'px'); el.style.setProperty('--y',y+'px');
+      });
+    };
+    $$('.screen',f).forEach(scr=>{
+      scr.addEventListener('scroll',()=>lamp(scr));
+      scr.addEventListener('pointermove',e=>{ scr._px=e.clientX; scr._py=e.clientY; lamp(scr); });
+      scr.addEventListener('pointerleave',()=>{ scr._px=null; lamp(scr); });
+    });
+    f.addEventListener('screen',()=>setTimeout(()=>$$('.screen:not([hidden])',f).forEach(lamp),40));
+  });
+
+  // ── 3 · macchina da scrivere ──
+  $$('.d3').forEach(f=>{
+    const box=f.querySelector('.typed'), src=box.querySelector('.src'), out=box.querySelector('.out');
+    let chars=[], timer=null, i=0;
+    function build(){
+      clearInterval(timer); out.innerHTML=src.innerHTML; chars=[]; i=0;
+      const w=document.createTreeWalker(out,NodeFilter.SHOW_TEXT), nodes=[];
+      while(w.nextNode()) nodes.push(w.currentNode);
+      nodes.forEach(n=>{
+        const fr=document.createDocumentFragment();
+        [...n.textContent].forEach(ch=>{ const s=document.createElement('span'); s.className='c'; s.textContent=ch; fr.appendChild(s); chars.push(s); });
+        n.replaceWith(fr);
+      });
+    }
+    function showAll(){ clearInterval(timer); chars.forEach(c=>{c.classList.add('on');c.classList.remove('cur');}); }
+    function play(){
+      build();
+      if(reduce){ showAll(); return; }
+      timer=setInterval(()=>{
+        if(i>=chars.length){ clearInterval(timer); return; }
+        if(i>0) chars[i-1].classList.remove('cur');
+        chars[i].classList.add('on','cur'); i++;
+      }, 26);
+    }
+    f.addEventListener('screen',e=>{ if(e.detail==='read') play(); else clearInterval(timer); });
+    f.querySelector('[data-replay]').addEventListener('click',play);
+    f.querySelector('[data-skip]').addEventListener('click',showAll);
+  });
+
+  // ── 4 · il verso al centro prende corpo ──
+  $$('.d4').forEach(f=>{
+    const r=f.querySelector('.s-read'), lns=$$('.ln',r);
+    const upd=()=>{
+      const rc=r.getBoundingClientRect(), cy = r._py!=null ? r._py : rc.top+rc.height*.45;
+      lns.forEach(l=>{
+        const b=l.getBoundingClientRect(), d=Math.abs(b.top+b.height/2-cy)/(rc.height*.32);
+        l.style.setProperty('--k', Math.max(0,1-d).toFixed(3));
+      });
+    };
+    r.addEventListener('scroll',upd);
+    r.addEventListener('pointermove',e=>{ if(e.pointerType==='mouse'){ r._py=e.clientY; upd(); } });
+    r.addEventListener('pointerleave',()=>{ r._py=null; upd(); });
+    f.addEventListener('screen',()=>setTimeout(upd,40));
+  });
+
+  // ── 5 · la luce cambia col racconto ──
+  $$('.d5').forEach(f=>{
+    const r=f.querySelector('.s-read'), lbl=r.querySelector('.lbl');
+    const st=[{bg:[238,241,238],fg:'#1d2330',mut:'#5d6a7a',lab:'Mattina · 07:40'},
+              {bg:[216,185,138],fg:'#26180c',mut:'#5a4228',lab:'Pomeriggio · 15:10'},
+              {bg:[31,37,64],fg:'#e9e4f0',mut:'#b3b0cc',lab:'Sera · 19:40'}];
+    const upd=()=>{
+      const m=r.scrollHeight-r.clientHeight, p=m>0? Math.min(1,Math.max(0,r.scrollTop/m)):0;
+      const x=p*2, a=Math.min(1,Math.floor(x)), t=x-a;
+      const c=st[a].bg.map((v,k)=>Math.round(v+(st[a+1].bg[k]-v)*t));
+      const s=st[Math.round(x)];
+      r.style.setProperty('--bg',`rgb(${c})`); r.style.setProperty('--fg',s.fg); r.style.setProperty('--mut',s.mut);
+      lbl.textContent=s.lab;
+    };
+    r.addEventListener('scroll',upd);
+    const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('in'); }),{root:r,threshold:.15});
+    $$('.rv',r).forEach(el=>io.observe(el));
+    f.addEventListener('screen',e=>{ if(e.detail==='read'){ $$('.rv',r).forEach(el=>el.classList.remove('in')); r.scrollTop=0; setTimeout(()=>{upd(); $$('.rv',r).forEach(el=>io.unobserve(el)||io.observe(el));},30);} });
+  });
+
+  // ricalcola quando cambia chip (i pannelli nascosti non hanno misure)
+  document.getElementById('chips').addEventListener('click',()=>setTimeout(()=>frames.forEach(f=>f.dispatchEvent(new CustomEvent('screen',{detail:cur(f)}))),60));
+
+  // scorciatoia per i test: #3 apre la direzione 3, #3r apre la lettura, #3rd in versione desktop
+  const m=/^#(\d)(r)?(d)?$/.exec(location.hash);
+  if(m){
+    const chip=document.getElementById('chips').children[+m[1]-1]; if(chip) chip.click();
+    const f=frames[+m[1]-1];
+    setTimeout(()=>{
+      if(m[3]){ f.classList.remove('is-m'); f.classList.add('is-d'); f.closest('.dir-panel').querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v==='d')); }
+      if(m[2]) go(f,'read'); else f.dispatchEvent(new CustomEvent('screen',{detail:'home'}));
+    },120);
+  } else setTimeout(()=>frames.forEach(f=>f.dispatchEvent(new CustomEvent('screen',{detail:'home'}))),80);
+})();
+</script>
+</body>
+</html>

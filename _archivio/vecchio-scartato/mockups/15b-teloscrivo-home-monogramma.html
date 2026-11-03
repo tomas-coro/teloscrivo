@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>teloscrivo - mockup 15b monogramma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<style>
+/* ===== FONT DI TOMAS ===== */
+@font-face{font-family:"Fibonacci";src:url("fonts/fibonacci.ttf");font-style:normal}
+@font-face{font-family:"Fibonacci";src:url("fonts/fibonacci-italic.ttf");font-style:italic}
+@font-face{font-family:"Vetro";src:url("fonts/vetro.otf")}
+@font-face{font-family:"Balligesta";src:url("fonts/balligesta.otf")}
+
+:root{--seal:#DBF2FC;--navy:#072D59;--deep:#041B38;--pink:#FD6E88;--serif:"Newsreader","Iowan Old Style",serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#0a1424;color:var(--seal);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+
+/* ===== SHELL DEL MOCKUP ===== */
+.shell{max-width:1360px;margin:0 auto;padding:16px 16px 40px}
+.top{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-bottom:12px}
+.top h1{font:italic 400 1.7rem/1 "Fibonacci";margin:0 12px 0 0}
+.top h1 i{display:inline-block;width:.17em;height:.17em;border-radius:50%;background:var(--pink);margin-left:.06em}
+.grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grp>span{font:500 .7rem var(--serif);letter-spacing:.2em;text-transform:uppercase;color:#6f88a3;margin-right:2px}
+.grp button{font:500 .78rem var(--serif);letter-spacing:.14em;text-transform:uppercase;color:#9db6cc;background:transparent;border:1px solid #20344f;border-radius:8px;padding:0 14px;min-height:44px;cursor:pointer}
+.grp button[aria-pressed="true"]{color:var(--deep);background:var(--seal);border-color:var(--seal)}
+.grp button:hover{color:var(--seal);border-color:#3c5a80}
+.grp button[aria-pressed="true"]:hover{color:var(--deep)}
+.why{font-size:.95rem;color:#9db6cc;max-width:92ch;margin:0 0 16px;line-height:1.5;text-wrap:pretty}
+.why b{color:var(--seal);font-weight:500}
+.stagebox{display:flex;justify-content:center}
+
+/* ===== DEVICE ===== */
+.device{position:relative;overflow:hidden;background:var(--deep);container-type:size;
+  width:390px;max-width:100%;height:min(800px,calc(100vh - 200px));min-height:560px;border-radius:30px;border:1px solid #2a4163}
+.device.d{width:100%;max-width:1280px;border-radius:14px;height:min(780px,calc(100vh - 200px))}
+.scroller{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.scroller::-webkit-scrollbar{display:none}
+
+/* ===== ELEMENTI COMUNI ===== */
+.logo{font-family:"Fibonacci",serif;font-style:italic;font-weight:400;letter-spacing:-.01em;line-height:1;color:#fff;white-space:nowrap}
+.logo i{display:inline-block;width:.15em;height:.15em;border-radius:50%;background:var(--pink);margin-left:.05em}
+.tag{font:italic 400 .74rem/1.4 var(--serif);letter-spacing:.16em;text-transform:uppercase;color:var(--seal);display:flex;align-items:center;gap:12px;margin:16px 0 0;text-wrap:balance}
+.tag::before{content:"";width:26px;height:2px;background:var(--pink);flex:none}
+.vet{font-family:"Vetro",serif;font-variant-ligatures:none;text-transform:uppercase;font-weight:400;letter-spacing:.02em;line-height:1}
+.num{font-family:"Fibonacci",serif;font-weight:400}
+.lab{font:500 .74rem/1 var(--serif);letter-spacing:.24em;text-transform:uppercase;color:var(--pink);margin:0 0 18px}
+a{color:inherit;text-decoration:none}
+.go{cursor:pointer}
+.cue{font:italic 400 .72rem "Fibonacci";letter-spacing:.34em;text-transform:uppercase;color:var(--seal);opacity:.8}
+.sig{font-family:"Balligesta",cursive;font-size:3rem;line-height:1;color:var(--pink);margin-top:34px}
+.ex{font:italic .76rem var(--serif);opacity:.6}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border:1px solid var(--pink);color:var(--pink);font:500 .8rem var(--serif);letter-spacing:.14em;text-transform:uppercase;border-radius:6px;background:transparent;cursor:pointer;transition:background .2s,color .2s}
+.btn:hover{background:var(--pink);color:var(--deep)}
+
+
+/* ===== SFONDO STATICO: cielo + luna ===== */
+.sk2{position:absolute;inset:0;background:var(--deep);overflow:hidden}
+.sk2 .moon{position:absolute;inset:-4% 0;background:url("img/luna-mobile.webp") 100% 12%/cover no-repeat}
+.sk2 .veil{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(4,27,56,.25),rgba(4,27,56,0) 30%,rgba(4,27,56,0) 60%,rgba(4,27,56,.35))}
+@container (min-width:820px){.sk2 .moon{background-image:url("img/luna-desktop.webp");background-position:50% 30%}}
+.H{position:absolute;inset:0;overflow:hidden}
+.cap{font:500 .7rem var(--serif);letter-spacing:.22em;text-transform:uppercase;color:var(--seal);opacity:.7}
+
+/* ===== LOGHI ===== */
+.arc{position:absolute;overflow:visible;pointer-events:none}
+.arc path{fill:none;stroke:url(#arcg);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.6s ease .3s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.d{display:inline-block;width:.16em;height:.16em;border-radius:50%;background:var(--pink);margin-left:.06em;box-shadow:0 0 .5em rgba(253,110,136,.55)}
+.tg{display:flex;align-items:center;gap:12px;margin-top:1.1em;font:italic 400 .72rem/1.3 var(--serif);letter-spacing:.24em;text-transform:uppercase;color:var(--seal)}
+.tg::before{content:"";width:28px;height:2px;background:var(--pink);flex:none}
+.lg{position:relative;display:inline-block;font-family:"Fibonacci",serif;font-style:italic;font-weight:400;color:#fff;line-height:1;white-space:nowrap;letter-spacing:-.01em}
+.lg.light{color:var(--navy)}.lg.light .tg{color:var(--navy)}
+.lg.mini .tg{display:none}
+/* A - Orbita: s rosa in "scrivo" + arco di luce che sfiora la parola */
+.lgA .s{font-style:inherit;background:linear-gradient(180deg,#ffb3c0,#FD6E88 70%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lgA .arc{right:-.62em;top:-.85em;width:1.25em;height:1.25em}
+.lgA .tgw{position:absolute;left:0;top:100%;font-size:1rem}
+/* B - Punto: parola + punto rosa */
+/* C - Impilato: telo. / scrivo con arco in alto a destra */
+.lgC .l1,.lgC .l2{display:block}
+.lgC .l2{margin-left:.04em}
+.lgC .arc{right:-.62em;top:-.55em;width:1.15em;height:1.15em}
+.lgC.mini .l1,.lgC.mini .l2{line-height:.95}
+
+
+/* M - Monogramma t con luna (logo vero di Tomas, tracciato in SVG) */
+.lgM{line-height:0}.lgM svg{display:block;width:46px;height:46px;overflow:visible}
+.lgM .mt{fill:var(--mt,#fff)}.lgM .mm{fill:#FD6E88}.lgM.light{--mt:var(--navy)}
+.LV .dark .lgM svg{width:250px;height:250px}.LV .card .lgM svg{width:84px;height:84px}
+.ico.iM{background:var(--navy);display:flex;align-items:center;justify-content:center}.ico.iM .lgM svg{width:70%;height:70%}
+/* ===== VISTA LOGO ===== */
+.LV{position:absolute;inset:0;display:grid;grid-template-rows:62% 38%}
+.LV .dark{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden}
+.LV .dark .lg{font-size:6.4rem}
+.LV .row{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px;padding:12px;background:#0a1830}
+.LV .card{border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:10px;position:relative;overflow:hidden}
+.LV .card.paper{background:var(--seal)}
+.LV .card.night{background:var(--deep);border:1px solid #20344f}
+.LV .card .cap{position:absolute;left:10px;top:8px;color:#6f88a3}
+.LV .card.paper .cap{color:#5a7690}
+.LV .card .lg{font-size:1.9rem}
+.ico{width:76px;height:76px;border-radius:20px;background:linear-gradient(160deg,#0b3a73,#041b38);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.ico b{font:italic 400 2.6rem/1 "Fibonacci";color:#fff;position:relative;z-index:1}
+.ico .d{position:relative;z-index:1;margin-left:.02em;width:.4rem;height:.4rem;vertical-align:baseline}
+.ico::after{content:"";position:absolute;width:150%;height:90%;left:-25%;bottom:-62%;border-radius:50%;background:radial-gradient(circle at 50% 8%,#fff 0,#ffd2da 8%,#FD6E88 22%,rgba(7,45,89,0) 60%)}
+.ico.i2::after{display:none}
+.ico.i3::after{width:70%;height:70%;left:auto;right:-26%;top:-26%;bottom:auto}
+.fav{display:flex;gap:10px;align-items:flex-end}
+.fav span{display:block;border-radius:22%;background:linear-gradient(160deg,#0b3a73,#041b38);color:#fff;font:italic 400 1em/1 "Fibonacci";display:flex;align-items:center;justify-content:center}
+@container (max-width:600px){
+  .LV{grid-template-rows:52% 48%}
+  .LV .dark .lg{font-size:2.6rem}
+  .LV .row{grid-template-columns:1fr 1fr;grid-template-rows:1fr auto}
+  .LV .row .card:nth-child(1){grid-column:1/3}
+  .LV .row .card:nth-child(3){display:none}
+  .LV .card .lg{font-size:1.7rem}
+}
+
+/* ===== HEADER + NAV (le tre direzioni) ===== */
+.nav a{cursor:pointer}
+.mb{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 4px;background:none;border:0;color:var(--seal);font:500 .74rem var(--serif);letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+.mb i{display:block;width:22px;height:8px;border-top:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transition:transform .3s}
+.H.open .mb i{transform:scaleY(.2)}
+.items{list-style:none;margin:0;padding:0}
+.items li{cursor:pointer}
+.items .n{font-family:"Fibonacci",serif;font-style:normal}
+.items .t{font-family:"Vetro",serif;font-variant-ligatures:none;text-transform:uppercase}
+.nav{display:none}
+.panel{pointer-events:none;opacity:0;visibility:hidden;transition:opacity .35s,transform .35s,visibility .35s}
+.H.open .panel{pointer-events:auto;opacity:1;visibility:visible}
+
+/* A - Orbita: barra trasparente, voci in testo con puntino luna; mobile: schermata intera */
+.dA .bar{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;padding:22px 24px;z-index:5}
+.dA .bar .lg{font-size:1.55rem}
+.dA .nav{gap:34px;font:500 .74rem var(--serif);letter-spacing:.2em;text-transform:uppercase}
+.dA .nav a{position:relative;padding:8px 0;color:var(--seal);transition:color .2s}
+.dA .nav a::before{content:"";position:absolute;left:50%;top:-6px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--pink);transform:scale(0);transition:transform .25s}
+.dA .nav a:hover,.dA .nav a.on{color:#fff}.dA .nav a:hover::before,.dA .nav a.on::before{transform:scale(1)}
+.dA .hero{position:absolute;left:0;right:0;bottom:7cqh;padding:0 24px}
+.dA .hero .lg{font-size:3.7rem}
+.dA .hero .tg{margin-top:1.4rem}
+.dA .panel{position:absolute;inset:0;z-index:4;background:rgba(4,27,56,.97);display:flex;flex-direction:column;justify-content:center;padding:0 28px}
+.dA .panel .items li{display:flex;align-items:baseline;gap:16px;border-top:1px solid rgba(219,242,252,.16);padding:16px 0}
+.dA .panel .items .t{font-size:1.7rem}.dA .panel .items .n{font-size:1rem;color:var(--pink)}
+.dA .panel .items li:last-child{border-bottom:1px solid rgba(219,242,252,.16)}
+.dA .panel .items li{transform:translateY(14px);transition:transform .45s}
+.dA.open .panel .items li{transform:none}
+.dA.open .panel .items li:nth-child(2){transition-delay:.05s}.dA.open .panel .items li:nth-child(3){transition-delay:.1s}.dA.open .panel .items li:nth-child(4){transition-delay:.15s}.dA.open .panel .items li:nth-child(5){transition-delay:.2s}
+
+/* B - Pillola di vetro: barra fluttuante centrata, logo + punto; mobile: tendina sotto la pillola */
+.dB .bar{position:absolute;left:14px;right:14px;top:14px;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:6px 8px 6px 20px;border-radius:999px;border:1px solid rgba(219,242,252,.22);background:rgba(4,27,56,.42);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.dB .bar .lg{font-size:1.4rem}
+.dB .bar .mb{width:44px;height:44px;justify-content:center;border-radius:50%;background:rgba(219,242,252,.12);padding:0}.dB .bar .mb span{display:none}
+.dB .nav{gap:4px;font:500 .72rem var(--serif);letter-spacing:.18em;text-transform:uppercase}
+.dB .nav a{padding:12px 16px;border-radius:999px;color:var(--seal);transition:background .2s,color .2s}
+.dB .nav a:hover{background:rgba(219,242,252,.14)}
+.dB .nav a.on{background:var(--seal);color:var(--deep)}
+.dB .hero{position:absolute;left:0;right:0;bottom:9cqh;padding:0 24px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.dB .hero .lg{font-size:4.5rem}
+.dB .hero .tg{justify-content:center}.dB .hero .tg::before{display:none}
+.dB .hero .tg::after{content:"";width:28px;height:2px;background:var(--pink)}
+.dB .panel{position:absolute;left:14px;right:14px;top:74px;z-index:4;border-radius:22px;border:1px solid rgba(219,242,252,.22);background:rgba(4,27,56,.78);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:8px 22px;transform:translateY(-10px)}
+.dB.open .panel{transform:none}
+.dB .panel .items li{display:flex;justify-content:space-between;align-items:baseline;padding:15px 0;border-bottom:1px solid rgba(219,242,252,.14);font:italic 400 1.35rem var(--serif)}
+.dB .panel .items li:last-child{border-bottom:0}.dB .panel .items .n{font-size:.9rem;opacity:.6}
+
+/* C - Indice laterale: logo impilato, voci numerate sul bordo destro; mobile: cassetto a destra */
+.dC .bar{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;padding:22px 24px}
+.dC .bar .lg{font-size:1.5rem}
+.dC .nav{position:absolute;right:30px;top:50%;transform:translateY(-50%);flex-direction:column;align-items:flex-end;gap:2px}
+.dC .nav a{display:flex;align-items:baseline;gap:14px;padding:10px 0;color:var(--seal);opacity:.75;transition:opacity .2s,transform .2s}
+.dC .nav a .n{font:italic 400 .9rem "Fibonacci";color:var(--pink)}
+.dC .nav a .t{font:500 .74rem var(--serif);letter-spacing:.22em;text-transform:uppercase}
+.dC .nav a:hover,.dC .nav a.on{opacity:1;transform:translateX(-8px)}
+.dC .nav::after{content:"";position:absolute;right:-14px;top:-30px;bottom:-30px;width:1px;background:linear-gradient(transparent,rgba(219,242,252,.4),transparent)}
+.dC .hero{position:absolute;left:0;bottom:8cqh;padding:0 24px}
+.dC .hero .lg{font-size:5.4rem;line-height:.92}
+.dC .hero .rl{display:block;width:3.2rem;height:2px;background:var(--pink);margin:1.1rem 0 0}
+.dC .hero .tg{margin-top:.9rem}.dC .hero .tg::before{display:none}
+.dC .panel{position:absolute;top:0;bottom:0;right:0;width:82%;z-index:4;background:rgba(4,27,56,.95);padding:90px 26px 30px;transform:translateX(30px);box-shadow:-30px 0 60px rgba(0,0,0,.4)}
+.dC.open .panel{transform:none}
+.dC .panel .items li{display:flex;align-items:baseline;gap:14px;padding:15px 0;border-bottom:1px solid rgba(219,242,252,.16)}
+.dC .panel .items .n{font-size:1rem;color:var(--pink)}.dC .panel .items .t{font-size:1.35rem}
+.dC .bar .mb{margin-top:-4px;position:relative;z-index:6}
+
+@container (min-width:820px){
+  .dA .bar{padding:32px 64px}.dA .bar .lg{font-size:1.9rem}.dA .nav{display:flex}.dA .mb{display:none}.dA .panel{display:none}
+  .dA .hero{padding:0 64px;bottom:12cqh}.dA .hero .lg{font-size:7.2rem}
+  .dB .bar{left:50%;right:auto;transform:translateX(-50%);width:min(900px,calc(100% - 64px));top:26px;padding:6px 8px 6px 28px}
+  .dB .bar .lg{font-size:1.6rem}.dB .nav{display:flex}.dB .bar .mb{display:none}.dB .panel{display:none}
+  .dB .hero{bottom:12cqh}.dB .hero .lg{font-size:8rem}
+  .dC .bar{padding:34px 64px}.dC .bar .lg{font-size:1.9rem}.dC .nav{display:flex;right:64px}.dC .bar .mb{display:none}.dC .panel{display:none}
+  .dC .hero{padding:0 64px;bottom:10cqh}.dC .hero .lg{font-size:8.6rem}
+}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="arcg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FD6E88" stop-opacity="0"/><stop offset=".35" stop-color="#FD6E88"/><stop offset=".7" stop-color="#8fb8ff"/><stop offset="1" stop-color="#DBF2FC" stop-opacity="0"/></linearGradient></defs></svg>
+<div class="shell">
+  <div class="top"><h1>teloscrivo<i></i></h1>
+    <div class="grp" id="gView"></div><div class="grp" id="gDir"></div><div class="grp" id="gDev"></div></div>
+  <p class="why" id="why"></p>
+  <div class="stagebox"><div class="device" id="dev"></div></div>
+</div>
+<script>
+let view='head', dir='M', mode='m';
+const MONO='<svg viewBox="98 82 1605 1605" role="img" aria-label="teloscrivo"><g transform="translate(0 1760) scale(.1 -.1)"><path class="mt" d="M11629 16137 c-52 -47 -146 -153 -294 -332 -296 -358 -947 -1037 -1285 -1341 -1142 -1026 -2256 -1614 -3750 -1980 -291 -71 -429 -109 -735 -201 -404 -121 -425 -129 -1075 -394 -835 -341 -1888 -1078 -2193 -1534 -76 -113 -28 -97 191 64 374 273 692 464 1069 640 993 463 1937 700 3123 781 186 13 1036 26 1074 16 71 -18 61 -52 -104 -341 -56 -99 -165 -292 -242 -430 -77 -137 -164 -290 -193 -340 -29 -49 -85 -151 -125 -225 -40 -74 -119 -218 -175 -320 -980 -1776 -1610 -3415 -1767 -4590 -247 -1862 835 -3559 2656 -4165 700 -232 1462 -317 2166 -242 374 40 399 70 120 137 -1395 335 -2431 1634 -2697 3385 -32 213 -41 833 -15 1070 84 765 286 1520 685 2560 44 115 374 916 425 1032 409 926 731 1608 1220 2580 99 195 108 203 302 223 571 60 1548 218 2123 344 468 103 1116 281 1195 329 98 59 -39 63 -1223 39 -957 -20 -1825 -14 -1855 13 -37 34 -23 70 238 596 138 277 270 547 295 599 24 52 131 277 237 500 106 223 227 482 270 575 42 94 120 260 173 371 255 536 304 708 166 581z"/><path class="mm" d="M15856 7108 c-14 -24 -60 -128 -101 -233 -80 -204 -327 -712 -418 -862 -185 -304 -510 -757 -658 -918 -41 -44 -108 -121 -150 -170 -549 -644 -1456 -1255 -2299 -1546 -1655 -572 -3465 -57 -4399 1253 -176 247 -197 180 -86 -263 498 -1976 1934 -3204 3445 -2944 1826 314 3425 1745 4223 3780 255 652 509 1621 498 1908 -1 50 -23 48 -55 -5z"/></g></svg>';
+const DIRS=[['M','Monogramma t + luna (il tuo logo)'],['A','Logo A · s rosa + arco'],['B','Logo B · punto rosa'],['C','Logo C · impilato']];
+const DESC={
+ M:'<b>Monogramma · il tuo logo.</b> La t con il gancio che diventa la mezzaluna rosa, tracciata in SVG dal tuo file. In alto a sinistra sta da sola: il nome "teloscrivo." è già il titolo grande della home.',
+ A:'<b>Logo A · s rosa + arco.</b> Un solo rigo: la "s" di "scrivo" è rosa e un arco di luce (come il bordo della luna) sfiora la parola e si disegna all\'apertura. È la versione grande del tuo logo di riferimento, ridotta a stare in alto a sinistra.',
+ B:'<b>Logo B · punto rosa.</b> "teloscrivo" con il punto rosa finale, la versione più semplice e quella che già usiamo nel titolo. Nessun arco.',
+ C:'<b>Logo C · impilato.</b> "telo." sopra e "scrivo" sotto, con l\'arco di luce in alto a destra (la tua prima variante). Occupa due righe, più compatto in larghezza.'
+};
+const ITEMS=[['01','Testi'],['02','Poesie'],['03','Racconti brevi'],['04','Dalle canzoni'],['05','TikTok']];
+const dev=document.getElementById('dev');
+function chip(p,l,on,fn){const b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed',on);b.onclick=fn;p.appendChild(b)}
+function bar(){
+  const gv=document.getElementById('gView'),gd=document.getElementById('gDir'),gm=document.getElementById('gDev');
+  gv.innerHTML='<span>Vista</span>';gd.innerHTML='<span>Direzione</span>';gm.innerHTML='<span>Schermo</span>';
+  [['head','Header + navigazione'],['logo','Solo logo']].forEach(([k,l])=>chip(gv,l,view===k,()=>{view=k;render()}));
+  DIRS.forEach(([k,l])=>chip(gd,l,dir===k,()=>{dir=k;render()}));
+  [['m','Mobile'],['d','Desktop']].forEach(([k,l])=>chip(gm,l,mode===k,()=>{mode=k;render()}));
+  document.getElementById('why').innerHTML=DESC[dir]+(view==='head'?' La home è quella di prima (titolo grande, frase, luna): cambia solo il logo in alto a sinistra.':' Qui il logo da solo: su notte, su carta chiara, come icona app e come favicon.');
+}
+const ARC='<svg class="arc" viewBox="0 0 100 100"><path pathLength="1" d="M4 96 A92 92 0 0 1 96 4"/></svg>';
+function logo(d,cls=''){
+  if(d==='M')return `<div class="lg lgM ${cls}">${MONO}</div>`;
+  if(d==='A')return `<div class="lg lgA ${cls}"><span>telo<i class="s">s</i>crivo</span>${ARC}<div class="tg">La luna porta consiglio</div></div>`;
+  if(d==='B')return `<div class="lg lgB ${cls}"><span>teloscrivo<i class="d"></i></span><div class="tg">La luna porta consiglio</div></div>`;
+  return `<div class="lg lgC ${cls}"><span class="l1">telo<i class="d"></i></span><span class="l2">scrivo</span>${ARC}<span class="rl"></span><div class="tg">La luna porta consiglio</div></div>`;
+}
+const sky='<div class="sk2"><div class="moon"></div><div class="veil"></div></div>';
+function navLinks(){return ITEMS.map(([n,t],i)=>`<a class="${i===0?'on':''}"><span class="n">${n}</span><span class="t">${t}</span></a>`).join('')}
+function navPlain(){return ITEMS.map(([n,t],i)=>`<a class="${i===0?'on':''}">${t}</a>`).join('')}
+function panel(){return `<div class="panel"><ul class="items">${ITEMS.map(([n,t])=>`<li><span class="n">${n}</span><span class="t">${t}</span></li>`).join('')}</ul></div>`}
+function headHTML(){
+  const mb='<button class="mb" data-mb aria-label="Menu"><span>Menu</span><i></i></button>';
+  return `<div class="H dA">${sky}<div class="bar">${logo(dir,'mini')}<nav class="nav">${navPlain()}</nav>${mb}</div>${panel()}<div class="hero">${logo('B','big')}</div></div>`;
+}
+function logoHTML(){
+  const ic=dir==='M'?`<div class="ico iM">${logo('M')}</div>`:dir==='A'?'<div class="ico"><b>t</b></div>':dir==='B'?'<div class="ico i2"><b>t<i class="d"></i></b></div>':'<div class="ico i3"><b>t</b></div>';
+  const fav=dir==='M'?`<div class="fav">${[32,20,16].map(n=>`<span class="lgM" style="width:${n}px;height:${n}px;background:none;border:0">${MONO.replace('<svg ','<svg style=\"width:'+n+'px;height:'+n+'px\" ')}</span>`).join('')}</div>`:`<div class="fav"><span style="width:32px;height:32px;font-size:20px">t</span><span style="width:20px;height:20px;font-size:13px">t</span><span style="width:16px;height:16px;font-size:11px">t</span></div>`;
+  return `<div class="LV"><div class="dark">${sky}<div style="position:relative">${logo(dir)}</div></div>
+   <div class="row"><div class="card paper"><span class="cap">Su carta chiara</span>${logo(dir,'light')}</div>
+   <div class="card night"><span class="cap">Icona app</span>${ic}</div>
+   <div class="card night"><span class="cap">Favicon</span>${fav}</div></div></div>`;
+}
+function render(){
+  dev.className='device'+(mode==='d'?' d':'');
+  dev.innerHTML=view==='head'?headHTML():logoHTML();
+  bar();
+  const H=dev.querySelector('.H'); const mb=dev.querySelector('[data-mb]');
+  if(mb)mb.onclick=()=>H.classList.toggle('open');
+  dev.querySelectorAll('.panel li').forEach(li=>li.onclick=()=>H.classList.remove('open'));
+  dev.querySelectorAll('.nav a').forEach(a=>a.onclick=()=>{dev.querySelectorAll('.nav a').forEach(x=>x.classList.remove('on'));a.classList.add('on')});
+}
+(()=>{const h=location.hash.slice(1).split('-');if(h[0]==='logo')view='logo';if(['A','B','C','M'].includes(h[1]))dir=h[1];if(h[2]==='d')mode='d';if(h[3]==='open')setTimeout(()=>dev.querySelector('.H')&&dev.querySelector('.H').classList.add('open'),50)})();
+render();
+if(location.hash.endsWith('open'))dev.querySelector('.H').classList.add('open');
+</script>
+</body>
+</html>

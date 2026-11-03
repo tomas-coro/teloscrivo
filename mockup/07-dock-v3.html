@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+  viewer-template.html · scocca del visualizzatore di direzioni (skill `mockup`)
+  ─────────────────────────────────────────────────────────────────────────────
+  SCOCCA FISSA, CONTENUTO VARIABILE.
+  La skill sostituisce SOLO il contenuto di <div id="panels"> con i 3/4 pannelli
+  reali. Ogni direzione è un <section class="dir-panel" data-name data-mood data-why>
+  che contiene SOLO il design di anteprima: la barra-titolo (nome+mood) e la riga
+  "perché" sono disegnate automaticamente dallo script qui sotto.
+  I chip in #chips sono generati automaticamente, uno per pannello.
+  NON modificare la scocca o lo script: cambia solo #panels (e <title>).
+-->
+<title>teloscrivo · dock v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Hanken+Grotesk:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=Roboto+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171e; --ink-2:#1b1f28; --ink-3:#232936;
+    --line:#323a4a; --bone:#e9e4d8; --bone-dim:#a39e93;
+    --brass:#e0a96d; --brass-deep:#b9824a; --ok:#7fb59a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%, #1d2230 0, transparent 60%), var(--ink);
+    color:var(--bone); font-family:"Hanken Grotesk",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:24px 18px 64px}
+
+  header.top{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+  .eyebrow{font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;color:var(--brass);font-weight:700}
+  h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(1.4rem,4vw,2rem);margin:.35rem 0 0;letter-spacing:-.015em}
+  .lead{color:var(--bone-dim);font-size:.9rem;margin:.45rem 0 0;max-width:52ch}
+
+  /* chip bar */
+  #chips{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+  #chips button{
+    font:inherit;font-weight:600;font-size:.84rem;color:var(--bone-dim);
+    background:var(--ink-2);border:1px solid var(--line);border-radius:11px;
+    padding:10px 15px;min-height:44px;cursor:pointer;display:flex;align-items:center;gap:8px;
+    transition:color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  #chips button:hover{color:var(--bone)}
+  #chips button[aria-pressed="true"]{border-color:var(--brass);color:var(--bone);background:var(--ink-3)}
+  #chips button .swatch{width:11px;height:11px;border-radius:4px;background:var(--brass);flex:none}
+
+  /* palco */
+  #stage{position:relative}
+  .dir-panel[hidden]{display:none}
+  .dir-panel{animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .dir-card{background:var(--ink-2);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .dir-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line)}
+  .dir-name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.1rem;line-height:1.15}
+  .dir-mood{font-size:.74rem;color:var(--bone-dim);margin-top:2px}
+  .dir-tag{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:5px 9px;border-radius:99px;white-space:nowrap;background:var(--ink-3);color:var(--bone-dim);border:1px solid var(--line)}
+  .dir-tag[data-role="Attuale"]{background:rgba(224,169,109,.16);color:var(--brass);border-color:var(--brass-deep)}
+  .dir-tag[data-role="Variante +"]{background:rgba(127,181,154,.14);color:var(--ok);border-color:#3f5a4f}
+  .dir-body{padding:20px 18px}
+  .dir-why{display:flex;gap:9px;align-items:flex-start;padding:13px 18px;border-top:1px solid var(--line);background:rgba(255,255,255,.015);font-size:.82rem;color:var(--bone-dim)}
+  .dir-why b{color:var(--bone);font-weight:600}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+
+  
+  /* ══════════ teloscrivo · dock v2 (palette fusa) ══════════ */
+  @font-face{font-family:"Fibonacci";src:url(../assets/fonts/fibonacci.ttf)}
+  @font-face{font-family:"Fibonacci";font-style:italic;src:url(../assets/fonts/fibonacci-italic.ttf)}
+
+  .vt{display:flex;gap:6px;margin:0 0 14px}
+  .vt button{font:inherit;font-size:.8rem;font-weight:600;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--ink-3);color:var(--bone-dim);cursor:pointer}
+  .vt button[aria-pressed="true"]{color:var(--bone);border-color:var(--brass)}
+  .frame{container-type:inline-size;margin:0 auto;border:1px solid var(--line);border-radius:22px;overflow:hidden;position:relative}
+  .frame[data-view="m"]{width:390px;max-width:100%;height:780px}
+  .frame[data-view="d"]{width:100%;height:660px}
+
+  .site{--navy:#072D59;--seal:#DBF2FC;--pink:#FD6E88;
+    position:relative;height:100%;overflow:hidden;font-family:Poppins,sans-serif;background:var(--bg);color:var(--fg);
+    --muted:color-mix(in srgb,var(--fg) 66%,var(--bg));
+    --line:color-mix(in srgb,var(--fg) 18%,transparent);
+    --soft:color-mix(in srgb,var(--fg) 8%,transparent);
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .site[data-theme="light"]{--bg:var(--seal);--fg:var(--navy);--o1:color-mix(in oklab,var(--navy) 62%,var(--seal));--o2:var(--navy);--dockbg:color-mix(in srgb,var(--seal) 30%,transparent);--dockline:color-mix(in srgb,var(--seal) 55%,transparent)}
+  .site[data-theme="dark"]{--bg:var(--navy);--fg:var(--seal);--o1:color-mix(in oklab,var(--seal) 38%,var(--navy));--o2:color-mix(in oklab,var(--navy) 88%,var(--seal));--dockbg:color-mix(in srgb,var(--navy) 50%,transparent);--dockline:color-mix(in srgb,var(--seal) 22%,transparent)}
+  .site[data-theme="light"] .lg-d,.site[data-theme="dark"] .lg-l{display:none}   /* file logo nominati per lo sfondo */
+  .site *{box-sizing:border-box}
+  .site button{font:inherit;color:inherit}
+  .site :focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+  .site ul{list-style:none;margin:0;padding:0}
+
+  /* cielo: le tre tinte fuse (Seal in alto, Navy in basso, Rosa che si scioglie nel blu) */
+  @property --sx{syntax:"<percentage>";inherits:true;initial-value:14%}
+  .d1[data-cat="testi"]{--sx:14%}.d1[data-cat="poesie"]{--sx:38%}.d1[data-cat="racconti"]{--sx:62%}.d1[data-cat="canzoni"]{--sx:86%}
+  .sky{transition:--sx .9s cubic-bezier(.2,.8,.2,1);position:absolute;inset:0;z-index:0;pointer-events:none;transition:background .6s}
+  .site[data-theme="light"] .sky{background:
+    radial-gradient(90% 38% at var(--sx) 104%,color-mix(in oklab,var(--pink) 78%,transparent),transparent 70%),
+    radial-gradient(70% 30% at 100% 92%,color-mix(in oklab,var(--pink) 38%,transparent),transparent 70%),
+    linear-gradient(180deg,var(--seal) 0%,var(--seal) 64%,color-mix(in oklab,var(--seal) 52%,var(--navy)) 86%,color-mix(in oklab,var(--navy) 86%,var(--seal)) 100%)}
+  .site[data-theme="dark"] .sky{background:
+    radial-gradient(80% 36% at var(--sx) 106%,color-mix(in oklab,var(--pink) 62%,transparent),transparent 70%),
+    radial-gradient(60% 40% at 96% 4%,color-mix(in oklab,var(--seal) 20%,transparent),transparent 70%),
+    linear-gradient(180deg,var(--navy) 0%,var(--navy) 55%,color-mix(in oklab,var(--navy) 80%,var(--pink)) 100%)}
+
+  .tbar{position:absolute;top:0;left:0;right:0;height:82px;padding-bottom:20px;background:linear-gradient(180deg,var(--bg) 62%,transparent);padding:0 18px;display:flex;align-items:center;justify-content:space-between;z-index:3}
+  .brand{display:flex;align-items:center;gap:9px;color:var(--fg);text-decoration:none}
+  .brand img{height:26px;width:auto;display:block}
+  .wm{font-family:Fibonacci,sans-serif;font-size:1.4rem;line-height:1;display:inline-flex;align-items:baseline;gap:3px}
+  .dot{width:.3em;height:.3em;border-radius:50%;background:var(--pink);display:inline-block}
+  .cap{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .tbar .rt{display:flex;align-items:center;gap:12px}
+  .site .th{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--soft);cursor:pointer;font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+  .pulse{width:8px;height:8px;border-radius:50%;background:var(--pink);display:inline-block;flex:none;animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--pink) 55%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* contenuto che svanisce sopra (header) e sotto (dock) invece di tagliarsi */
+  .sc{position:relative;z-index:1;height:100%;overflow:auto;padding:100px 18px 190px;scroll-behavior:smooth;
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent 44px,#000 82px,#000 calc(100% - 190px),transparent calc(100% - 96px));
+    mask-image:linear-gradient(to bottom,transparent 0,transparent 44px,#000 82px,#000 calc(100% - 190px),transparent calc(100% - 96px))}
+  .wrapin{max-width:760px;margin:0 auto}
+
+  /* ── hero ── */
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .hero{display:grid;gap:30px}
+  .hero-h{font-family:Fibonacci,sans-serif;font-weight:400;font-size:clamp(2.1rem,10.8cqi,3.7rem);line-height:1.06;margin:0 0 18px;min-height:3.2em}
+  .hero-h em{font-style:italic}
+  .hero-h{text-wrap:balance}
+  .cr{display:inline-block;width:.07em;height:.8em;margin:0 -.07em 0 .03em;background:var(--pink);vertical-align:-.04em;animation:blink 1s steps(1) infinite}
+  .gh{visibility:hidden}
+  @keyframes blink{50%{opacity:0}}
+  .hero-p{color:var(--muted);font-size:.95rem;margin:0;max-width:38ch}
+  .cta{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border:0;border-radius:12px;background:var(--pink);color:var(--navy);font:600 .92rem Poppins,sans-serif;cursor:pointer;transition:transform .2s,box-shadow .2s}
+  .cta:hover{transform:translateY(-2px);box-shadow:0 10px 26px color-mix(in oklab,var(--pink) 45%,transparent)}
+  .cta svg{width:18px;height:18px;transition:transform .2s}
+  .cta:hover svg{transform:translateX(3px)}
+  .clk{display:none}
+
+  /* ── ultimo scritto (card grande) ── */
+  .last{padding:24px 22px 20px;border:1px solid var(--line);border-radius:20px;background:color-mix(in srgb,var(--bg) 58%,transparent)}
+  .lk{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+  .lt{font-family:Fibonacci,sans-serif;font-weight:400;font-size:2.6rem;line-height:1;margin:0 0 14px}
+  .lx{font-weight:300;font-size:1.05rem;line-height:1.75;margin:0 0 22px}
+  .lf{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+
+  /* ── le 4 cartelle con la loro frase ── */
+  .fgrid{display:grid;grid-template-columns:1fr;gap:10px}
+  .fc{display:grid;grid-template-columns:46px 1fr;gap:6px 14px;align-items:center;text-align:left;padding:14px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--bg) 50%,transparent);cursor:pointer;transition:transform .2s,border-color .2s}
+  .fc:hover{transform:translateY(-3px);border-color:var(--fg)}
+  .fc .ic{grid-row:1 / span 2}
+  .fc b{display:flex;justify-content:space-between;align-items:baseline;font-weight:500;font-size:1rem}
+  .fc b span{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .fc small{color:var(--muted);font-size:.82rem;line-height:1.45}
+
+  /* ── lista ── */
+  .lh{display:flex;justify-content:space-between;align-items:baseline;margin:34px 0 8px}
+  .lh .cap:first-child{color:var(--fg)}
+  .entry{display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:center;width:100%;min-height:64px;padding:8px 10px;margin:0 -10px;border:0;border-radius:12px;background:none;text-align:left;cursor:pointer;animation:rise .4s both;animation-delay:calc(var(--i) * 55ms);transition:background .2s,transform .2s}
+  .entry:hover{background:var(--soft);transform:translateX(4px)}
+  .entry b{font-weight:500;font-size:.98rem;display:block;line-height:1.3}
+  .entry small{color:var(--muted);font-size:.76rem}
+  .entry .rd{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .entry .rx{display:none}
+  .nw{font:700 .58rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;background:var(--pink);color:var(--navy);padding:2px 6px;border-radius:4px;margin-left:8px;font-style:normal;vertical-align:2px}
+  .empty{padding:24px 0;color:var(--muted);font-size:.9rem}
+  .more{display:inline-block;margin-top:10px;font-size:.84rem;color:var(--fg);text-decoration:underline;text-decoration-color:var(--pink);text-underline-offset:4px;text-decoration-thickness:2px}
+
+  /* ── icone: "tessere app" con le 3 tinte fuse ── */
+  .ic{--g:var(--seal);--ac:var(--pink);position:relative;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;flex:none;
+    box-shadow:inset 0 1px 0 color-mix(in srgb,var(--seal) 45%,transparent),0 5px 12px color-mix(in srgb,var(--navy) 28%,transparent)}
+  .ic svg{width:24px;height:24px;fill:none;stroke:var(--g);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .ic .ac{stroke:var(--ac)}
+  .ic.s{width:36px;height:36px;border-radius:10px;box-shadow:none}
+  .ic.s svg{width:19px;height:19px}
+  .ic-testi{background:linear-gradient(145deg,color-mix(in oklab,var(--navy) 72%,var(--seal)),var(--navy))}
+  .ic-poesie{--g:var(--navy);--ac:var(--seal);background:linear-gradient(145deg,var(--pink),color-mix(in oklab,var(--pink) 68%,var(--seal)))}
+  .ic-racconti{--g:var(--navy);background:linear-gradient(145deg,color-mix(in oklab,var(--seal) 78%,var(--navy)),color-mix(in oklab,var(--seal) 44%,var(--navy)))}
+  .ic-canzoni{background:linear-gradient(145deg,var(--navy),color-mix(in oklab,var(--pink) 58%,var(--navy)))}
+  .ic-cerca{--g:var(--navy);background:linear-gradient(145deg,var(--seal),color-mix(in oklab,var(--seal) 72%,var(--navy)))}
+  .bd{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--pink);color:var(--navy);font:700 .62rem "Roboto Condensed",sans-serif;display:grid;place-items:center;border:2px solid color-mix(in oklab,var(--navy) 70%,var(--seal))}
+
+  /* ── dock ── */
+  .dock{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:flex-end;gap:4px;padding:10px 10px 8px;border-radius:24px;background:var(--dockbg);border:1px solid var(--dockline);backdrop-filter:blur(16px) saturate(1.25);-webkit-backdrop-filter:blur(16px) saturate(1.25);z-index:4}
+  .dk{position:relative;width:58px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:0 0 11px;background:none;border:0;cursor:pointer;transform-origin:50% 100%;transition:transform .22s cubic-bezier(.3,1.6,.5,1)}
+  .dk .lb{font:600 .6rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--seal)}
+  .dk[aria-pressed="true"]::after{content:"";position:absolute;bottom:1px;width:5px;height:5px;border-radius:50%;background:var(--pink)}
+  .dk[aria-pressed="true"] .ic{outline:2px solid var(--pink);outline-offset:2px}
+  .dk.pop .ic{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes pop{0%{transform:translateY(0)}35%{transform:translateY(-14px)}100%{transform:translateY(0)}}
+  .sep{width:1px;align-self:stretch;margin:6px 6px 14px;background:var(--dockline)}
+  @media (hover:hover){
+    .dk:hover{transform:scale(1.28)}
+    .dk:hover + .dk,.dk:has(+ .dk:hover){transform:scale(1.12)}
+  }
+  .qp{position:absolute;left:14px;right:14px;bottom:112px;z-index:3;display:flex;align-items:center;gap:10px;padding:0 14px;height:52px;border-radius:14px;background:var(--bg);border:1px solid var(--fg);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s,transform .2s}
+  .qp.on{opacity:1;transform:none;pointer-events:auto}
+  .qp input{flex:1;min-width:0;height:48px;border:0;background:none;color:var(--fg);font:400 1rem Poppins,sans-serif;outline:0}
+  .qp svg{width:18px;height:18px;flex:none;color:var(--muted)}
+  .toast{position:absolute;left:50%;bottom:120px;transform:translate(-50%,10px);opacity:0;pointer-events:none;z-index:9;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.82rem;white-space:nowrap;transition:opacity .2s,transform .2s}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  @container (min-width:640px){
+    .tbar{padding:0 36px}
+    .sc{padding:104px 36px 190px}
+    .hero{grid-template-columns:1.1fr 1fr;column-gap:56px;align-items:center}
+    .hero-h{min-height:3.3em}
+    .clk{display:block}
+    .fgrid{grid-template-columns:repeat(4,1fr)}
+    .fc{grid-template-columns:1fr;padding:18px}
+    .fc .ic{grid-row:auto;margin-bottom:8px}
+    .hero-p{margin-bottom:24px}
+    .entry{grid-template-columns:36px minmax(160px,1fr) 1.4fr 70px}
+    .entry .rx{display:block;color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .entry .rd{text-align:right}
+    .qp{left:50%;right:auto;width:420px;margin-left:-210px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">Approfondimento · Dock</div>
+    <h1 id="mockTitle">teloscrivo · dock v3</h1>
+    <p class="lead">Intestazione che si scrive da solo, card "ultimo scritto", cartelle con la loro frase e dock con icone vere. Prova Mobile / Desktop, il tema, le cartelle del dock (il rosa sotto il dock segue la cartella aperta). Testi e date finti.</p>
+  </header>
+
+  <nav id="chips" role="tablist" aria-label="Direzioni"></nav>
+
+  <main id="stage">
+    <div id="panels">
+
+      <section class="dir-panel" data-name="Dock v2 · Aurora" data-mood="Seal, Navy e Rosa fusi · dock con icone vere · testo che si scrive" data-why="Le tre tinte non sono più a blocchi ma si sciolgono una nell'altra (chiaro in alto, blu profondo e rosa sotto il dock). Il rosa sotto il dock scivola sull'icona della cartella aperta, le icone hanno una grammatica unica e il dock ti dice quanti scritti ci sono." data-role="Variante +">
+        <div class="vt" role="group" aria-label="Vista"><button type="button" data-setview="m" aria-pressed="true">Mobile</button><button type="button" data-setview="d" aria-pressed="false">Desktop</button></div>
+        <div class="frame" data-view="m">
+          <div class="site d1" data-theme="light" data-cat="poesie">
+            <div class="sky" aria-hidden="true"></div>
+            <div class="tbar">
+              <a class="brand" href="#" aria-label="teloscrivo"><img class="lg-l" src="../assets/logo/monogramma-seal.svg" alt=""><img class="lg-d" src="../assets/logo/monogramma-navy.svg" alt=""><span class="wm">teloscrivo<span class="dot" aria-hidden="true"></span></span></a>
+              <div class="rt"><span class="cap clk" data-clock></span><button type="button" class="th" data-theme-toggle>Scuro</button></div>
+            </div>
+            <div class="sc" data-sc><div class="wrapin">
+              <section class="hero">
+                <div class="hero-l">
+                  <h2 class="hero-h"><span class="sr">Parole scritte per restare.</span><span aria-hidden="true" data-type></span></h2>
+                  <p class="hero-p">Sono teloscrivo. Qui lascio testi, poesie e racconti brevi: leggili con calma.</p>
+                </div>
+                <article class="last">
+                  <p class="cap lk"><i class="pulse"></i>Ultimo scritto · Poesie · 3 nov</p>
+                  <h3 class="lt">Sale</h3>
+                  <p class="lx">Il mare mi ha insegnato<br>a restare, anche quando<br>la riva dice di andare.</p>
+                  <div class="lf"><span class="cap">1 min di lettura</span><button type="button" class="cta" data-cta>Leggi<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+                </article>
+              </section>
+              <div class="lh"><span class="cap">Le cartelle</span></div>
+              <div class="fgrid" data-fgrid></div>
+              <div class="lh" data-lhrow><span class="cap" data-lh>Ultimi scritti</span><span class="cap" data-lc></span></div>
+              <ul data-rows></ul>
+              <a href="#" class="more" data-more hidden></a>
+            </div></div>
+            <div class="qp" data-qp><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input type="search" data-q placeholder="Cerca tra i testi" aria-label="Cerca tra i testi"></div>
+            <nav class="dock" data-dock aria-label="Cartelle"></nav>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ── Scocca generica: chip auto-costruiti dai pannelli, uno visibile alla volta ──
+(function(){
+  const panelsBox = document.getElementById('panels');
+  const panels = [...panelsBox.querySelectorAll('.dir-panel')];
+  const chips = document.getElementById('chips');
+
+  // Disegna la chrome (barra nome+mood, riga "perché") dentro ogni pannello dai data-*
+  panels.forEach(p=>{
+    const inner = p.innerHTML;
+    const role = p.dataset.role || '';
+    const tag = role ? `<span class="dir-tag" data-role="${role}">${role}</span>` : `<span class="dir-tag">Direzione</span>`;
+    p.innerHTML = `
+      <div class="dir-card">
+        <div class="dir-head">
+          <div>
+            <div class="dir-name">${p.dataset.name||'Direzione'}</div>
+            <div class="dir-mood">${p.dataset.mood||''}</div>
+          </div>${tag}
+        </div>
+        <div class="dir-body">${inner}</div>
+        ${p.dataset.why ? `<div class="dir-why">✶&nbsp;<span><b>Perché:</b> ${p.dataset.why}</span></div>` : ``}
+      </div>`;
+  });
+
+  function show(i){
+    panels.forEach((p,j)=>p.toggleAttribute('hidden', j!==i));
+    [...chips.children].forEach((c,j)=>c.setAttribute('aria-pressed', j===i));
+  }
+
+  panels.forEach((p,i)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-pressed', i===0 ? 'true':'false');
+    b.innerHTML = `<span class="swatch"></span>${p.dataset.name || ('Direzione '+(i+1))}`;
+    b.addEventListener('click', ()=>show(i));
+    chips.appendChild(b);
+  });
+
+  show(0);
+
+  })();
+</script>
+
+<script>
+// ══ teloscrivo · dock v2: dati finti e interazioni (gira DOPO la scocca) ══
+(function(){
+  const COUNTS={testi:12,poesie:9,racconti:5,canzoni:7};
+  const NAMES={testi:'Testi',poesie:'Poesie',racconti:'Racconti brevi',canzoni:'Dalle canzoni'};
+  const SHORT={testi:'Testi',poesie:'Poesie',racconti:'Racconti',canzoni:'Canzoni'};
+  const KEYS=Object.keys(NAMES);
+  const POSTS=[
+    {t:'Sale',c:'poesie',d:'3 nov',n:1,x:'Il mare mi ha insegnato\na restare, anche quando\nla riva dice di andare.'},
+    {t:'Lettera a chi resta',c:'testi',d:'1 nov',x:'Non ti chiedo di capire. Ti chiedo di lasciare la luce accesa in corridoio.'},
+    {t:'Il treno delle 6:40',c:'racconti',d:'29 ott',x:'Ogni mattina lo stesso sedile, lo stesso finestrino, e una storia che nessuno aveva ancora chiesto.'},
+    {t:'Quello che non ti ho detto',c:'canzoni',d:'27 ott',x:'Scritta in una notte, cantata sottovoce. Ascoltala su Spotify.'},
+    {t:'Casa',c:'poesie',d:'25 ott',x:'Casa non è un posto.\nÈ il rumore delle chiavi\nche ti aspetta.'},
+    {t:'Piove da giorni',c:'testi',d:'22 ott',x:'Le giornate grigie hanno un vantaggio: non fingono di essere altro.'},
+    {t:'La stanza in fondo',c:'racconti',d:'19 ott',x:'Nessuno la apriva da anni, ma la luce sotto la porta era sempre accesa.'},
+    {t:'Luce bassa',c:'poesie',d:'16 ott',x:'Scrivo quando la casa dorme,\nquando anche le parole\nabbassano la voce.'},
+    {t:'Ritornello',c:'canzoni',d:'12 ott',x:'Quattro righe che tornano, come certi pensieri a mezzanotte.'}
+  ];
+  // icone: stesso tratto, stesso peso; il segno rosa ("ac") e' l'unico dettaglio colorato
+  const GLYPH={
+    testi:'<path d="M6.5 3h7.5l4 4v13.5h-11.5z"/><path d="M14 3v4h4"/><path d="M9.5 12h6"/><path class="ac" d="M9.5 15.5h4"/>',
+    poesie:'<path d="M19.5 4.5c-6.5-.5-11 3-12 9.5L5 19.5l.8.7 3.2-1.8c6.4-1 10-5.5 10.5-12.9z"/><path class="ac" d="M8 17l7-7"/>',
+    racconti:'<path d="M3 6c3-1.2 6-.8 9 1.2 3-2 6-2.4 9-1.2v12c-3-1.2-6-.8-9 1.2-3-2-6-2.4-9-1.2z"/><path class="ac" d="M12 7.2v12"/>',
+    canzoni:'<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5"/><path class="ac" d="M9.5 9l10-2"/>',
+    cerca:'<circle cx="10.5" cy="10.5" r="6"/><path class="ac" d="M15 15l5 5"/>'
+  };
+  const icon=(k,small)=>`<span class="ic ${small?'s ':''}ic-${k}"><svg viewBox="0 0 24 24" aria-hidden="true">${GLYPH[k]}</svg></span>`;
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const hit=(p,q)=>{q=norm(q.trim());return !q||norm(p.t+' '+p.x+' '+NAMES[p.c]).includes(q)};
+  const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  const panel=document.querySelector('.dir-panel'),frame=panel.querySelector('.frame'),site=panel.querySelector('.d1');
+  const $=s=>site.querySelector(s);
+  const rows=$('[data-rows]'),lh=$('[data-lh]'),lc=$('[data-lc]'),more=$('[data-more]'),dock=$('[data-dock]'),qp=$('[data-qp]'),qi=$('[data-q]'),sc=$('[data-sc]'),lhrow=$('[data-lhrow]');
+  let cat=null,q='';
+
+  function toast(msg){
+    let t=$('.toast');
+    if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');site.appendChild(t);}
+    t.textContent=msg;t.classList.remove('on');void t.offsetWidth;t.classList.add('on');
+    clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2300);
+  }
+
+  // vista e tema
+  panel.querySelectorAll('[data-setview]').forEach(b=>b.addEventListener('click',()=>{
+    frame.dataset.view=b.dataset.setview;
+    panel.querySelectorAll('[data-setview]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  }));
+  const th=$('[data-theme-toggle]');
+  const thLabel=()=>th.textContent=site.dataset.theme==='light'?'Scuro':'Chiaro';
+  th.addEventListener('click',()=>{site.dataset.theme=site.dataset.theme==='light'?'dark':'light';thLabel();});
+
+  // orologio vivo
+  function clock(){
+    const d=new Date();
+    $('[data-clock]').textContent=d.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'')+' · '+d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  }
+  clock();setInterval(clock,20000);
+
+  // dock con icone e contatori
+  dock.innerHTML=KEYS.map(k=>`<button type="button" class="dk" data-cat="${k}" aria-pressed="false" aria-label="${NAMES[k]}, ${COUNTS[k]} scritti">${icon(k)}<span class="lb">${SHORT[k]}</span></button>`).join('')
+    +`<i class="sep"></i><button type="button" class="dk" data-search aria-pressed="false" aria-label="Cerca">${icon('cerca')}<span class="lb">Cerca</span></button>`;
+  KEYS.forEach(k=>{const ic=dock.querySelector(`.dk[data-cat="${k}"] .ic`);ic.insertAdjacentHTML('beforeend',`<b class="bd">${COUNTS[k]}</b>`);});
+
+  const OPEN={testi:'Pensieri che non stanno in una frase.',poesie:'Poche righe, dette piano.',racconti:'Storie brevi, da leggere in un respiro.',canzoni:'Quello che ho scritto cantando sottovoce.'};
+  const fgrid=$('[data-fgrid]');
+  fgrid.innerHTML=KEYS.map(k=>`<button type="button" class="fc" data-cat="${k}">${icon(k)}<b>${NAMES[k]}<span>${COUNTS[k]}</span></b><small>${OPEN[k]}</small></button>`).join('');
+  fgrid.addEventListener('click',e=>{const b=e.target.closest('.fc');if(b)dock.querySelector(`.dk[data-cat="${b.dataset.cat}"]`).click();});
+  function render(){
+    const items=POSTS.filter(p=>(!cat||p.c===cat)&&hit(p,q));
+    lh.textContent=q?'Risultati':(cat?NAMES[cat]:'Ultimi scritti');
+    lc.textContent=q?items.length+' trovati':(cat?COUNTS[cat]+' scritti':'');
+    rows.innerHTML=items.length?items.map((p,i)=>`<li><button type="button" class="entry" style="--i:${i}" data-t="${esc(p.t)}">${icon(p.c,true)}<span><b>${esc(p.t)}${p.n?'<em class="nw">nuovo</em>':''}</b><small>${SHORT[p.c]}</small></span><span class="rx">${esc(p.x.replace(/\n/g,' / '))}</span><span class="rd">${p.d}</span></button></li>`).join(''):`<li class="empty">Nessun risultato per «${esc(q)}»</li>`;
+    dock.querySelectorAll('[data-cat]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cat===cat?'true':'false'));
+    if(cat&&!q){more.hidden=false;more.textContent='Vedi tutti i '+COUNTS[cat]+' ›';}else more.hidden=true;
+    if(cat)site.dataset.cat=cat; // il rosa sotto il dock segue la cartella
+  }
+  dock.addEventListener('click',e=>{
+    const b=e.target.closest('.dk');if(!b)return;
+    b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');
+    if(b.hasAttribute('data-search')){
+      const on=!qp.classList.contains('on');qp.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');
+      if(on)qi.focus();else{qi.value='';q='';render();}
+      return;
+    }
+    cat=(cat===b.dataset.cat)?null:b.dataset.cat;render();
+    if(cat)sc.scrollTo({top:lhrow.offsetTop-90,behavior:reduced?'auto':'smooth'});else sc.scrollTo({top:0,behavior:reduced?'auto':'smooth'});
+  });
+  qi.addEventListener('input',()=>{q=qi.value;render();});
+  rows.addEventListener('click',e=>{const b=e.target.closest('.entry');if(b)toast('Qui si apre «'+b.dataset.t+'»');});
+  more.addEventListener('click',e=>{e.preventDefault();toast("Qui si apre l'elenco completo");});
+  $('[data-cta]').addEventListener('click',()=>toast('Qui si apre «Sale»'));
+
+  // il titolo si scrive da solo e cicla le frasi (senza accenti: Fibonacci Demo non li ha)
+  const PH=[['Scrivo quello che a voce','non riesco a dire.'],['Ogni testo, una luce','lasciata accesa.'],['Qui si scrive','piano.'],['Parole scritte','per restare.'],['Scrivo per chi','resta sveglio.']];
+  const ty=$('[data-type]');let pi=0;
+  // la frase intera e' sempre nel layout (parte invisibile): le righe non saltano mentre scrive
+  function draw(ph,n){
+    const a=ph[0]+' ',b=ph[1],na=Math.min(n,a.length),nb=Math.max(0,n-a.length);
+    const cr='<i class="cr"></i>';
+    ty.innerHTML=esc(a.slice(0,na))+(nb<=0?cr:'')+'<span class="gh">'+esc(a.slice(na))+'</span>'
+      +'<em>'+esc(b.slice(0,nb))+(nb>0?cr:'')+'<span class="gh">'+esc(b.slice(nb))+'</span></em>';
+  }
+  (function cycle(){
+    const ph=PH[pi%PH.length],full=ph[0].length+1+ph[1].length;let n=0;
+    if(reduced){draw(ph,full);return;}
+    function erase(){draw(ph,--n);if(n>0)setTimeout(erase,22);else{pi++;setTimeout(cycle,300);}}
+    (function type(){
+      if(panel.hidden){setTimeout(type,500);return;}
+      draw(ph,++n);
+      if(n<full)setTimeout(type,52);else setTimeout(erase,3400);
+    })();
+  })();
+
+  thLabel();render();
+})();
+</script>
+
+</body>
+</html>
