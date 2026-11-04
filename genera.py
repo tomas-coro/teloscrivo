@@ -14,12 +14,13 @@ le applica il filtro duotono blu del sito e scrive assets/foto/<slug>-800.webp e
 Intestazione di uno scritto (tutto su una riga ciascuno):
     titolo:   obbligatorio
     data:     obbligatorio, AAAA-MM-GG
-    sezione:  obbligatorio, una tra testi | poesie | racconti | canzoni
+    sezione:  obbligatorio, una tra testi | poesie | racconti | canzoni (anche due, separate da virgola: `testi, poesie`; la prima e' la principale)
     estratto: facoltativo (se manca: prime righe per poesie/canzoni, prima frase per il resto)
     spotify:  facoltativo, link https:// (compare il bottone "Ascolta su Spotify")
     foto-focus: facoltativo, punto da tenere nel ritaglio, es. `30% 50%` (default: centro)
 Righe che iniziano con # nell'intestazione sono commenti.
 Il corpo: righe = versi (poesie, canzoni); righe vuote = pausa/paragrafo.
+Citazione in cima: righe che iniziano con `> ` (l'ultima e' l'autore). Poesia finale dentro un testo: una riga `[poesia]` e sotto i versi.
 """
 import html
 import json
@@ -45,7 +46,8 @@ TIKTOK_VIDEOS = []  # elenco di (titolo, sottotitolo, link al video), facoltativ
 # (e il sito usa il segnaposto colorato). Quando le foto ci sono tutte, mettilo True: uno scritto senza foto blocca la generazione.
 PHOTO_DIR = "foto"
 PHOTO_OUT = "assets/foto"
-PHOTO_SIZES = (800, 1600)  # larghezze in uscita, sempre 16:10
+PHOTO_SIZES = (800, 1600)  # larghezze in uscita, sempre 16:10 (mai ingrandite: se la foto e' piu' stretta, si scrive la sua misura)
+PHOTO_MIN_WIDTH = 700
 REQUIRE_PHOTOS = False
 # Filtro duotono: ombre = Navy, luci = Seal Blue; prima della tinta si aumenta un po' il contrasto (stessa resa del mockup 27)
 DUO_DARK, DUO_LIGHT = (0x07, 0x2D, 0x59), (0xDB, 0xF2, 0xFC)
@@ -132,9 +134,13 @@ class Post:
             self.date = date.fromisoformat(meta["data"])
         except ValueError:
             raise SiteError(f"{path.name}: data '{meta['data']}' non valida (usa AAAA-MM-GG)")
-        self.cat = meta["sezione"]
-        if self.cat not in SECTIONS:
-            raise SiteError(f"{path.name}: sezione '{self.cat}' sconosciuta (ammesse: {', '.join(SECTIONS)})")
+        self.cats = [c.strip() for c in meta["sezione"].split(",") if c.strip()]
+        for c in self.cats:
+            if c not in SECTIONS:
+                raise SiteError(f"{path.name}: sezione '{c}' sconosciuta (ammesse: {', '.join(SECTIONS)})")
+        if not self.cats or len(set(self.cats)) != len(self.cats):
+            raise SiteError(f"{path.name}: 'sezione' vuota o con una sezione ripetuta")
+        self.cat = self.cats[0]  # la principale: colore, icona, prima voce in elenco
         self.spotify = meta.get("spotify", "")
         if self.spotify and not self.spotify.startswith("https://"):
             raise SiteError(f"{path.name}: il link spotify deve iniziare con https://")
@@ -142,7 +148,22 @@ class Post:
         if not re.fullmatch(r"\d{1,3}% \d{1,3}%", self.focus) or any(int(v) > 100 for v in re.findall(r"\d+", self.focus)):
             raise SiteError(f"{path.name}: foto-focus '{self.focus}' non valido (esempio: 30% 50%, valori da 0 a 100)")
         self.has_photo = False  # lo decide bake_photos()
-        self.body = m.group(2).strip("\n")
+        self.photo_sizes = []
+        raw = m.group(2).strip("\n")
+        lines = raw.split("\n")
+        self.quote = []
+        while lines and lines[0].startswith(">"):
+            self.quote.append(lines.pop(0)[1:].strip())
+        raw = "\n".join(lines).strip("\n")
+        self.poem = ""
+        parts = re.split(r"^\[poesia\]\s*$", raw, flags=re.M)
+        if len(parts) > 2:
+            raise SiteError(f"{path.name}: c'e' piu' di una riga [poesia]")
+        if len(parts) == 2:
+            raw, self.poem = parts[0].strip("\n"), parts[1].strip("\n")
+            if not self.poem.strip():
+                raise SiteError(f"{path.name}: dopo [poesia] non ci sono versi")
+        self.body = raw  # la parte in prosa (o in versi se la sezione principale e' poesie/canzoni)
         if not self.body.strip():
             raise SiteError(f"{path.name}: il testo e' vuoto")
         self.excerpt = meta.get("estratto") or self._default_excerpt()
@@ -154,12 +175,20 @@ class Post:
         return re.split(r"(?<=[.!?])\s+", first)[0]  # solo . ! ? (i due punti non chiudono la frase)
 
     @property
+    def cat_label(self):
+        return " · ".join(SECTIONS[c][0] for c in self.cats)
+
+    @property
+    def full_text(self):  # tutto quello che si legge: serve a ricerca e tempo di lettura
+        return "\n\n".join(x for x in ("\n".join(self.quote), self.body, self.poem) if x.strip())
+
+    @property
     def flat(self):  # estratto su una riga sola
         return self.excerpt.replace("\n", " / ")
 
     @property
     def minutes(self):
-        return max(1, round(len(self.body.split()) / 200))
+        return max(1, round(len(self.full_text.split()) / 200))
 
     @property
     def url(self):  # relativo alla radice del sito
@@ -174,24 +203,38 @@ class Post:
     def month_label(self):
         return f"{MONTHS_LONG[self.date.month - 1]} {self.date.year}"
 
-    def body_html(self):
-        """Il testo e' tutto nell'HTML. Ogni riga/frase e' un <span class=u>: il JS la fa comparire scorrendo."""
-        if self.cat in LINE_SECTIONS:
-            out, gap = [], False
-            for line in self.body.split("\n"):
-                if not line.strip():
-                    gap = bool(out)
-                    continue
-                if gap:
-                    out.append('<span class="gap"></span>')
-                    gap = False
-                out.append(f'<span class="u l">{esc(line.strip())}</span>')
-            return "".join(out)
-        paras = [p for p in re.split(r"\n\s*\n", self.body) if p.strip()]
+    @staticmethod
+    def _lines_html(text):
+        out, gap = [], False
+        for line in text.split("\n"):
+            if not line.strip():
+                gap = bool(out)
+                continue
+            if gap:
+                out.append('<span class="gap"></span>')
+                gap = False
+            out.append(f'<span class="u l">{esc(line.strip())}</span>')
+        return "".join(out)
+
+    @staticmethod
+    def _prose_html(text):
+        paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
         return "".join(
             "<p>" + "".join(f'<span class="u">{esc(s)} </span>' for s in re.split(r"(?<=[.!?:])\s+", " ".join(p.split()))) + "</p>"
             for p in paras
         )
+
+    def body_html(self):
+        """Il testo e' tutto nell'HTML. Ogni riga/frase e' un <span class=u>: il JS la fa comparire scorrendo."""
+        out = ""
+        if self.quote:  # citazione in cima: tutte le righe tranne l'ultima sono la frase, l'ultima e' l'autore
+            frase, autore = (self.quote[:-1], self.quote[-1]) if len(self.quote) > 1 else (self.quote, "")
+            out += ('<blockquote class="cita"><p><span class="u">' + esc(" ".join(frase)) + "</span></p>"
+                    + (f'<cite class="u">{esc(autore)}</cite>' if autore else "") + "</blockquote>")
+        out += self._lines_html(self.body) if self.cat in LINE_SECTIONS else self._prose_html(self.body)
+        if self.poem:  # poesia finale: sempre a versi, separata dal testo
+            out += '<div class="poema">' + self._lines_html(self.poem) + "</div>"
+        return out
 
 
 def load_posts():
@@ -206,7 +249,7 @@ def load_posts():
 # ═══ PEZZI DI PAGINA ═══
 def present_cats(posts):
     """Solo le sezioni che hanno almeno uno scritto (le altre non hanno pagina e non compaiono nei menu)."""
-    return [k for k in SECTIONS if any(p.cat == k for p in posts)]
+    return [k for k in SECTIONS if any(k in p.cats for p in posts)]
 
 
 def nav_html(root, current=None):
@@ -281,7 +324,7 @@ def card_html(p, root):
     """Una scheda della griglia: il clic apre subito lo scritto (niente anteprima)."""
     return (f'<article class="desk-window" data-cat="{p.cat}"><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
             f'<a href="{root}{p.url}" data-card><span class="desk-photo{" has-img" if p.has_photo else ""}" aria-hidden="true">{photo_img(p, root, "(min-width:900px) 380px, 90vw")}</span>'
-            f'<span class="desk-info"><span class="desk-meta"><b>{esc(SECTIONS[p.cat][0])}</b>{p.long_date()}</span>'
+            f'<span class="desk-info"><span class="desk-meta"><b>{esc(p.cat_label)}</b>{p.long_date()}</span>'
             f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
             f'<span class="desk-more"><span class="t">Apri lo scritto</span><i class="arr" aria-hidden="true">↗</i></span></span></a></article>')
 
@@ -343,11 +386,12 @@ def bake_photos(posts):
         w, h = im.size
         if w < h:
             raise SiteError(f"{PHOTO_DIR}/{src.name}: e' verticale ({w}x{h}). Le foto devono essere orizzontali.")
-        if w < PHOTO_SIZES[0]:
-            raise SiteError(f"{PHOTO_DIR}/{src.name}: troppo piccola ({w}px di larghezza, minimo {PHOTO_SIZES[0]}).")
+        if w < PHOTO_MIN_WIDTH:
+            raise SiteError(f"{PHOTO_DIR}/{src.name}: troppo piccola ({w}px di larghezza, minimo {PHOTO_MIN_WIDTH}).")
         cropped = duotone(crop_16_10(im, p.focus))
         out.mkdir(parents=True, exist_ok=True)
-        for size in PHOTO_SIZES:
+        p.photo_sizes = [s for s in PHOTO_SIZES if cropped.width >= s] or [cropped.width]
+        for size in p.photo_sizes:
             target = cropped.resize((size, round(size / 1.6)), Image.LANCZOS) if cropped.width > size else cropped
             target.save(out / f"{p.slug}-{size}.webp", "WEBP", quality=80, method=6)
         p.has_photo = True
@@ -358,17 +402,17 @@ def photo_img(p, root, sizes, eager=False):
     """<img> della foto filtrata (vuoto se lo scritto non ha foto: resta il segnaposto colorato)."""
     if not p.has_photo:
         return ""
-    srcset = ", ".join(f"{root}{PHOTO_OUT}/{p.slug}-{s}.webp {s}w" for s in PHOTO_SIZES)
+    srcset = ", ".join(f"{root}{PHOTO_OUT}/{p.slug}-{s}.webp {s}w" for s in p.photo_sizes)
     load = 'fetchpriority="high"' if eager else 'loading="lazy" decoding="async"'
-    return (f'<img src="{root}{PHOTO_OUT}/{p.slug}-{PHOTO_SIZES[0]}.webp" srcset="{srcset}" sizes="{sizes}" alt="" '
-            f'width="{PHOTO_SIZES[-1]}" height="{round(PHOTO_SIZES[-1] / 1.6)}" {load} style="object-position:{p.focus}">')
+    return (f'<img src="{root}{PHOTO_OUT}/{p.slug}-{p.photo_sizes[0]}.webp" srcset="{srcset}" sizes="{sizes}" alt="" '
+            f'width="{p.photo_sizes[-1]}" height="{round(p.photo_sizes[-1] / 1.6)}" {load} style="object-position:{p.focus}">')
 
 
 # ═══ PAGINE ═══
 def page_home(posts):
     root = ""
     newest = posts[0]
-    latest = [{"t": p.title, "k": SECTIONS[p.cat][0], "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
+    latest = [{"t": p.title, "k": p.cat_label, "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
     first = latest[0]
     windows = "".join(card_html(p, root) for p in posts)
     tiktok = ""
@@ -397,7 +441,7 @@ def page_home(posts):
       <p class="hero-rule"><span class="cap">Ultimo scritto il {newest.long_date()} · {plural(len(posts), "scritto", "scritti")}</span></p>
     </div>
     <article class="last">
-      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · {SECTIONS[newest.cat][0]} · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
+      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · {newest.cat_label} · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
       <div class="wbody"><p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p></div>
       <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
     </article>
@@ -416,7 +460,7 @@ def page_home(posts):
 def page_section(k, posts):
     root = "../"
     name, _, opening = SECTIONS[k]
-    items = [p for p in posts if p.cat == k]
+    items = [p for p in posts if k in p.cats]
     desc = f"{opening} {plural(len(items), 'scritto', 'scritti')} in {name.lower()}."
     canon = f"{BASE_URL}{k}/"
     ld = [{"@context": "https://schema.org", "@type": "CollectionPage", "name": f"{name} | {SITE}", "url": canon, "inLanguage": "it", "description": desc}]
@@ -438,10 +482,10 @@ def page_section(k, posts):
 def page_reader(p, posts):
     root = "../../"
     name = SECTIONS[p.cat][0]
-    rel = [x for x in posts if x is not p and x.cat == p.cat] + [x for x in posts if x is not p and x.cat != p.cat]
+    rel = [x for x in posts if x is not p and set(x.cats) & set(p.cats)] + [x for x in posts if x is not p and not set(x.cats) & set(p.cats)]
     rel_html = "".join(
         f'<a class="rcard" data-cat="{x.cat}" href="{root}{x.url}"><span class="desk-photo{" has-img" if x.has_photo else ""}" aria-hidden="true">{photo_img(x, root, "(min-width:640px) 340px, 120px")}</span>'
-        f'<span class="rcb"><span class="rcm"><b>{esc(SECTIONS[x.cat][0])}</b>{x.short_date()}</span>'
+        f'<span class="rcb"><span class="rcm"><b>{esc(x.cat_label)}</b>{x.short_date()}</span>'
         f'<span class="rct">{esc(x.title)}</span><span class="rcx">{esc(x.excerpt).replace(chr(10), " ")}</span>'
         f'<span class="rcgo">Leggi{ARROW_CTA}</span></span></a>'
         for x in rel[:2]
@@ -457,12 +501,14 @@ def page_reader(p, posts):
     desc = p.flat[:155]
     ld = [{
         "@context": "https://schema.org", "@type": "Article", "headline": p.title, "inLanguage": "it",
-        "datePublished": p.date.isoformat(), "dateModified": p.date.isoformat(), "articleSection": name,
+        "datePublished": p.date.isoformat(), "dateModified": p.date.isoformat(), "articleSection": p.cat_label,
         "author": {"@type": "Person", "name": SITE}, "publisher": {"@type": "Organization", "name": SITE},
         "mainEntityOfPage": canon, "url": canon, "image": f"{BASE_URL}og.png", "description": desc,
     }]
-    chip = (f'<a class="catchip" href="{root}{p.cat}/" aria-label="Tutti gli scritti: {esc(name)}">'
-            f'<svg viewBox="0 0 24 24" aria-hidden="true">{GLYPH[p.cat]}</svg>{esc(name)}</a>')
+    chip = "".join(
+        f'<a class="catchip" href="{root}{c}/" aria-label="Tutti gli scritti: {esc(SECTIONS[c][0])}">'
+        f'<svg viewBox="0 0 24 24" aria-hidden="true">{GLYPH[c]}</svg>{esc(SECTIONS[c][0])}</a>'
+        for c in p.cats)
     links = "".join(f'<a href="{root}{k}/">{esc(SECTIONS[k][1])}</a>' for k in present_cats(posts))
     body = f"""<body class="reader swipe" id="inizio" data-cat="{p.cat}">
 <a class="skip" href="#contenuto">Vai al testo</a>
@@ -511,7 +557,7 @@ def page_404():
 
 def sitemap(posts):
     urls = [(BASE_URL, posts[0].date)]
-    urls += [(f"{BASE_URL}{k}/", max([p.date for p in posts if p.cat == k] or [posts[0].date])) for k in present_cats(posts)]
+    urls += [(f"{BASE_URL}{k}/", max([p.date for p in posts if k in p.cats] or [posts[0].date])) for k in present_cats(posts)]
     urls.append((f"{BASE_URL}cerca/", posts[0].date))
     urls += [(f"{BASE_URL}{p.url}", p.date) for p in posts]
     rows = "".join(f"  <url><loc>{esc(u)}</loc><lastmod>{d.isoformat()}</lastmod></url>\n" for u, d in urls)
@@ -520,7 +566,7 @@ def sitemap(posts):
 
 def search_index(posts):
     return json.dumps([
-        {"t": p.title, "s": SECTIONS[p.cat][0], "d": p.short_date(), "x": p.flat, "b": " ".join(p.body.split()), "u": p.url}
+        {"t": p.title, "s": p.cat_label, "d": p.short_date(), "x": p.flat, "b": " ".join(p.full_text.split()), "u": p.url}
         for p in posts
     ], ensure_ascii=False, separators=(",", ":"))
 
