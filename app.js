@@ -40,16 +40,43 @@
   }
   $$('[data-share]').forEach(b => { b.hidden = false; b.addEventListener('click', share); }); // nascosti nell'HTML: senza JS non servono
 
-  // ── titolo che vola tra elenco e lettura (View Transitions, dove supportate) ──
-  // Il titolo della pagina di lettura ha gia' il nome "titolo" (CSS). Qui lo diamo alla riga cliccata
-  // (in uscita) o a quella da cui si torna (in ritorno), cosi' il browser le fa viaggiare insieme.
-  function mark(url) {
-    $$('a.entry').forEach(a => { const t = $('.et', a); if (t) t.style.viewTransitionName = a.href === url ? 'titolo' : ''; });
-  }
-  addEventListener('pageswap', e => { if (e.viewTransition && e.activation && e.activation.entry) mark(e.activation.entry.url); });
+  // ── dalla scheda allo scritto (View Transitions tra pagine, dove il browser le supporta) ──
+  // Al clic su una scheda ricordiamo dov'era. La pagina dello scritto si apre allargandosi da quel
+  // rettangolo; tornando indietro si richiude dentro la scheda. Ritaglio animato sul "root" della transizione.
+  // Senza supporto (o con "riduci movimento") resta la dissolvenza di base, nessun errore.
+  const ORIGIN = 'teloscrivo-origin', FULL = 'inset(0px 0px 0px 0px round 0px)', EASE = 'cubic-bezier(.2,.8,.2,1)';
+  const clipOf = r => `inset(${r.top}px ${innerWidth - r.right}px ${innerHeight - r.bottom}px ${r.left}px round 15px)`;
+  const bare = u => u.split('#')[0].split('?')[0];
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-card]');
+    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const r = a.closest('.desk-window').getBoundingClientRect();
+    try { sessionStorage.setItem(ORIGIN, JSON.stringify({ url: bare(a.href), top: r.top, right: r.right, bottom: r.bottom, left: r.left })); } catch (_) { /* storage bloccato: niente apertura dalla scheda, resta la dissolvenza */ }
+  });
   addEventListener('pagereveal', e => {
-    const from = window.navigation && navigation.activation && navigation.activation.from;
-    if (e.viewTransition && from) mark(from.url);
+    const vt = e.viewTransition;
+    if (!vt || reduced) return;
+    const root = document.documentElement;
+    const run = (cls, anim) => {
+      root.classList.add(cls);
+      vt.ready.then(anim).catch(() => {});
+      vt.finished.finally(() => root.classList.remove(cls));
+    };
+    if ($('.rbody')) { // sono in uno scritto: se arrivo da una scheda, mi apro da lì
+      let o = null;
+      try { o = JSON.parse(sessionStorage.getItem(ORIGIN) || 'null'); sessionStorage.removeItem(ORIGIN); } catch (_) { /* illeggibile: dissolvenza */ }
+      if (o && o.url === bare(location.href)) {
+        run('vt-expand', () => root.animate({ clipPath: [clipOf(o), FULL] }, { duration: 480, easing: EASE, pseudoElement: '::view-transition-new(root)' }));
+      }
+    } else { // sono in un elenco: se torno da uno scritto, lo scritto si richiude dentro la sua scheda
+      const from = window.navigation && navigation.activation && navigation.activation.from;
+      if (!from) return;
+      const card = $$('[data-card]').find(a => bare(a.href) === bare(from.url));
+      if (!card) return;
+      const r = card.closest('.desk-window').getBoundingClientRect();
+      if (r.bottom < 40 || r.top > innerHeight - 40) return; // scheda fuori schermo: dissolvenza
+      run('vt-collapse', () => root.animate({ clipPath: [FULL, clipOf(r)] }, { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards', pseudoElement: '::view-transition-old(root)' }));
+    }
   });
 
   // ── lettura: il testo compare riga per riga mentre scorri (e sparisce se risali) ──
@@ -69,17 +96,57 @@
     addEventListener('resize', reveal);
     reveal();
   }
-  // "Indietro": se si arriva da una pagina del sito torna davvero indietro (cosi' il titolo rivola),
-  // altrimenti il link porta alla sezione.
-  const back = $('[data-rback]');
-  if (back) back.addEventListener('click', e => {
+  // ── Indietro: UN solo modo, usato da tasto, Esc, freccia sinistra, swipe e X della ricerca ──
+  // Se si arriva da una pagina del sito torna davvero indietro (cosi' l'apertura si richiude nella scheda),
+  // altrimenti (link da Google, link condiviso) va al collegamento di riserva: la categoria o la home.
+  const backLink = $('[data-rback]') || $('[data-search-close]');
+  function goBack() {
     try {
-      if (document.referrer && new URL(document.referrer).origin === location.origin && history.length > 1) {
-        e.preventDefault();
-        history.back();
+      if (document.referrer && new URL(document.referrer).origin === location.origin && history.length > 1) { history.back(); return; }
+    } catch (_) { /* referrer non leggibile: usa il collegamento di riserva */ }
+    location.href = backLink.href;
+  }
+  if (backLink) {
+    backLink.addEventListener('click', e => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return; e.preventDefault(); goBack(); });
+    addEventListener('keydown', e => {
+      if (e.defaultPrevented || e.altKey || e.metaKey || e.ctrlKey) return;
+      const typing = /^(input|textarea)$/i.test(e.target.tagName);
+      if (e.key === 'Escape' || (e.key === 'ArrowLeft' && !typing)) { e.preventDefault(); goBack(); }
+    });
+  }
+  // swipe verso destra = indietro, la pagina segue il dito. Solo scritti e categorie (body.swipe).
+  const page = $('#contenuto');
+  if (backLink && page && document.body.classList.contains('swipe')) {
+    let sw = null;
+    page.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && (innerWidth >= 640 || e.clientX > 44)) return; // col mouse solo dal bordo, nella vista telefono
+      if (e.pointerType !== 'mouse' && e.clientX < 24) return; // il bordo e' del gesto "indietro" del telefono: non lo duplico
+      sw = { x: e.clientX, y: e.clientY, t: performance.now(), on: false };
+    });
+    page.addEventListener('pointermove', e => {
+      if (!sw) return;
+      const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+      if (!sw.on) {
+        if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { sw = null; return; } // e' uno scroll
+        if (dx > 12 && dx > Math.abs(dy) * 1.4) { sw.on = true; try { page.setPointerCapture(e.pointerId); } catch (_) { /* senza cattura funziona lo stesso */ } }
+        else return;
       }
-    } catch (_) { /* referrer non leggibile: resta il link normale */ }
-  });
+      page.style.transform = `translateX(${Math.max(0, dx)}px)`;
+    });
+    const settle = (dx, commit) => {
+      page.style.transform = '';
+      if (commit) { goBack(); return; }
+      if (!reduced) page.animate([{ transform: `translateX(${dx}px)` }, { transform: 'none' }], { duration: 240, easing: EASE });
+    };
+    page.addEventListener('pointerup', e => {
+      if (!sw) return;
+      const s = sw; sw = null;
+      if (!s.on) return;
+      const dx = Math.max(0, e.clientX - s.x), v = dx / Math.max(1, performance.now() - s.t);
+      settle(dx, dx > innerWidth * 0.33 || v > 0.6);
+    });
+    page.addEventListener('pointercancel', e => { if (sw && sw.on) settle(Math.max(0, e.clientX - sw.x), false); sw = null; });
+  }
 
   // ── apertura della home: una volta per scheda, senza bloccare chi riduce il movimento ──
   const opening = $('[data-opening]');
@@ -179,59 +246,23 @@
     if (LATEST.length > 1) play(0); else meta(LATEST[0], 0);
   }
 
-  // ── home: filtri per sezione sull'elenco (senza JS l'elenco resta intero) ──
-  const chips = $('[data-chips]');
-  if (chips) {
-    chips.hidden = false;
-    const lh = $('[data-lh]'), lc = $('[data-lc]'), NAMES = JSON.parse(chips.dataset.names);
-    chips.addEventListener('click', e => {
-      const b = e.target.closest('button'); if (!b) return;
-      const k = b.dataset.cat;
-      $$('button', chips).forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-      let shown = 0;
-      $$('li[data-cat]').forEach(li => { const off = !!k && li.dataset.cat !== k; li.hidden = off; if (!off) shown++; });
-      $$('.mg').forEach(g => { g.hidden = !$('li[data-cat]:not([hidden])', g); });
-      lh.textContent = k ? NAMES[k] : 'Tutti gli scritti';
-      lc.textContent = shown + (shown === 1 ? ' scritto' : ' scritti');
-    });
-  }
-
-  // ── anteprima scritti: la pagina completa resta raggiungibile anche senza JS ──
-  const deskReader = $('.desk-reader');
-  if (deskReader) {
-    let source;
-    $$('[data-preview]').forEach(a => a.addEventListener('click', e => {
-      e.preventDefault();
-      source = a;
-      const card = a.closest('.desk-window');
-      $('[data-window-name]', deskReader).textContent = $('.desk-bar span', card).textContent;
-      $('#desk-reader-title', deskReader).textContent = $('.desk-title', card).textContent;
-      $('[data-reader-meta]', deskReader).textContent = $('.desk-meta b', card).textContent + ' · ' + $('.desk-meta', card).textContent.replace($('.desk-meta b', card).textContent, '');
-      $('[data-reader-excerpt]', deskReader).textContent = $('.desk-excerpt', card).textContent;
-      $('[data-reader-link]', deskReader).href = a.href;
-      deskReader.showModal();
-      $('[data-close]', deskReader).focus();
-    }));
-    $('[data-close]', deskReader).addEventListener('click', () => deskReader.close());
-    deskReader.addEventListener('close', () => source?.focus());
-  }
   $$('[data-slide]').forEach(button => button.addEventListener('click', () => $('.desk-phones').scrollBy({ left: Number(button.dataset.slide) * 147, behavior: reduced ? 'instant' : 'smooth' })));
 
   // ── pagina Cerca: legge cerca.json e filtra mentre scrivi ──
   const sp = $('[data-searchpage]');
   if (sp) {
     const input = $('input', sp), out = $('[data-results]', sp), root = sp.dataset.root;
-    const ARROW = '<svg class="ar" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg>';
     let DATA = null;
+    const row = p => `<li><a href="${root}${p.u}"><span class="cap cat">${esc(p.s)} · ${esc(p.d)}</span><b>${esc(p.t)}</b><small>${esc(p.x)}</small></a></li>`;
     const show = () => {
-      const q = norm(input.value.trim());
-      history.replaceState(null, '', q ? '?q=' + encodeURIComponent(input.value.trim()) : location.pathname);
-      if (!q) { out.innerHTML = '<p class="msg">Scrivi una parola: cerco nei titoli e nei testi.</p>'; return; }
+      const raw = input.value.trim(), q = norm(raw);
+      history.replaceState(null, '', q ? '?q=' + encodeURIComponent(raw) : location.pathname);
+      if (!q) { out.innerHTML = '<span class="cap scount">Gli ultimi scritti</span><ul class="sres">' + DATA.slice(0, 4).map(row).join('') + '</ul>'; return; }
       const terms = q.split(/\s+/);
       const hits = DATA.filter(p => terms.every(t => p.h.includes(t)));
       out.innerHTML = hits.length
-        ? '<ul>' + hits.map(p => `<li><a class="entry" href="${root}${p.u}"><span class="ed">${esc(p.d)}</span><b class="et">${esc(p.t)}</b><span class="ec">${esc(p.s)}</span><span class="rx">${esc(p.x)}</span>${ARROW}</a></li>`).join('') + '</ul>'
-        : `<p class="msg">Nessun risultato per «${esc(input.value.trim())}».</p>`;
+        ? `<span class="cap scount">${hits.length} ${hits.length === 1 ? 'risultato' : 'risultati'}</span><ul class="sres">${hits.map(row).join('')}</ul>`
+        : `<p class="msg">Nessun risultato per «${esc(raw)}». Prova con una parola più semplice.</p>`;
     };
     fetch(root + 'cerca.json')
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -242,7 +273,7 @@
         input.addEventListener('input', show);
         input.disabled = false;
         show();
-        input.focus();
+        input.focus({ preventScroll: true });
       })
       .catch(err => { // errore visibile, niente finta "nessun risultato"
         out.innerHTML = '<p class="msg err">La ricerca non si e\' caricata (' + esc(err.message) + '). Riprova tra poco o torna alla home.</p>';

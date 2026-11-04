@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Griglia e navigazione · teloscrivo</title>
+<link rel="stylesheet" href="../style.css?v=3">
+<style>
+/* ═══ Mockup 21: solo cio' che cambia rispetto a style.css ═══ */
+html{overflow-y:scroll}
+.wrapin{max-width:1180px}
+.hero{display:block;margin-bottom:44px}
+.hero-h{font-size:clamp(3rem,14vw,5rem)}
+.hero-sub{font-size:clamp(1.4rem,5vw,1.9rem)}
+
+/* intestazione: il bottone Cerca diventa X */
+.sbtn{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 16px;border:1px solid var(--dockline);border-radius:14px;background:var(--pink);color:var(--navy);cursor:pointer;font:600 .8rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 0 4px color-mix(in srgb,var(--fg) 9%,transparent);transition:padding .25s,transform .15s}
+.sbtn:active{transform:scale(.96)}
+.sbtn .ico{position:relative;width:18px;height:18px;flex:none}
+.sbtn .ico svg{position:absolute;inset:0;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.sbtn .x{opacity:0;transform:rotate(-90deg) scale(.4)}
+.sbtn .lbl{display:inline-block;max-width:5em;margin-left:9px;overflow:hidden;white-space:nowrap;transition:max-width .28s,margin .28s,opacity .2s}
+.sbtn[aria-expanded="true"]{padding:0}
+.sbtn[aria-expanded="true"] .lens{opacity:0;transform:rotate(90deg) scale(.4)}
+.sbtn[aria-expanded="true"] .x{opacity:1;transform:none}
+.sbtn[aria-expanded="true"] .lbl{max-width:0;margin:0;opacity:0}
+
+/* titolo sezione + contatore */
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.sec-h h2{font:400 clamp(2.4rem,6vw,3.5rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0}
+.count{color:var(--muted)}
+.sec-p{color:var(--muted);font-size:.88rem;margin:5px 0 14px}
+
+/* chip categoria dentro lo scritto: apre tutti i testi di quella categoria */
+.metarow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 18px}
+.metarow .cap{margin:0;color:var(--muted)}
+.catchip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px 0 12px;border:1px solid color-mix(in srgb,var(--pink) 55%,var(--line));border-radius:99px;background:color-mix(in srgb,var(--pink) 12%,transparent);color:var(--fg);font-size:.82rem;text-decoration:none;transition:background .2s,color .2s,transform .15s}
+.catchip:hover{background:var(--pink);color:var(--navy)}
+.catchip:active{transform:scale(.97)}
+.catchip svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.catchip .ac{stroke:var(--pink);transition:stroke .2s}
+.catchip:hover .ac{stroke:var(--navy)}
+.rd .rhead{padding-top:0}
+.rd .rphoto.ph{margin-bottom:26px}
+
+/* vista categoria: sopra lo scritto, con il suo Indietro */
+.cv{position:fixed;inset:0;z-index:25;touch-action:pan-y;box-shadow:-18px 0 40px #0006;background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(--pink) 20%,transparent),transparent 72%),var(--navy)}
+.cv .rbar{position:absolute}
+.cv-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:84px 18px 60px}
+@media(min-width:640px){.cv-scroll{padding:84px 36px 64px}}
+.cv .wrapin{max-width:1180px}
+.cv h2{font:400 clamp(2.6rem,7vw,4rem)/1.05 Fibonacci,Poppins,sans-serif;margin:8px 0 6px}
+.cv .cap.n{display:block;margin:0 0 26px}
+
+/* griglia: 1 colonna mobile, 2 tablet, 3 desktop */
+.shelf{grid-template-columns:1fr;gap:16px}
+@media(min-width:640px){.shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}}
+@media(min-width:1000px){.shelf{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}}
+.desk-window{transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s,box-shadow .25s;will-change:transform}
+@media(hover:hover){.desk-window:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--pink) 55%,var(--line));box-shadow:0 14px 34px #0004}}
+.desk-title{font-size:clamp(1.7rem,2.4vw,2.05rem)}
+.desk-info{padding:18px 20px 20px}
+.ph{display:block;position:relative;overflow:hidden;aspect-ratio:16/10;background:linear-gradient(155deg,#8da6b4,#38577e 51%,#17294b)}
+.ph.g2{background:linear-gradient(135deg,#ae8aa3,#5b4b78 55%,#132c51)}
+.ph.g3{background:linear-gradient(140deg,#748895,#2a4765 50%,#101a3e)}
+.ph::before{content:'';position:absolute;inset:20% -30%;background:radial-gradient(ellipse at 70% 20%,#dbf2fc66,transparent 35%),linear-gradient(140deg,transparent 40%,#071c3b88 41%,transparent 70%)}
+.empty{grid-column:1/-1;color:var(--muted);padding:30px 0}
+
+/* lettura: pagina intera, un solo passo dalla card */
+.rd{position:fixed;inset:0;z-index:20;background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(--pink) 20%,transparent),transparent 72%),var(--navy);touch-action:pan-y;box-shadow:-18px 0 40px #0006}
+.rd-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:84px 22px 80px}
+.rd:focus,.cv:focus{outline:none}
+.rd .rbar{position:absolute;justify-content:flex-start}
+.cv .rbar{justify-content:flex-start}
+.rd .rart{max-width:40rem;margin:0 auto}
+.rphoto.ph{border:1px solid var(--line);border-radius:15px;aspect-ratio:16/9;margin:0 0 30px}
+.rd .rt{view-transition-name:none;font-size:clamp(2.9rem,12vw,4.8rem)}
+.rd .rbody{padding:30px 0 40px}
+.rd .rbody p{margin:0 0 1.5em}
+.rd .rend a.ra{transition:border-color .2s}
+.rbtn[data-back]{padding-left:10px}
+.rbtn[data-back] svg{transition:transform .2s}
+.rbtn[data-back]:hover svg{transform:translateX(-3px)}
+
+/* ricerca */
+.srch{position:fixed;inset:0;z-index:8;padding:calc(var(--th) + 6px) 18px 30px;background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(--pink) 20%,transparent),transparent 72%),var(--navy);overflow-y:auto}
+.srch-in{max-width:640px;margin:0 auto}
+.sfield{display:flex;align-items:center;gap:12px;min-height:58px;padding:0 18px;border:1px solid var(--dockline);border-radius:16px;background:var(--soft);transition:border-color .2s}
+.sfield:focus-within{border-color:var(--pink)}
+.sfield svg{width:20px;height:20px;flex:none;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round}
+.sfield input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--fg);font:400 1.05rem Poppins,sans-serif}
+.sfield input::placeholder{color:var(--muted)}
+.scount{margin:22px 0 4px;display:block}
+.sres li a{display:block;padding:16px 2px;border-bottom:1px solid var(--line);text-decoration:none}
+.sres li a:hover b{color:var(--pink)}
+.sres b{display:block;font:400 1.75rem/1.1 Fibonacci,Poppins,sans-serif;margin:4px 0 6px;transition:color .2s}
+.sres small{display:block;color:var(--muted);font-size:.82rem;line-height:1.5}
+.sres .cat{color:var(--pink);font-size:.74rem}
+.smsg{color:var(--muted);padding:22px 0}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .desk-window,.sbtn,.sbtn *,.catchip,.rbtn svg{transition:none!important}
+  .desk-window:hover{transform:none}
+}
+</style>
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<header class="tbar">
+  <a class="brand" href="#" aria-label="teloscrivo, torna alla home"><img src="../assets/logo/monogramma-navy.svg" alt="" width="34" height="34"></a>
+  <button type="button" class="sbtn" id="sbtn" aria-expanded="false" aria-controls="srch" aria-label="Apri la ricerca">
+    <span class="ico"><svg class="lens" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg><svg class="x" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg></span><span class="lbl">Cerca</span>
+  </button>
+</header>
+
+<main class="page"><div class="wrapin">
+  <section class="hero">
+    <h1 class="hero-h">teloscrivo<span class="dot" aria-hidden="true"></span></h1>
+    <p class="hero-sub">la luna porta consiglio</p>
+  </section>
+  <section aria-labelledby="h-all">
+    <div class="sec-h"><h2 id="h-all">Gli scritti</h2><span class="cap count" id="count" aria-live="polite"></span></div>
+    <p class="sec-p">Le finestre sulla scrivania, tre alla volta.</p>
+    <div class="desk-shelf shelf" id="shelf"></div>
+  </section>
+</div></main>
+
+<!-- ricerca -->
+<div class="srch" id="srch" role="dialog" aria-label="Cerca negli scritti" hidden>
+  <div class="srch-in">
+    <label class="sfield"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg><input id="q" type="search" placeholder="Un titolo, una parola, un verso" autocomplete="off" enterkeyhint="search"></label>
+    <span class="cap scount" id="scount" aria-live="polite"></span>
+    <ul class="sres" id="sres"></ul>
+  </div>
+</div>
+
+<!-- categoria -->
+<div class="cv" id="cv" tabindex="-1" role="dialog" aria-modal="true" aria-label="Scritti della categoria" hidden>
+  <header class="rbar"><button type="button" class="rbtn" data-cvback><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Indietro</button></header>
+  <div class="cv-scroll" id="cvscroll"><div class="wrapin"><span class="cap" style="color:var(--pink)">Categoria</span><h2 id="cvt"></h2><span class="cap n" id="cvn" aria-live="polite"></span><div class="desk-shelf shelf" id="cvshelf"></div></div></div>
+</div>
+
+<!-- lettura -->
+<div class="rd" id="rd" tabindex="-1" role="dialog" aria-modal="true" aria-label="Scritto" hidden>
+  <header class="rbar"><button type="button" class="rbtn" data-back><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Indietro</button></header>
+  <div class="rd-scroll" id="rscroll"><article class="rart" id="rart"></article></div>
+</div>
+
+<script>
+const DATA = [{"slug": "sale", "title": "Sale", "cat": "poesie", "date": "2026-11-03", "dateLong": "3 novembre", "dateShort": "3 nov", "excerpt": "Il mare mi ha insegnato a restare, anche quando la riva dice di andare.", "body": "Il mare mi ha insegnato\na restare, anche quando\nla riva dice di andare.\n\nOgni onda torna indietro\ne porta via un po' di me,\nun po' di sale sulle labbra,\nun nome che non dico più.\n\nResto.\nCome resta la sabbia\ndopo che l'acqua ha finito di parlare.", "min": 1}, {"slug": "lettera-a-chi-resta", "title": "Lettera a chi resta", "cat": "testi", "date": "2026-11-01", "dateLong": "1 novembre", "dateShort": "1 nov", "excerpt": "Non ti chiedo di capire.", "body": "Non ti chiedo di capire. Ti chiedo di lasciare la luce accesa in corridoio.\n\nCi sono sere in cui non so spiegare perché sto zitto. Non è rabbia e non è stanchezza: è che le parole, certi giorni, pesano più di me. Allora mi siedo vicino alla finestra e aspetto che passino.\n\nTu non devi fare niente. Basta che la luce resti accesa, così so che da qualche parte c'è un posto dove posso tornare quando riesco di nuovo a parlare.", "min": 1}, {"slug": "il-treno-delle-6-40", "title": "Il treno delle 6:40", "cat": "racconti", "date": "2026-10-29", "dateLong": "29 ottobre", "dateShort": "29 ott", "excerpt": "Ogni mattina lo stesso sedile, lo stesso finestrino, e una storia che nessuno aveva ancora chiesto.", "body": "Ogni mattina lo stesso sedile, lo stesso finestrino, e una storia che nessuno aveva ancora chiesto.\n\nLa donna con il cappotto verde saliva sempre alla seconda fermata. Teneva in grembo una borsa di tela e non la lasciava mai, nemmeno quando il treno frenava. Io facevo finta di leggere.\n\nUn giorno la borsa si aprì e cadde un quaderno. Lo raccolsi prima di pensarci. Sulla copertina c'era scritto, a penna, una parola sola: resto.\n\nLei sorrise e non disse niente. Scese alla fermata dopo, e io rimasi con la sensazione di aver letto l'inizio di qualcosa.", "min": 1}, {"slug": "quello-che-non-ti-ho-detto", "title": "Quello che non ti ho detto", "cat": "canzoni", "date": "2026-10-27", "dateLong": "27 ottobre", "dateShort": "27 ott", "excerpt": "Scritta in una notte, cantata sottovoce.", "body": "Scritta in una notte, cantata sottovoce.\n\nQuello che non ti ho detto\nè rimasto nella tasca del cappotto,\ninsieme a un biglietto e a un'estate\nche non ho più il coraggio di aprire.\n\nTi penso quando piove,\ne piove spesso, da queste parti.\nTi penso e non lo scrivo,\nlo canto piano, perché non si senta.", "min": 1}, {"slug": "casa", "title": "Casa", "cat": "poesie", "date": "2026-10-25", "dateLong": "25 ottobre", "dateShort": "25 ott", "excerpt": "Casa non è un posto. È il rumore delle chiavi che ti aspetta.", "body": "Casa non è un posto.\nÈ il rumore delle chiavi\nche ti aspetta.\n\nÈ il piatto lasciato sul fuoco,\nla luce della cucina,\nuna voce che dice il tuo nome\ncome se fosse l'unico.\n\nPuoi cambiare città, lingua, stagione.\nCasa è quello che si accende\nquando entri.", "min": 1}, {"slug": "piove-da-giorni", "title": "Piove da giorni", "cat": "testi", "date": "2026-10-22", "dateLong": "22 ottobre", "dateShort": "22 ott", "excerpt": "Le giornate grigie hanno un vantaggio: non fingono di essere altro.", "body": "Le giornate grigie hanno un vantaggio: non fingono di essere altro.\n\nPiove da giorni e nessuno mi chiede di essere più luminoso di così. Il cielo basso mi dà il permesso di restare a metà, di non spiegare, di bere il caffè guardando il vetro.\n\nForse è questo che ci manca, a volte: un tempo che ci lasci stare. Oggi ne ho uno, e lo tengo stretto.", "min": 1}, {"slug": "la-stanza-in-fondo", "title": "La stanza in fondo", "cat": "racconti", "date": "2026-10-19", "dateLong": "19 ottobre", "dateShort": "19 ott", "excerpt": "Nessuno la apriva da anni, ma la luce sotto la porta era sempre accesa.", "body": "Nessuno la apriva da anni, ma la luce sotto la porta era sempre accesa.\n\nLo notai il giorno in cui ci trasferimmo. Mia madre disse che era un difetto dell'impianto. Mio padre disse che non importava. Io non dissi niente, ma ogni sera passavo davanti a quella porta più lentamente.\n\nUna notte appoggiai l'orecchio al legno. Non sentii voci, né passi. Sentii qualcuno che respirava piano, come chi aspetta di essere cercato.\n\nPoi la luce si spense, e per la prima volta ebbi paura di aver capito.", "min": 1}, {"slug": "luce-bassa", "title": "Luce bassa", "cat": "poesie", "date": "2026-10-16", "dateLong": "16 ottobre", "dateShort": "16 ott", "excerpt": "Scrivo quando la casa dorme, quando anche le parole abbassano la voce.", "body": "Scrivo quando la casa dorme,\nquando anche le parole\nabbassano la voce.\n\nNon cerco la frase giusta.\nCerco quella che resta accesa\ncome una lampada in fondo al corridoio,\nabbastanza piano da non svegliare nessuno.", "min": 1}, {"slug": "ritornello", "title": "Ritornello", "cat": "canzoni", "date": "2026-10-12", "dateLong": "12 ottobre", "dateShort": "12 ott", "excerpt": "Quattro righe che tornano, come certi pensieri a mezzanotte.", "body": "Quattro righe che tornano, come certi pensieri a mezzanotte.\n\nTorna la sera, torna il mare,\ntorna il nome che non so dire.\nTorna la sera, torna il mare,\ntorna, e resto a respirare.", "min": 1}];
+const CATS = {testi:'Testi', poesie:'Poesie', racconti:'Racconti brevi', canzoni:'Dalle canzoni'};
+const GLYPH = {
+  testi:'<path d="M6.5 3h7.5l4 4v13.5h-11.5z"/><path d="M14 3v4h4"/><path d="M9.5 12h6"/><path class="ac" d="M9.5 15.5h4"/>',
+  poesie:'<path d="M19.5 4.5c-6.5-.5-11 3-12 9.5L5 19.5l.8.7 3.2-1.8c6.4-1 10-5.5 10.5-12.9z"/><path class="ac" d="M8 17l7-7"/>',
+  racconti:'<path d="M3 6c3-1.2 6-.8 9 1.2 3-2 6-2.4 9-1.2v12c-3-1.2-6-.8-9 1.2-3-2-6-2.4-9-1.2z"/><path class="ac" d="M12 7.2v12"/>',
+  canzoni:'<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5"/><path class="ac" d="M9.5 9l10-2"/>'
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const EASE = 'cubic-bezier(.2,.8,.2,1)';
+const PRESENT = Object.keys(CATS).filter(k => DATA.some(s => s.cat === k));  // solo le categorie che hanno davvero scritti
+const BY = Object.fromEntries(DATA.map((s, i) => [s.slug, Object.assign(s, {g: i % 3 + 1})]));
+
+/* ── griglia ── */
+const shelf = $('#shelf');
+const cardHTML = s => `<article class="desk-window" data-cat="${s.cat}" data-slug="${s.slug}"><div class="desk-bar"><i></i><i></i><i></i><span>${s.slug}.txt</span></div><a href="#${s.slug}" data-open><span class="ph g${s.g}" role="img" aria-label="Segnaposto per la foto di ${esc(s.title)}"></span><span class="desk-info"><span class="desk-meta"><b>${CATS[s.cat]}</b>${s.dateLong}</span><span class="desk-title">${esc(s.title)}</span><span class="desk-excerpt">${esc(s.excerpt)}</span><span class="desk-more">Apri lo scritto ↗</span></span></a></article>`;
+shelf.innerHTML = DATA.map(cardHTML).join('');
+const cards = $$('.desk-window');
+
+$('#count').textContent = DATA.length + ' scritti';
+
+/* ── navigazione: l'hash e' la cronologia. Indietro, Esc, swipe e gesture del browser fanno la stessa cosa ── */
+let depth = 0, lastCard = null;
+function go(hash) { depth++; location.hash = hash; }
+function goBack() {
+  if (depth > 0) { depth--; history.back(); }
+  else { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} route(); }
+}
+function openCard(e) {
+  const a = e.target.closest('[data-open]'); if (!a || e.metaKey || e.ctrlKey) return;
+  e.preventDefault(); lastCard = a.closest('.desk-window'); go(lastCard.dataset.slug);
+}
+shelf.addEventListener('click', openCard);
+$('#cvshelf').addEventListener('click', openCard);
+$('#sbtn').addEventListener('click', () => { if (srchOpen) goBack(); else go('cerca'); });
+$('[data-back]').addEventListener('click', goBack);
+$('[data-cvback]').addEventListener('click', goBack);
+addEventListener('hashchange', route);
+addEventListener('keydown', e => {
+  const typing = /input|textarea/i.test(e.target.tagName);
+  if (e.key === 'Escape' && (rdState === 'open' || cvState === 'open' || srchOpen)) { e.preventDefault(); goBack(); }
+  else if (e.key === 'ArrowLeft' && (rdState === 'open' || cvState === 'open') && !typing && !e.altKey && !e.metaKey) { e.preventDefault(); goBack(); }
+});
+function route() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  const cat = h.startsWith('c-') ? h.slice(2) : null;
+  if (BY[h]) { hideCat(); showReader(h, lastCard); }
+  else if (cat && PRESENT.includes(cat)) showCat(cat);   // lo scritto resta aperto sotto
+  else if (h === 'cerca') { hideReader(); hideCat(); openSearch(); }
+  else { hideReader(); hideCat(); closeSearch(); }
+}
+
+/* ── lettura ── */
+const rd = $('#rd'), rscroll = $('#rscroll'), rart = $('#rart');
+let rdState = 'closed', openSlug = null;
+function fillReader(s) {
+  const lineLike = s.cat === 'poesie' || s.cat === 'canzoni';
+  const stanzas = s.body.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+  // unita' = una riga (poesie, canzoni) o una frase (testi, racconti): compaiono con lo scroll
+  const body = lineLike
+    ? stanzas.map(b => b.split('\n').map(l => `<span class="u l">${esc(l)}</span>`).join('')).join('<span class="gap"></span>')
+    : stanzas.map(b => '<p>' + (b.replace(/\n/g, ' ').match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [b]).map(x => `<span class="u">${esc(x)}</span>`).join('') + '</p>').join('');
+  const more = DATA.filter(x => x.slug !== s.slug).sort((a, b) => (b.cat === s.cat) - (a.cat === s.cat)).slice(0, 2);
+  rart.innerHTML = `<header class="rhead"><span class="rphoto ph g${s.g}" role="img" aria-label="Segnaposto per la foto di ${esc(s.title)}"></span><div class="metarow"><a class="catchip" href="#c-${s.cat}" data-cat="${s.cat}" aria-label="Tutti gli scritti: ${CATS[s.cat]}"><svg viewBox="0 0 24 24" aria-hidden="true">${GLYPH[s.cat]}</svg>${CATS[s.cat]}</a><span class="cap">${s.dateShort} · ${s.min} min</span></div><h1 class="rt">${esc(s.title)}</h1><p class="cue" data-cue aria-hidden="true"><span>Scorri per leggere</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></p></header><div class="rbody">${body}</div><footer class="rend"><span class="cap">Leggi anche</span>${more.map(m => `<a class="ra" href="#${m.slug}" data-more><b>${esc(m.title)}</b><small>${CATS[m.cat]} · ${m.dateShort}</small></a>`).join('')}</footer>`;
+  document.title = s.title + ' · teloscrivo';
+  openSlug = s.slug;
+  requestAnimationFrame(reveal);
+}
+// il testo segue lo scroll, in giu e in su: sotto l'88% dell'altezza e' spento, sopra e' acceso
+let ticking = false;
+function reveal() {
+  const lim = innerHeight * 0.88;
+  $$('.u', rart).forEach(u => u.classList.toggle('on', u.getBoundingClientRect().top < lim));
+  const rend = $('.rend', rart); if (rend) rend.classList.toggle('on', rend.getBoundingClientRect().top < lim);
+  const cue = $('[data-cue]', rart); if (cue) cue.classList.toggle('off', rscroll.scrollTop > 40);
+  ticking = false;
+}
+rscroll.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(reveal); } }, {passive: true});
+addEventListener('resize', reveal);
+rart.addEventListener('click', e => {
+  const c = e.target.closest('[data-cat]');
+  if (c) { e.preventDefault(); go('c-' + c.dataset.cat); return; }
+  const a = e.target.closest('[data-more]'); if (!a) return;
+  e.preventDefault();
+  const slug = a.getAttribute('href').slice(1);
+  try { history.replaceState(null, '', '#' + slug); } catch (er) {}
+  lastCard = null; swap(slug);
+});
+async function swap(slug) {
+  if (!reduced) await rscroll.animate([{opacity: 1}, {opacity: 0}], {duration: 130, fill: 'forwards'}).finished;
+  fillReader(BY[slug]); rscroll.scrollTop = 0; reveal();
+  rscroll.getAnimations().forEach(a => a.cancel());
+  rscroll.animate([{opacity: 0, transform: reduced ? 'none' : 'translateY(10px)'}, {opacity: 1, transform: 'none'}], {duration: reduced ? 160 : 280, easing: EASE});
+}
+function cardClip(card) {
+  const r = card.getBoundingClientRect();
+  return `inset(${r.top}px ${innerWidth - r.right}px ${innerHeight - r.bottom}px ${r.left}px round 15px)`;
+}
+function showReader(slug, origin) {
+  if (rdState === 'open') { if (slug !== openSlug) swap(slug); return; }
+  rd.getAnimations().forEach(a => a.cancel());
+  fillReader(BY[slug]);
+  rd.hidden = false; rdState = 'open'; rd.style.transform = '';
+  document.documentElement.style.overflow = 'hidden';
+  rscroll.scrollTop = 0;
+  if (origin && !origin.hidden && !reduced) {
+    rd.animate([{clipPath: cardClip(origin), opacity: .5}, {clipPath: 'inset(0 0 0 0 round 0px)', opacity: 1}], {duration: 460, easing: EASE});
+    [...rart.children].forEach((el, i) => el.animate([{opacity: 0, transform: 'translateY(18px)'}, {opacity: 1, transform: 'none'}], {duration: 440, delay: 200 + i * 50, easing: EASE, fill: 'backwards'}));
+  } else {
+    rd.animate([{opacity: 0}, {opacity: 1}], {duration: 200});
+  }
+  rd.focus({preventScroll: true});
+}
+function finishClose() {
+  rd.getAnimations().forEach(a => a.cancel()); rscroll.getAnimations().forEach(a => a.cancel());
+  rd.hidden = true; rd.style.transform = ''; rdState = 'closed';
+  document.documentElement.style.overflow = ''; document.title = 'Griglia e navigazione · teloscrivo';
+}
+function hideReader() {
+  if (rdState !== 'open') return;
+  rdState = 'closing';
+  const card = cards.find(c => c.dataset.slug === openSlug);
+  const usable = card && !card.hidden;
+  if (usable && !reduced) {
+    const r = card.getBoundingClientRect();
+    if (r.bottom < 40 || r.top > innerHeight - 40) { document.documentElement.style.overflow = ''; card.scrollIntoView({block: 'center', behavior: 'instant'}); document.documentElement.style.overflow = 'hidden'; }
+    rscroll.animate([{opacity: 1}, {opacity: 0}], {duration: 200, fill: 'forwards'});
+    rd.animate([{clipPath: 'inset(0 0 0 0 round 0px)'}, {clipPath: cardClip(card)}], {duration: 400, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards'}).finished.then(() => { finishClose(); card.querySelector('a').focus({preventScroll: true}); }).catch(() => {});
+  } else {
+    rd.animate([{opacity: 1}, {opacity: 0}], {duration: 180, fill: 'forwards'}).finished.then(finishClose).catch(() => {});
+  }
+}
+
+/* ── categoria: tutti gli scritti di quella categoria ── */
+const cv = $('#cv'), cvscroll = $('#cvscroll');
+let cvState = 'closed', cvCat = null;
+function showCat(cat) {
+  if (cvState === 'open' && cvCat === cat) return;
+  const list = DATA.filter(s => s.cat === cat);
+  $('#cvt').textContent = CATS[cat];
+  $('#cvn').textContent = list.length + (list.length === 1 ? ' scritto' : ' scritti');
+  $('#cvshelf').innerHTML = list.map(cardHTML).join('');
+  cv.getAnimations().forEach(a => a.cancel());
+  cv.hidden = false; cvState = 'open'; cvCat = cat; cv.style.transform = ''; cvscroll.scrollTop = 0;
+  cv.animate([{opacity: 0, transform: reduced ? 'none' : 'translateY(18px)'}, {opacity: 1, transform: 'none'}], {duration: reduced ? 160 : 340, easing: EASE});
+  if (!reduced) $$('#cvshelf .desk-window').forEach((c, i) => c.animate([{opacity: 0, transform: 'translateY(16px)'}, {opacity: 1, transform: 'none'}], {duration: 380, delay: 120 + i * 45, easing: EASE, fill: 'backwards'}));
+  cv.focus({preventScroll: true});
+}
+function finishCat() { cv.getAnimations().forEach(a => a.cancel()); cv.hidden = true; cv.style.transform = ''; cvState = 'closed'; }
+function hideCat() {
+  if (cvState !== 'open') return;
+  cvState = 'closing';
+  cv.animate([{opacity: 1}, {opacity: 0}], {duration: reduced ? 1 : 200, fill: 'forwards'}).finished.then(finishCat).catch(() => {});
+}
+
+/* ── gesture: swipe verso destra = indietro, la pagina segue il dito ── */
+function attachSwipe(el, isOpen, begin, done) {
+  let sw = null;
+  el.addEventListener('pointerdown', e => {
+    if (!isOpen()) return;
+    if (e.pointerType === 'mouse' && (innerWidth >= 640 || e.clientX > 44)) return;  // col mouse solo dal bordo, nella vista telefono
+    sw = {x: e.clientX, y: e.clientY, t: performance.now(), on: false};
+  });
+  el.addEventListener('pointermove', e => {
+    if (!sw) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (!sw.on) {
+      if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { sw = null; return; }
+      if (dx > 12 && dx > Math.abs(dy) * 1.4) { sw.on = true; try { el.setPointerCapture(e.pointerId); } catch (er) {} }
+      else return;
+    }
+    el.style.transform = `translateX(${Math.max(0, dx)}px)`;
+  });
+  function end(e) {
+    if (!sw) return;
+    const s = sw; sw = null; if (!s.on) return;
+    const dx = Math.max(0, e.clientX - s.x), v = dx / Math.max(1, performance.now() - s.t);
+    if (dx > innerWidth * .33 || v > .6) {
+      begin();
+      el.animate([{transform: `translateX(${dx}px)`}, {transform: 'translateX(100%)'}], {duration: reduced ? 1 : 220, easing: 'ease-out', fill: 'forwards'}).finished.then(() => {
+        done();
+        if (depth > 0) { depth--; history.back(); } else { try { history.replaceState(null, '', location.pathname + location.search); } catch (er) {} route(); }
+      }).catch(() => {});
+    } else {
+      el.animate([{transform: `translateX(${dx}px)`}, {transform: 'none'}], {duration: 240, easing: EASE});
+      el.style.transform = '';
+    }
+  }
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+}
+attachSwipe(rd, () => rdState === 'open', () => { rdState = 'closing'; }, () => { finishClose(); lastCard = null; });
+attachSwipe(cv, () => cvState === 'open', () => { cvState = 'closing'; }, finishCat);
+
+/* ── ricerca ── */
+const srch = $('#srch'), q = $('#q'), sbtn = $('#sbtn');
+let srchOpen = false;
+function renderResults() {
+  const t = norm(q.value.trim());
+  const list = t ? DATA.filter(s => norm(s.title + ' ' + s.body + ' ' + CATS[s.cat]).includes(t)) : DATA.slice(0, 4);
+  $('#scount').textContent = t ? (list.length ? list.length + (list.length === 1 ? ' risultato' : ' risultati') : '') : 'Gli ultimi scritti';
+  $('#sres').innerHTML = list.length ? list.map(s => `<li><a href="#${s.slug}" data-sres="${s.slug}"><span class="cap cat">${CATS[s.cat]} · ${s.dateShort}</span><b>${esc(s.title)}</b><small>${esc(s.excerpt)}</small></a></li>`).join('') : `<li class="smsg">Nessun risultato per «${esc(q.value.trim())}». Prova con una parola più semplice.</li>`;
+}
+q.addEventListener('input', renderResults);
+$('#sres').addEventListener('click', e => {
+  const a = e.target.closest('[data-sres]'); if (!a || e.metaKey || e.ctrlKey) return;
+  e.preventDefault(); lastCard = null; go(a.dataset.sres);
+});
+function openSearch() {
+  if (srchOpen) return;
+  srchOpen = true; srch.hidden = false; sbtn.setAttribute('aria-expanded', 'true'); sbtn.setAttribute('aria-label', 'Chiudi la ricerca');
+  renderResults();
+  srch.animate([{opacity: 0, transform: reduced ? 'none' : 'translateY(-14px)'}, {opacity: 1, transform: 'none'}], {duration: reduced ? 160 : 280, easing: EASE});
+  q.focus({preventScroll: true});
+}
+function closeSearch() {
+  if (!srchOpen) return;
+  srchOpen = false; sbtn.setAttribute('aria-expanded', 'false'); sbtn.setAttribute('aria-label', 'Apri la ricerca');
+  srch.animate([{opacity: 1, transform: 'none'}, {opacity: 0, transform: reduced ? 'none' : 'translateY(-10px)'}], {duration: reduced ? 120 : 200, easing: 'ease-in', fill: 'forwards'}).finished.then(() => { if (!srchOpen) { srch.hidden = true; srch.getAnimations().forEach(a => a.cancel()); } }).catch(() => {});
+  q.value = ''; q.blur();
+}
+
+route();
+</script>
+</body>
+</html>

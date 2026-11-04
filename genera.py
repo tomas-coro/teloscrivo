@@ -3,7 +3,7 @@
 
 Uso:   python3 genera.py
 Legge: scritti/*.md  (uno per scritto, con intestazione tra due righe `---`)
-Scrive: index.html, <sezione>/index.html, scritti/<slug>/index.html, cerca/index.html,
+Scrive: index.html, <sezione>/index.html (solo sezioni con almeno uno scritto), scritti/<slug>/index.html, cerca/index.html,
         404.html, cerca.json, sitemap.xml, robots.txt, .nojekyll
 
 Nessuna dipendenza: solo libreria standard di Python 3.
@@ -55,12 +55,12 @@ GLYPH = {
     "racconti": '<path d="M3 6c3-1.2 6-.8 9 1.2 3-2 6-2.4 9-1.2v12c-3-1.2-6-.8-9 1.2-3-2-6-2.4-9-1.2z"/><path class="ac" d="M12 7.2v12"/>',
     "canzoni": '<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5"/><path class="ac" d="M9.5 9l10-2"/>',
 }
-ARROW = '<svg class="ar" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg>'
 ARROW_CTA = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_BACK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_DOWN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_UP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4M5 9l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_SEARCH = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>'
+ICON_X = '<svg class="x" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg>'
 ICON_EXT = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14L14 6M7 6h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
 
@@ -177,10 +177,19 @@ def load_posts():
 
 
 # ═══ PEZZI DI PAGINA ═══
+def present_cats(posts):
+    """Solo le sezioni che hanno almeno uno scritto (le altre non hanno pagina e non compaiono nei menu)."""
+    return [k for k in SECTIONS if any(p.cat == k for p in posts)]
+
+
 def nav_html(root, current=None):
-    cur = ' aria-current="page"' if current == "cerca" else ""
-    return (f'<nav class="mn" aria-label="Ricerca">'
-            f'<a href="{root}cerca/" data-search{cur}>{ICON_SEARCH}<span>Cerca</span></a></nav>')
+    """Bottone Cerca. Sulla pagina Cerca diventa una X che torna dov'eri (senza JS porta alla home)."""
+    lens = '<svg class="lens" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>'
+    if current == "cerca":
+        return (f'<a class="sbtn" href="{root}" data-search-close data-open aria-current="page" aria-label="Chiudi la ricerca">'
+                f'<span class="ico">{lens}{ICON_X}</span><span class="lbl">Cerca</span></a>')
+    return (f'<a class="sbtn" href="{root}cerca/" aria-label="Apri la ricerca">'
+            f'<span class="ico">{lens}{ICON_X}</span><span class="lbl">Cerca</span></a>')
 
 
 def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=False):
@@ -211,7 +220,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/fibonacci.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=3">
+<link rel="stylesheet" href="{root}style.css?v=4">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -234,29 +243,20 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=2" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=3" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
     return f'<span class="ic ic-{k}"><svg viewBox="0 0 24 24" aria-hidden="true">{GLYPH[k]}</svg></span>'
 
 
-def entries_html(posts, root, newest=None, heading="h3"):
-    """Elenco raggruppato per mese."""
-    groups = {}
-    for p in posts:
-        groups.setdefault(p.month_label(), []).append(p)
-    out = []
-    for month, items in groups.items():
-        lis = "".join(
-            f'<li data-cat="{p.cat}"><a class="entry" href="{root}{p.url}">'
-            f'<span class="ed">{p.short_date()}</span>'
-            f'<b class="et">{esc(p.title)}{"<em class=\"nw\">nuovo</em>" if p is newest else ""}</b>'
-            f'<span class="ec">{SECTIONS[p.cat][1]}</span><span class="rx">{esc(p.flat)}</span>{ARROW}</a></li>'
-            for p in items
-        )
-        out.append(f'<section class="mg" aria-label="{esc(month)}"><{heading} class="mh">{esc(month)}</{heading}><ul>{lis}</ul></section>')
-    return "".join(out)
+def card_html(p, root):
+    """Una scheda della griglia: il clic apre subito lo scritto (niente anteprima)."""
+    return (f'<article class="desk-window" data-cat="{p.cat}"><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
+            f'<a href="{root}{p.url}" data-card><span class="desk-photo" aria-hidden="true"></span>'
+            f'<span class="desk-info"><span class="desk-meta"><b>{esc(SECTIONS[p.cat][0])}</b>{p.long_date()}</span>'
+            f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
+            f'<span class="desk-more">Apri lo scritto ↗</span></span></a></article>')
 
 
 # ═══ PAGINE ═══
@@ -265,15 +265,7 @@ def page_home(posts):
     newest = posts[0]
     latest = [{"t": p.title, "k": SECTIONS[p.cat][0], "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
     first = latest[0]
-    windows = "".join(
-        f'<article class="desk-window" data-cat="{p.cat}"><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
-        f'<a href="{p.url}" data-preview><span class="desk-photo" role="img" aria-label="Segnaposto per la foto di {esc(p.title)}"></span>'
-        f'<span class="desk-info"><span class="desk-meta"><b>{esc(SECTIONS[p.cat][0])}</b>{p.long_date()}</span>'
-        f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
-        f'<span class="desk-more">Apri lo scritto ↗</span></span></a></article>'
-        for p in posts
-    )
-    filters = "".join(f'<a href="{k}/">{esc(name)}</a>' for k, (name, _, _) in SECTIONS.items())
+    windows = "".join(card_html(p, root) for p in posts)
     tiktok = ""
     if TIKTOK_VIDEOS:
         cards = "".join(f'<a class="desk-phone" href="{esc(u)}" target="_blank" rel="noopener noreferrer"><span class="desk-screen">teloscrivo <span>{esc(t)}<small>{esc(s)}</small></span></span></a>' for t, s, u in TIKTOK_VIDEOS)
@@ -305,16 +297,12 @@ def page_home(posts):
       <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
     </article>
   </section>
-  <section class="desk-section" aria-labelledby="h-all"><h2 id="h-all">Gli scritti</h2><p>Le finestre sulla scrivania, due alla volta.</p>
-    <nav class="desk-filters" aria-label="Sezioni">{filters}</nav><div class="desk-shelf">{windows}</div>
+  <section class="desk-section" aria-labelledby="h-all"><div class="sec-h"><h2 id="h-all">Gli scritti</h2><span class="cap count">{plural(len(posts), "scritto", "scritti")}</span></div><p>Una finestra per ogni scritto: aprila per leggere.</p>
+    <div class="desk-shelf">{windows}</div>
   </section>
   {tiktok}
   {foot_html(root)}
 </div></main>
-<dialog class="desk-reader" aria-labelledby="desk-reader-title"><div class="desk-bar"><i></i><i></i><i></i><span data-window-name>lettura.txt</span><button type="button" class="desk-close" data-close aria-label="Chiudi la lettura">Chiudi ✕</button></div>
-  <div class="desk-reading"><div class="desk-photo" role="img" aria-label="Segnaposto della foto dello scritto"></div><div class="desk-meta" data-reader-meta></div>
-  <h2 id="desk-reader-title"></h2><p data-reader-excerpt></p><a class="cta" data-reader-link href="{newest.url}">Leggi il testo completo ↗</a>
-  <p class="desk-disclaimer">Questa è un'anteprima. Il testo completo si legge nella pagina dello scritto.</p></div></dialog>
 <script type="application/json" id="latest">{latest_json}</script>
 {tail_html(root)}"""
     return head_html(root, f"{SITE} · poesie, testi e racconti brevi", desc, BASE_URL, jsonld=ld) + body
@@ -327,12 +315,15 @@ def page_section(k, posts):
     desc = f"{opening} {plural(len(items), 'scritto', 'scritti')} in {name.lower()}."
     canon = f"{BASE_URL}{k}/"
     ld = [{"@context": "https://schema.org", "@type": "CollectionPage", "name": f"{name} | {SITE}", "url": canon, "inLanguage": "it", "description": desc}]
-    listing = entries_html(items, root, heading="h2") if items else '<p class="msg">Qui non c\'e\' ancora niente. Torna presto.</p>'
-    body = f"""<body id="inizio" data-cat="{k}">
-{top_html(root, k)}<main id="contenuto" class="page"><div class="wrapin">
-  <header class="phead"><span class="cap">Sezione</span><h1>{name}</h1><p>{opening}</p></header>
-  <p class="cap" style="margin:18px 0 0">{plural(len(items), "scritto", "scritti")}</p>
-  {listing}
+    cards = "".join(card_html(p, root) for p in items)
+    body = f"""<body class="reader swipe" id="inizio" data-cat="{k}">
+<a class="skip" href="#contenuto">Vai al contenuto</a>
+<div class="sky" aria-hidden="true"></div>
+<header class="rbar"><a class="rbtn" data-rback href="{root}">{ICON_BACK}Indietro</a></header>
+<main id="contenuto" class="page"><div class="wrapin">
+  <header class="phead"><span class="cap">Categoria</span><h1>{name}</h1><p>{opening}</p></header>
+  <p class="cap sec-n">{plural(len(items), "scritto", "scritti")}</p>
+  <div class="desk-shelf">{cards}</div>
   {foot_html(root)}
 </div></main>
 {tail_html(root)}"""
@@ -356,17 +347,20 @@ def page_reader(p, posts):
         "author": {"@type": "Person", "name": SITE}, "publisher": {"@type": "Organization", "name": SITE},
         "mainEntityOfPage": canon, "url": canon, "image": f"{BASE_URL}og.png", "description": desc,
     }]
-    body = f"""<body class="reader" id="inizio" data-cat="{p.cat}">
+    chip = (f'<a class="catchip" href="{root}{p.cat}/" aria-label="Tutti gli scritti: {esc(name)}">'
+            f'<svg viewBox="0 0 24 24" aria-hidden="true">{GLYPH[p.cat]}</svg>{esc(name)}</a>')
+    links = "".join(f'<a href="{root}{k}/">{esc(SECTIONS[k][1])}</a>' for k in present_cats(posts))
+    body = f"""<body class="reader swipe" id="inizio" data-cat="{p.cat}">
 <a class="skip" href="#contenuto">Vai al testo</a>
 <div class="sky" aria-hidden="true"></div>
 <div class="rprog" aria-hidden="true"></div>
-<header class="rbar"><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a><span class="cap">{name}</span><button type="button" class="rbtn" data-share hidden>Condividi</button></header>
+<header class="rbar"><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a></header>
 <main id="contenuto" class="rsc"><article class="rart">
-  <header class="rhead"><p class="cap">{name} · {p.short_date()} · {p.minutes} min</p><h1 class="rt">{esc(p.title)}</h1><p class="cue" data-cue aria-hidden="true"><span>Scorri per leggere</span>{ICON_DOWN}</p></header>
+  <header class="rhead"><span class="rphoto" aria-hidden="true"></span><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div><h1 class="rt">{esc(p.title)}</h1><p class="cue" data-cue aria-hidden="true"><span>Scorri per leggere</span>{ICON_DOWN}</p></header>
   <div class="rbody">{p.body_html()}</div>
   <footer class="rend"><span class="cap">Leggi anche</span>{rel_html}{spotify}
     <div class="sh2"><button type="button" class="rbtn" data-share hidden>Condividi</button><a class="rbtn" href="{root}">Torna alla home</a></div>
-    <nav class="reader-links" aria-label="Esplora gli scritti">{''.join(f'<a href="{root}{k}/">{esc(short)}</a>' for k, (_, short, _) in SECTIONS.items())}<a href="{root}cerca/">Cerca</a></nav>
+    <nav class="reader-links" aria-label="Esplora gli scritti">{links}<a href="{root}cerca/">Cerca</a></nav>
   </footer>
 </article></main>
 {tail_html(root)}"""
@@ -379,9 +373,9 @@ def page_search():
     desc = "Cerca tra poesie, testi e racconti brevi di teloscrivo."
     body = f"""<body id="inizio">
 {top_html(root, "cerca")}<main id="contenuto" class="page"><div class="wrapin">
-  <header class="phead"><span class="cap">Cerca</span><h1>Cerca</h1><p>Un titolo, una parola, un verso.</p></header>
-  <div data-searchpage data-root="{root}">
-    <label class="qbox"><span class="sr">Cerca tra i testi</span>{ICON_SEARCH}<input type="search" placeholder="Cerca tra i testi" autocomplete="off" disabled></label>
+  <h1 class="sr">Cerca</h1>
+  <div class="srch-in" data-searchpage data-root="{root}">
+    <label class="sfield"><span class="sr">Cerca tra i testi</span>{ICON_SEARCH}<input type="search" placeholder="Un titolo, una parola, un verso" autocomplete="off" enterkeyhint="search" disabled></label>
     <div data-results aria-live="polite"><noscript><p class="msg">La ricerca ha bisogno di JavaScript. Puoi comunque sfogliare le sezioni dalla home.</p></noscript></div>
   </div>
   {foot_html(root)}
@@ -404,7 +398,7 @@ def page_404():
 
 def sitemap(posts):
     urls = [(BASE_URL, posts[0].date)]
-    urls += [(f"{BASE_URL}{k}/", max([p.date for p in posts if p.cat == k] or [posts[0].date])) for k in SECTIONS]
+    urls += [(f"{BASE_URL}{k}/", max([p.date for p in posts if p.cat == k] or [posts[0].date])) for k in present_cats(posts)]
     urls.append((f"{BASE_URL}cerca/", posts[0].date))
     urls += [(f"{BASE_URL}{p.url}", p.date) for p in posts]
     rows = "".join(f"  <url><loc>{esc(u)}</loc><lastmod>{d.isoformat()}</lastmod></url>\n" for u, d in urls)
@@ -463,7 +457,13 @@ def main():
             shutil.rmtree(d)
             print(f"  rimossa pagina orfana: scritti/{d.name}/")
     write("index.html", page_home(posts))
-    for k in SECTIONS:
+    live = present_cats(posts)
+    for k in SECTIONS:  # una sezione senza scritti non ha pagina: se ce n'era una vecchia, sparisce solo il suo index.html generato
+        stale = ROOT / k / "index.html"
+        if k not in live and stale.is_file():
+            stale.unlink()
+            print(f"  rimossa pagina di sezione vuota: {k}/index.html")
+    for k in live:
         write(f"{k}/index.html", page_section(k, posts))
     for p in posts:
         write(f"scritti/{p.slug}/index.html", page_reader(p, posts))
@@ -475,7 +475,7 @@ def main():
     write(".nojekyll", "")
     check_links()
     n_html = sum(1 for w in written if w.endswith(".html"))
-    print(f"OK: {len(posts)} pagine scritto, {len(SECTIONS)} pagine sezione, cerca, 404, home ({n_html} pagine HTML), "
+    print(f"OK: {len(posts)} pagine scritto, {len(live)} pagine sezione, cerca, 404, home ({n_html} pagine HTML), "
           f"cerca.json, sitemap.xml, robots.txt. Link interni controllati. URL base: {BASE_URL}")
 
 

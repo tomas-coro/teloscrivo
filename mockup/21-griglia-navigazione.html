@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Griglia e navigazione · teloscrivo</title>
+<link rel="stylesheet" href="../style.css?v=3">
+<style>
+body{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+.top{flex:none;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--line);background:#0a305b;position:relative;z-index:2}
+.top h1{font:400 1.5rem/1 Fibonacci,Poppins,sans-serif;margin:0 auto 0 0}
+.seg{display:inline-flex;padding:3px;border:1px solid var(--dockline);border-radius:12px;background:var(--soft)}
+.seg button,.go button{min-height:40px;padding:0 15px;border:0;border-radius:9px;background:none;cursor:pointer;font:600 .74rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--pink);color:var(--navy)}
+.go{display:flex;gap:6px;align-items:center}.go .cap{margin-right:4px}
+.go button{border:1px solid var(--line)}.go button:hover{border-color:var(--pink)}
+.stage{flex:1;min-height:0;display:grid;place-items:center;padding:14px;position:relative;z-index:1}
+.dev{height:100%;width:100%;max-width:1440px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--navy);transition:max-width .35s cubic-bezier(.2,.8,.2,1)}
+body[data-v="mobile"] .dev{max-width:390px;max-height:844px;border:8px solid #061b37;border-radius:38px}
+iframe{display:block;width:100%;height:100%;border:0}
+.tips{flex:none;margin:0;padding:9px 18px;font-size:.76rem;color:var(--muted);border-top:1px solid var(--line);background:#0a305b;position:relative;z-index:2}
+</style>
+</head>
+<body data-v="mobile">
+<div class="sky" aria-hidden="true"></div>
+<header class="top">
+  <h1>Griglia e navigazione</h1>
+  <div class="seg" role="group" aria-label="Vista"><button type="button" data-v="mobile" aria-pressed="true">Mobile</button><button type="button" data-v="desktop" aria-pressed="false">Desktop</button></div>
+  <div class="go"><span class="cap">Vai a</span><button type="button" data-go="">Home</button><button type="button" data-go="#la-stanza-in-fondo">Scritto</button><button type="button" data-go="#cerca">Ricerca</button><button type="button" data-go="#c-poesie">Categoria</button></div>
+</header>
+<div class="stage"><div class="dev"><iframe id="f" src="21-app-navigazione.html" title="Prototipo"></iframe></div></div>
+<p class="tips">Prova: clic su una card (si apre subito lo scritto, il testo compare scorrendo e sparisce risalendo) · clic sul chip della categoria in alto (es. Poesie) per vedere tutti gli scritti di quella categoria · Indietro, Esc, freccia sinistra o swipe verso destra (vista Mobile: trascina col mouse dal bordo sinistro) · Cerca diventa X.</p>
+<script>
+const f = document.getElementById('f');
+document.querySelectorAll('[data-v]').forEach(b => b.addEventListener('click', () => {
+  document.body.dataset.v = b.dataset.v;
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+}));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { f.src = '21-app-navigazione.html' + b.dataset.go; }));
+</script>
+</body>
+</html>
