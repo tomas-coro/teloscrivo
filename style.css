@@ -265,6 +265,9 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .rbtn svg{width:16px;height:16px;transition:transform .2s}
 .rbtn[data-rback]{padding-left:10px}
 .rbtn[data-rback]:hover svg{transform:translateX(-3px)}
+.rbtns{display:flex;gap:8px}
+.rbtn[hidden]{display:none}
+@media (max-width:639px){.rbtn-home span{display:none}.rbtn-home{padding:0 12px}}
 /* chip categoria dentro lo scritto: apre tutti i testi di quella categoria */
 .metarow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 18px}
 .metarow .cap{margin:0;color:var(--muted)}
@@ -314,14 +317,9 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .nf h1{font-family:Fibonacci,Poppins,sans-serif;font-weight:400;font-size:clamp(3rem,15vw,5rem);line-height:1;margin:0}
 .nf p{margin:0;max-width:34ch;font-weight:300;font-size:1.05rem}
 
-/* ── passaggio tra le pagine (View Transitions, dove il browser le supporta) ──
-   Da una scheda a uno scritto la nuova pagina si apre dal rettangolo della scheda e al ritorno si richiude
-   dentro la scheda (il ritaglio lo anima app.js). Senza queste classi resta la dissolvenza. */
+/* ── passaggio tra le pagine: dissolvenza semplice (View Transitions, dove il browser le supporta) ── */
 @view-transition{navigation:auto}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
-.vt-expand::view-transition-old(root),.vt-expand::view-transition-new(root),
-.vt-collapse::view-transition-old(root),.vt-collapse::view-transition-new(root){animation:none;mix-blend-mode:normal}
-.vt-collapse::view-transition-old(root){z-index:2}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.25s}
 /* dove non ci sono, il titolo sale da solo */
 @supports not (view-transition-name:a){.rt{animation:trise .9s cubic-bezier(.2,.8,.2,1) .15s both}}
 @keyframes trise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}

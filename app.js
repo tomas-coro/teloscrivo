@@ -40,45 +40,6 @@
   }
   $$('[data-share]').forEach(b => { b.hidden = false; b.addEventListener('click', share); }); // nascosti nell'HTML: senza JS non servono
 
-  // ── dalla scheda allo scritto (View Transitions tra pagine, dove il browser le supporta) ──
-  // Al clic su una scheda ricordiamo dov'era. La pagina dello scritto si apre allargandosi da quel
-  // rettangolo; tornando indietro si richiude dentro la scheda. Ritaglio animato sul "root" della transizione.
-  // Senza supporto (o con "riduci movimento") resta la dissolvenza di base, nessun errore.
-  const ORIGIN = 'teloscrivo-origin', FULL = 'inset(0px 0px 0px 0px round 0px)', EASE = 'cubic-bezier(.2,.8,.2,1)';
-  const clipOf = r => `inset(${r.top}px ${innerWidth - r.right}px ${innerHeight - r.bottom}px ${r.left}px round 15px)`;
-  const bare = u => u.split('#')[0].split('?')[0];
-  document.addEventListener('click', e => {
-    const a = e.target.closest('[data-card]');
-    if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    const r = a.closest('.desk-window').getBoundingClientRect();
-    try { sessionStorage.setItem(ORIGIN, JSON.stringify({ url: bare(a.href), top: r.top, right: r.right, bottom: r.bottom, left: r.left })); } catch (_) { /* storage bloccato: niente apertura dalla scheda, resta la dissolvenza */ }
-  });
-  addEventListener('pagereveal', e => {
-    const vt = e.viewTransition;
-    if (!vt || reduced) return;
-    const root = document.documentElement;
-    const run = (cls, anim) => {
-      root.classList.add(cls);
-      vt.ready.then(anim).catch(() => {});
-      vt.finished.finally(() => root.classList.remove(cls));
-    };
-    if ($('.rbody')) { // sono in uno scritto: se arrivo da una scheda, mi apro da lì
-      let o = null;
-      try { o = JSON.parse(sessionStorage.getItem(ORIGIN) || 'null'); sessionStorage.removeItem(ORIGIN); } catch (_) { /* illeggibile: dissolvenza */ }
-      if (o && o.url === bare(location.href)) {
-        run('vt-expand', () => root.animate({ clipPath: [clipOf(o), FULL] }, { duration: 480, easing: EASE, pseudoElement: '::view-transition-new(root)' }));
-      }
-    } else { // sono in un elenco: se torno da uno scritto, lo scritto si richiude dentro la sua scheda
-      const from = window.navigation && navigation.activation && navigation.activation.from;
-      if (!from) return;
-      const card = $$('[data-card]').find(a => bare(a.href) === bare(from.url));
-      if (!card) return;
-      const r = card.closest('.desk-window').getBoundingClientRect();
-      if (r.bottom < 40 || r.top > innerHeight - 40) return; // scheda fuori schermo: dissolvenza
-      run('vt-collapse', () => root.animate({ clipPath: [FULL, clipOf(r)] }, { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards', pseudoElement: '::view-transition-old(root)' }));
-    }
-  });
-
   // ── lettura: il testo compare riga per riga mentre scorri (e sparisce se risali) ──
   const units = $$('.u'), rend = $('.rend'), cue = $('[data-cue]');
   if (units.length) {
@@ -99,6 +60,15 @@
   // ── Indietro: UN solo modo, usato da tasto, Esc, freccia sinistra, swipe e X della ricerca ──
   // Se si arriva da una pagina del sito torna davvero indietro (cosi' l'apertura si richiude nella scheda),
   // altrimenti (link da Google, link condiviso) va al collegamento di riserva: la categoria o la home.
+  // ── Home: serve solo quando Indietro non ci porta gia' alla home ──
+  // Scritto: si nasconde se arrivo dalla home. Categoria: Indietro porta alla home, quindi compare solo se arrivo da un altro scritto.
+  const homeBtn = $('[data-home]');
+  if (homeBtn) {
+    let from = null;
+    try { if (document.referrer) { const r = new URL(document.referrer); if (r.origin === location.origin) from = r.pathname.replace(/index\.html$/, ''); } } catch (_) { /* referrer illeggibile: tratto come arrivo diretto */ }
+    const atHome = from === new URL(homeBtn.href).pathname.replace(/index\.html$/, '');
+    homeBtn.hidden = homeBtn.dataset.home === 'scritto' ? atHome : (from === null || atHome);
+  }
   const backLink = $('[data-rback]') || $('[data-search-close]');
   function goBack() {
     try {

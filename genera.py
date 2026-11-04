@@ -57,6 +57,7 @@ GLYPH = {
 }
 ARROW_CTA = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_BACK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+ICON_HOME = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 9.5L10 4l6.5 5.5M5.5 8.5V16h9V8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_DOWN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_UP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4M5 9l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_SEARCH = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>'
@@ -319,7 +320,7 @@ def page_section(k, posts):
     body = f"""<body class="reader swipe" id="inizio" data-cat="{k}">
 <a class="skip" href="#contenuto">Vai al contenuto</a>
 <div class="sky" aria-hidden="true"></div>
-<header class="rbar"><a class="rbtn" data-rback href="{root}">{ICON_BACK}Indietro</a></header>
+<header class="rbar"><div class="rbtns"><a class="rbtn rbtn-home" data-home="categoria" href="{root}" aria-label="Torna alla home" hidden>{ICON_HOME}<span>Home</span></a><a class="rbtn" data-rback href="{root}">{ICON_BACK}Indietro</a></div></header>
 <main id="contenuto" class="page"><div class="wrapin">
   <header class="phead"><span class="cap">Categoria</span><h1>{name}</h1><p>{opening}</p></header>
   <p class="cap sec-n">{plural(len(items), "scritto", "scritti")}</p>
@@ -354,7 +355,7 @@ def page_reader(p, posts):
 <a class="skip" href="#contenuto">Vai al testo</a>
 <div class="sky" aria-hidden="true"></div>
 <div class="rprog" aria-hidden="true"></div>
-<header class="rbar"><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a></header>
+<header class="rbar"><div class="rbtns"><a class="rbtn rbtn-home" data-home="scritto" href="{root}" aria-label="Torna alla home">{ICON_HOME}<span>Home</span></a><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a></div></header>
 <main id="contenuto" class="rsc"><article class="rart">
   <header class="rhead"><span class="rphoto" aria-hidden="true"></span><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div><h1 class="rt">{esc(p.title)}</h1><p class="cue" data-cue aria-hidden="true"><span>Scorri per leggere</span>{ICON_DOWN}</p></header>
   <div class="rbody">{p.body_html()}</div>

@@ -78,7 +78,10 @@ html{overflow-y:scroll}
 .rd .rbody{padding:30px 0 40px}
 .rd .rbody p{margin:0 0 1.5em}
 .rd .rend a.ra{transition:border-color .2s}
-.rbtn[data-back]{padding-left:10px}
+.rbtn[data-back],.rbtn[data-cvback]{padding-left:10px}
+.rbar{gap:8px}
+.rbtn[hidden]{display:none}
+@media (max-width:639px){.rbtn-home span{display:none}.rbtn-home{padding:0 12px}}
 .rbtn[data-back] svg{transition:transform .2s}
 .rbtn[data-back]:hover svg{transform:translateX(-3px)}
 
@@ -138,13 +141,13 @@ html{overflow-y:scroll}
 
 <!-- categoria -->
 <div class="cv" id="cv" tabindex="-1" role="dialog" aria-modal="true" aria-label="Scritti della categoria" hidden>
-  <header class="rbar"><button type="button" class="rbtn" data-cvback><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Indietro</button></header>
+  <header class="rbar"><button type="button" class="rbtn rbtn-home" data-home hidden aria-label="Torna alla home"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 9.5L10 4l6.5 5.5M5.5 8.5V16h9V8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></button><button type="button" class="rbtn" data-cvback><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Indietro</button></header>
   <div class="cv-scroll" id="cvscroll"><div class="wrapin"><span class="cap" style="color:var(--pink)">Categoria</span><h2 id="cvt"></h2><span class="cap n" id="cvn" aria-live="polite"></span><div class="desk-shelf shelf" id="cvshelf"></div></div></div>
 </div>
 
 <!-- lettura -->
 <div class="rd" id="rd" tabindex="-1" role="dialog" aria-modal="true" aria-label="Scritto" hidden>
-  <header class="rbar"><button type="button" class="rbtn" data-back><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Indietro</button></header>
+  <header class="rbar"><button type="button" class="rbtn rbtn-home" data-home hidden aria-label="Torna alla home"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 9.5L10 4l6.5 5.5M5.5 8.5V16h9V8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></button><button type="button" class="rbtn" data-back><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Indietro</button></header>
   <div class="rd-scroll" id="rscroll"><article class="rart" id="rart"></article></div>
 </div>
 
@@ -176,9 +179,10 @@ $('#count').textContent = DATA.length + ' scritti';
 
 /* ── navigazione: l'hash e' la cronologia. Indietro, Esc, swipe e gesture del browser fanno la stessa cosa ── */
 let depth = 0, lastCard = null;
-function go(hash) { depth++; location.hash = hash; }
+function go(hash) { depth++; syncHome(); location.hash = hash; }
+function syncHome() { $$('[data-home]').forEach(b => { b.hidden = depth < 2; }); }
 function goBack() {
-  if (depth > 0) { depth--; history.back(); }
+  if (depth > 0) { depth--; syncHome(); history.back(); }
   else { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} route(); }
 }
 function openCard(e) {
@@ -189,6 +193,12 @@ shelf.addEventListener('click', openCard);
 $('#cvshelf').addEventListener('click', openCard);
 $('#sbtn').addEventListener('click', () => { if (srchOpen) goBack(); else go('cerca'); });
 $('[data-back]').addEventListener('click', goBack);
+// Home: salta dritto alla home, tornando indietro di tutti i passaggi fatti (scritto, categoria, altro scritto...)
+function goHome() {
+  if (depth > 0) { const n = depth; depth = 0; syncHome(); history.go(-n); }
+  else { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} route(); }
+}
+$$('[data-home]').forEach(b => b.addEventListener('click', goHome));
 $('[data-cvback]').addEventListener('click', goBack);
 addEventListener('hashchange', route);
 addEventListener('keydown', e => {
