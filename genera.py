@@ -3,8 +3,8 @@
 
 Uso:   python3 genera.py
 Legge: scritti/*.md  (uno per scritto, con intestazione tra due righe `---`)
-Scrive: index.html, <sezione>/index.html (solo sezioni con almeno uno scritto), scritti/<slug>/index.html, cerca/index.html,
-        testi/index.html (rimando a pensieri), 404.html, cerca.json, sitemap.xml, robots.txt, .nojekyll
+Scrive: index.html, <sezione>/index.html (solo sezioni con almeno uno scritto), scritti/<slug>/index.html,
+        testi/index.html (rimando a pensieri), 404.html, sitemap.xml, robots.txt, .nojekyll
 
 Dipendenze: libreria standard di Python 3 + Pillow (solo per le foto: pip3 install pillow).
 
@@ -86,8 +86,6 @@ SOCIAL_ICONS = {
 }
 ICON_DOWN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_UP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4M5 9l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-ICON_SEARCH = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>'
-ICON_X = '<svg class="x" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg>'
 ICON_LINK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5L9.8 5.2M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_MOON = '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" fill="currentColor"/></svg>'
 ICON_EXT = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14L14 6M7 6h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -183,7 +181,7 @@ class Post:
         return " · ".join(SECTIONS[c][0] for c in self.cats)
 
     @property
-    def full_text(self):  # tutto quello che si legge: serve a ricerca e tempo di lettura
+    def full_text(self):  # tutto quello che si legge: serve al tempo di lettura
         return "\n\n".join(x for x in ("\n".join(self.quote), self.body, self.poem) if x.strip())
 
     @property
@@ -256,16 +254,6 @@ def present_cats(posts):
     return [k for k in SECTIONS if any(k in p.cats for p in posts)]
 
 
-def nav_html(root, current=None):
-    """Bottone Cerca. Sulla pagina Cerca diventa una X che torna dov'eri (senza JS porta alla home)."""
-    lens = '<svg class="lens" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>'
-    if current == "cerca":
-        return (f'<a class="sbtn" href="{root}" data-search-close data-open aria-current="page" aria-label="Chiudi la ricerca">'
-                f'<span class="ico">{lens}{ICON_X}</span><span class="lbl">Cerca</span></a>')
-    return (f'<a class="sbtn" href="{root}cerca/" aria-label="Apri la ricerca">'
-            f'<span class="ico">{lens}{ICON_X}</span><span class="lbl">Cerca</span></a>')
-
-
 def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=False):
     ld = ""
     for obj in jsonld or []:
@@ -294,18 +282,17 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=10">
+<link rel="stylesheet" href="{root}style.css?v=11">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
 
 
-def top_html(root, current=None):
+def top_html(root):
     return f"""<a class="skip" href="#contenuto">Vai al contenuto</a>
 <div class="sky" aria-hidden="true"></div>
 <header class="tbar">
   <a class="brand" href="{root}" aria-label="teloscrivo, torna alla home"><img src="{root}assets/logo/monogramma-navy.svg" alt="" width="34" height="34"></a>
-  {nav_html(root, current)}
 </header>
 """
 
@@ -317,7 +304,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=6" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=7" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -533,23 +520,6 @@ def page_reader(p, posts):
     return head_html(root, f"{p.title} | {SITE}", desc, canon, og_type="article", jsonld=ld) + body
 
 
-def page_search():
-    root = "../"
-    canon = f"{BASE_URL}cerca/"
-    desc = "Cerca tra pensieri, poesie e citazioni di teloscrivo."
-    body = f"""<body id="inizio">
-{top_html(root, "cerca")}<main id="contenuto" class="page"><div class="wrapin">
-  <h1 class="sr">Cerca</h1>
-  <div class="srch-in" data-searchpage data-root="{root}">
-    <label class="sfield"><span class="sr">Cerca tra i testi</span>{ICON_SEARCH}<input type="search" placeholder="Un titolo, una parola, un verso" autocomplete="off" enterkeyhint="search" disabled></label>
-    <div data-results aria-live="polite"><noscript><p class="msg">La ricerca ha bisogno di JavaScript. Puoi comunque sfogliare le sezioni dalla home.</p></noscript></div>
-  </div>
-  {foot_html(root)}
-</div></main>
-{tail_html(root)}"""
-    return head_html(root, f"Cerca | {SITE}", desc, canon) + body
-
-
 def page_404():
     root = BASE_PATH  # pagina servita a qualsiasi indirizzo: i link devono partire dalla radice
     body = f"""<body id="inizio">
@@ -565,17 +535,9 @@ def page_404():
 def sitemap(posts):
     urls = [(BASE_URL, posts[0].date)]
     urls += [(f"{BASE_URL}{k}/", max([p.date for p in posts if k in p.cats] or [posts[0].date])) for k in present_cats(posts)]
-    urls.append((f"{BASE_URL}cerca/", posts[0].date))
     urls += [(f"{BASE_URL}{p.url}", p.date) for p in posts]
     rows = "".join(f"  <url><loc>{esc(u)}</loc><lastmod>{d.isoformat()}</lastmod></url>\n" for u, d in urls)
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{rows}</urlset>\n'
-
-
-def search_index(posts):
-    return json.dumps([
-        {"t": p.title, "s": p.cat_label, "d": p.short_date(), "x": p.flat, "b": " ".join(p.full_text.split()), "u": p.url}
-        for p in posts
-    ], ensure_ascii=False, separators=(",", ":"))
 
 
 # ═══ SCRITTURA E CONTROLLI ═══
@@ -636,21 +598,19 @@ def main():
         write(f"{k}/index.html", page_section(k, posts))
     for p in posts:
         write(f"scritti/{p.slug}/index.html", page_reader(p, posts))
-    write("cerca/index.html", page_search())
     write("testi/index.html", f'''<!DOCTYPE html><html lang="it"><head><meta charset="utf-8">
 <meta http-equiv="refresh" content="0;url={BASE_PATH}pensieri/">
 <link rel="canonical" href="{BASE_URL}pensieri/"><title>Pensieri | {SITE}</title>
 </head><body><p>La pagina Testi si chiama ora <a href="{BASE_PATH}pensieri/">Pensieri</a>.</p></body></html>
 ''')
     write("404.html", page_404())
-    write("cerca.json", search_index(posts))
     write("sitemap.xml", sitemap(posts))
     write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {BASE_URL}sitemap.xml\n")
     write(".nojekyll", "")
     check_links()
     n_html = sum(1 for w in written if w.endswith(".html"))
-    print(f"OK: {len(posts)} pagine scritto, {len(live)} pagine sezione, cerca, 404, home ({n_html} pagine HTML), "
-          f"cerca.json, sitemap.xml, robots.txt. Link interni controllati. URL base: {BASE_URL}")
+    print(f"OK: {len(posts)} pagine scritto, {len(live)} pagine sezione, 404, home ({n_html} pagine HTML), "
+          f"sitemap.xml, robots.txt. Link interni controllati. URL base: {BASE_URL}")
     if missing:
         print(f"AVVISO: {len(missing)} scritti senza foto (usano il segnaposto): {', '.join(missing)}. Mettile in {PHOTO_DIR}/<nome>.jpg", file=sys.stderr)
 
