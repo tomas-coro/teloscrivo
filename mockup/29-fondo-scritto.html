@@ -1,0 +1,7 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fondo dello scritto</title>
+<style>:root{--navy:#072D59;--seal:#DBF2FC;--pink:#FD6E88}body{margin:0;background:#04162d;color:var(--seal);font:14px Poppins,system-ui,sans-serif;text-align:center;padding:18px}
+.tg{display:inline-flex;border:1px solid #ffffff30;border-radius:99px;padding:4px;margin-bottom:16px}.tg button{border:0;background:none;color:inherit;padding:8px 20px;border-radius:99px;cursor:pointer;font:inherit}.tg button.on{background:var(--pink);color:var(--navy);font-weight:600}
+iframe{display:block;margin:0 auto;border:1px solid #ffffff25;border-radius:14px;background:var(--navy);height:calc(100vh - 110px);width:390px;max-width:100%}iframe.d{width:min(1100px,100%)}</style>
+<div class="tg"><button class="on" data-w="m">Mobile</button><button data-w="d">Desktop</button></div>
+<iframe id="f" src="29-fondo-scritto-frame.html"></iframe>
+<script>document.querySelectorAll('.tg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tg button').forEach(x=>x.classList.toggle('on',x===b));f.className=b.dataset.w==='d'?'d':''})</script></html>

@@ -39,6 +39,19 @@
       toast('Non riesco a copiare il link: copialo dalla barra del browser.');
     }
   }
+  // ── copia link: sempre copia negli appunti, anche dove c'e' il pannello di condivisione ──
+  async function copyLink(e) {
+    const b = e.currentTarget, l = $('[data-copy-lbl]', b), t = l.textContent;
+    const url = ($('link[rel="canonical"]') || {}).href || location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      l.textContent = 'Link copiato'; b.classList.add('done');
+      setTimeout(() => { l.textContent = t; b.classList.remove('done'); }, 2200);
+    } catch (err) {
+      toast('Non riesco a copiare il link: copialo dalla barra del browser.');
+    }
+  }
+  $$('[data-copy]').forEach(b => { b.hidden = false; b.addEventListener('click', copyLink); });
   $$('[data-share]').forEach(b => { b.hidden = false; b.addEventListener('click', share); }); // nascosti nell'HTML: senza JS non servono
 
   // ── lettura: il testo compare riga per riga mentre scorri (e sparisce se risali) ──

@@ -110,3 +110,4 @@
 - Dominio: Tomas compra `teloscrivo.it`; poi cambiare `BASE_URL` in `genera.py`. Hosting (Pages o Plesk) ancora da decidere.
 - TikTok: si aspetta (`TIKTOK_URL` vuoto). Spotify: solo negli scritti ispirati a una canzone, col link nel frontmatter.
 - Da fare: `/ui-check` + check A/B sul sito (ora con il font nuovo), prova gesti/transizioni su telefono (la fa Tomas).
+- **Fondo dello scritto (04/11/2026)**: saluto "Grazie per aver letto e ricorda che / la luna porta consiglio" (rosa che sfuma nel celeste + mezzaluna), Condividi + Copia link (impilati su mobile, affiancati su desktop), Leggi anche (con 1 solo scritto scheda a tutta larghezza), firma `scrivoanchesu.` + Instagram su una riga. Mockup `mockup/29-*`. Sito: `style.css?v=6`, `app.js?v=4`. Verificato con screenshot; NON ancora fatti `/ui-check`, check A/B, prova su telefono. Assunzione da confermare: l'emoticon e' la mezzaluna del logo.

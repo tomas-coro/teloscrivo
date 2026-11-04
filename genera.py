@@ -86,6 +86,8 @@ ICON_DOWN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l
 ICON_UP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4M5 9l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_SEARCH = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>'
 ICON_X = '<svg class="x" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg>'
+ICON_LINK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5L9.8 5.2M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+ICON_MOON = '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" fill="currentColor"/></svg>'
 ICON_EXT = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14L14 6M7 6h7v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
 
@@ -290,7 +292,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=5">
+<link rel="stylesheet" href="{root}style.css?v=6">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -313,7 +315,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=3" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=4" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -495,7 +497,7 @@ def page_reader(p, posts):
         f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span>{esc(label)}</span></a>'
         for k, (url, label) in SOCIAL.items() if url
     )
-    find_html = f'<div class="rfind"><span class="wm2 wm-find">scrivoanchesu<span class="dot" aria-hidden="true"></span></span><div class="soc">{soc}</div></div>' if soc else ""
+    find_html = f'<div class="rsign"><span class="wm2 wm-find">scrivoanchesu<span class="dot" aria-hidden="true"></span></span><div class="soc">{soc}</div></div>' if soc else ""
     spotify = (f'<a class="cta" href="{esc(p.spotify)}" target="_blank" rel="noopener">Ascolta su Spotify{ICON_EXT}</a>' if p.spotify else "")
     canon = f"{BASE_URL}{p.url}"
     desc = p.flat[:155]
@@ -518,8 +520,11 @@ def page_reader(p, posts):
 <main id="contenuto" class="rsc"><article class="rart">
   <header class="rhead"><div class="rhero"><div class="rphoto{" has-img" if p.has_photo else ""}">{photo_img(p, root, "(min-width:700px) 736px, 100vw", eager=True)}</div><h1 class="rt">{esc(p.title)}</h1></div><div class="rcard-b"><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div></div></header>
   <div class="rbody">{p.body_html()}</div>
-  <footer class="rend"><span class="cap">Leggi anche</span><div class="rcards">{rel_html}</div>{spotify}
-    <div class="rfoot"><button type="button" class="sharebtn" data-share hidden>{ICON_SHARE}<span data-share-lbl>Condividi</span></button>{find_html}</div>
+  <footer class="rend">
+    <section class="rbye"><p class="bye">Grazie per aver letto e ricorda che<br><em>la luna porta consiglio</em>{ICON_MOON}</p>
+      <div class="bye-actions"><button type="button" class="sharebtn" data-share hidden>{ICON_SHARE}<span data-share-lbl>Condividi</span></button><button type="button" class="copybtn" data-copy hidden>{ICON_LINK}<span data-copy-lbl>Copia link</span></button></div></section>
+    <span class="cap">Leggi anche</span><div class="rcards">{rel_html}</div>{spotify}
+    {find_html}
   </footer>
 </article></main>
 {tail_html(root)}"""
