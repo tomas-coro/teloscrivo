@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Immagine nello scritto · teloscrivo</title>
+<link rel="stylesheet" href="../style.css?v=3">
+<style>
+/* ═══ Mockup 22: tre modi di unire foto, titolo e testo nello scritto ═══
+   Usa style.css del sito (font, colori, cielo). Ogni direzione vive in un "telefono/schermo" con scroll proprio:
+   le misure seguono la larghezza del riquadro (container query), cosi' Mobile | Desktop funziona su qualsiasi finestra. */
+body{padding:20px 16px 60px}
+.mk{position:relative;z-index:1;max-width:1180px;margin:0 auto}
+.mk h1{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--pink);margin:0 0 4px}
+.mk .lead{margin:0 0 16px;color:var(--muted);font-size:.9rem;font-weight:300;max-width:60ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar .grow{flex:1}
+.chip{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--fg);font:500 .85rem Poppins,sans-serif;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--pink);background:color-mix(in srgb,var(--pink) 14%,transparent)}
+.why{margin:0 0 14px;color:var(--muted);font-size:.84rem;font-weight:300;max-width:70ch}
+.why b{color:var(--fg);font-weight:500}
+
+/* il riquadro: scrolla da solo, e' un "container" per le misure */
+.frame{container-type:inline-size;margin:0 auto;width:390px;max-width:100%;height:760px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--line);border-radius:22px;background:var(--navy);position:relative;scrollbar-width:thin}
+.frame.desk{width:100%}
+.fbar{position:sticky;top:0;z-index:20;height:56px;padding:0 12px;display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,var(--navy) 55%,transparent)}
+.fbar .rbtn{min-height:40px}
+.fsky{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 40% at 80% 12%,color-mix(in oklab,var(--pink) 18%,transparent),transparent 70%)}
+.sheet{position:relative;z-index:1;margin-top:-56px}
+
+/* pezzi comuni */
+.ph{--ph:linear-gradient(135deg,#ae8aa3,#5b4b78 55%,#132c51);display:block;position:relative;overflow:hidden;background:var(--ph)}
+.ph::before{content:'';position:absolute;inset:20% -30%;background:radial-gradient(ellipse at 70% 20%,#dbf2fc66,transparent 35%),linear-gradient(140deg,transparent 40%,#071c3b88 41%,transparent 70%)}
+.meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.meta .cap{margin:0;color:var(--muted)}
+.ttl{font-family:Fibonacci,Poppins,sans-serif;font-weight:400;line-height:1;margin:0;text-wrap:balance}
+.txt{font-weight:300;line-height:1.85}
+.txt p{margin:0 0 1.3em}
+.hint{display:flex;align-items:center;gap:10px;font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.hint svg{width:18px;height:18px;color:var(--pink)}
+
+/* ───────── A · BLOCCO UNICO: foto + titolo sono un'unica scheda, il testo parte subito dopo ───────── */
+.A .wrapA{max-width:36rem;margin:0 auto;padding:68px 20px 70px}
+.A .card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:color-mix(in srgb,var(--bg) 60%,transparent)}
+.A .ph{aspect-ratio:16/8;border-radius:0}
+.A .cb{padding:16px 18px 20px;display:grid;gap:10px}
+.A .ttl{font-size:2.5rem}
+.A .txt{font-size:1.2rem;padding-top:26px}
+@container (min-width:700px){
+  .A .wrapA{max-width:46rem;padding-top:84px}
+  .A .ph{aspect-ratio:21/8}
+  .A .cb{padding:22px 28px 26px}
+  .A .ttl{font-size:3.6rem}
+  .A .txt{font-size:1.35rem;max-width:36rem;margin:0 auto}
+}
+
+/* ───────── B · COPERTINA-SFONDO (alla Wattpad): la foto e' lo sfondo del titolo e sfuma nella pagina ───────── */
+.B .cover{position:relative;min-height:540px;display:flex;align-items:flex-end;padding:0 20px 34px;isolation:isolate}
+.B .cover .ph{position:absolute;inset:0;z-index:-2}
+.B .cover::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#072d5933 0%,#072d5900 28%,#072d59cc 66%,var(--navy) 100%)}
+.B .cin{width:100%;max-width:36rem;margin:0 auto;display:grid;gap:12px}
+.B .ttl{font-size:3.2rem;text-shadow:0 2px 30px #072d59}
+.B .txt{max-width:36rem;margin:0 auto;padding:6px 20px 70px;font-size:1.2rem}
+@container (min-width:700px){
+  .B .cover{min-height:620px;padding:0 40px 52px}
+  .B .ttl{font-size:5rem}
+  .B .txt{font-size:1.35rem}
+}
+
+/* ───────── C · LIBRO APERTO: foto verticale che resta ferma (desktop) / copertina piccola accanto al titolo (mobile) ───────── */
+.C .wrapC{padding:70px 20px 70px;max-width:36rem;margin:0 auto}
+.C .top{display:grid;grid-template-columns:104px 1fr;gap:16px;align-items:end;margin-bottom:26px}
+.C .ph{aspect-ratio:3/4;border-radius:12px;border:1px solid var(--line);box-shadow:0 18px 36px -20px #000}
+.C .tt{display:grid;gap:10px;min-width:0}
+.C .ttl{font-size:2.2rem}
+.C .txt{font-size:1.2rem}
+@container (min-width:700px){
+  .C .wrapC{max-width:64rem;display:grid;grid-template-columns:300px 1fr;gap:52px;padding-top:90px;align-items:start}
+  .C .top{display:contents}
+  .C .ph{position:sticky;top:84px;grid-row:1/3;aspect-ratio:3/4.1;border-radius:14px}
+  .C .tt{grid-column:2;grid-row:1}
+  .C .ttl{font-size:4.2rem}
+  .C .txt{grid-column:2;grid-row:2;font-size:1.35rem;max-width:34rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body class="reader">
+<div class="sky" aria-hidden="true"></div>
+<div class="mk">
+  <h1>Mockup 22 · Immagine nello scritto</h1>
+  <p class="lead">Tre modi di rendere foto, titolo e testo un blocco solo. Scorri dentro il riquadro per vedere dove parte il testo.</p>
+  <div class="bar" role="tablist" aria-label="Direzioni">
+    <button class="chip" data-dir="A" aria-pressed="true">1 · Blocco unico</button>
+    <button class="chip" data-dir="B" aria-pressed="false">2 · Copertina sfondo</button>
+    <button class="chip" data-dir="C" aria-pressed="false">3 · Libro aperto</button>
+    <span class="grow"></span>
+    <button class="chip" data-view="m" aria-pressed="true">Mobile</button>
+    <button class="chip" data-view="d" aria-pressed="false">Desktop</button>
+  </div>
+  <p class="why" id="why"></p>
+
+  <div class="frame A" id="frame">
+    <div class="fsky" aria-hidden="true"></div>
+    <div class="fbar"><a class="rbtn rbtn-home" href="#" aria-label="Torna alla home"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 9.5L10 4l6.5 5.5M5.5 8.5V16h9V8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Home</span></a><a class="rbtn" href="#"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Indietro</a></div>
+    <div class="sheet" id="sheet"></div>
+  </div>
+</div>
+
+<template id="tA">
+  <div class="wrapA">
+    <div class="card">
+      <span class="ph" aria-hidden="true"></span>
+      <div class="cb">
+        <div class="meta"><span class="catchip">Testi</span><span class="cap">1 nov · 1 min</span></div>
+        <h2 class="ttl">Lettera a chi resta</h2>
+      </div>
+    </div>
+    <div class="txt">TXT</div>
+  </div>
+</template>
+<template id="tB">
+  <div class="cover">
+    <span class="ph" aria-hidden="true"></span>
+    <div class="cin">
+      <div class="meta"><span class="catchip">Testi</span><span class="cap">1 nov · 1 min</span></div>
+      <h2 class="ttl">Lettera a chi resta</h2>
+      <p class="hint"><span>Scorri per leggere</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></p>
+    </div>
+  </div>
+  <div class="txt">TXT</div>
+</template>
+<template id="tC">
+  <div class="wrapC">
+    <div class="top">
+      <span class="ph" aria-hidden="true"></span>
+      <div class="tt">
+        <div class="meta"><span class="catchip">Testi</span><span class="cap">1 nov · 1 min</span></div>
+        <h2 class="ttl">Lettera a chi resta</h2>
+      </div>
+    </div>
+    <div class="txt">TXT</div>
+  </div>
+</template>
+
+<script>
+const TXT = `<p>Non ti chiedo di capire. Ti chiedo di lasciare la luce accesa in corridoio.</p>
+<p>Ci sono sere in cui non so spiegare perch&eacute; sto zitto. Non &egrave; rabbia e non &egrave; stanchezza: &egrave; che le parole, certi giorni, pesano pi&ugrave; di me. Allora mi siedo vicino alla finestra e aspetto che passino.</p>
+<p>Tu non devi fare niente. Basta che la luce resti accesa, cos&igrave; so che da qualche parte c'&egrave; un posto dove posso tornare quando riesco di nuovo a parlare.</p>
+<p>Poi, di solito, arriva il mattino. E con il mattino un po' di voce.</p>`;
+const WHY = {
+  A: '<b>Blocco unico</b> · foto bassa e titolo dentro la stessa scheda: l\'occhio vede un\'unica cosa e il testo parte già nella prima schermata (oggi serve scorrere quasi tutto il telefono). Il più vicino al sito attuale.',
+  B: '<b>Copertina sfondo</b> (alla Wattpad) · la foto occupa tutta la larghezza e il titolo ci sta scritto sopra; in basso sfuma nel blu della pagina e il testo sembra uscire dalla copertina. Più emotivo, ma la foto diventa protagonista.',
+  C: '<b>Libro aperto</b> · su telefono una copertina piccola accanto al titolo, su desktop la foto verticale resta ferma a sinistra mentre scorri il testo a destra. Più da libro/rivista, la foto non copre mai il testo.'
+};
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const frame = $('#frame'), sheet = $('#sheet');
+let dir = 'A';
+function render() {
+  sheet.innerHTML = $('#t' + dir).innerHTML.replace('TXT', TXT);
+  frame.className = 'frame ' + dir + (frame.classList.contains('desk') ? ' desk' : '');
+  $('#why').innerHTML = WHY[dir];
+  frame.scrollTop = 0;
+  $$('[data-dir]').forEach(b => b.setAttribute('aria-pressed', b.dataset.dir === dir));
+}
+$$('[data-dir]').forEach(b => b.addEventListener('click', () => { dir = b.dataset.dir; render(); }));
+$$('[data-view]').forEach(b => b.addEventListener('click', () => {
+  frame.classList.toggle('desk', b.dataset.view === 'd');
+  $$('[data-view]').forEach(x => x.setAttribute('aria-pressed', x === b));
+}));
+render();
+</script>
+</body>
+</html>

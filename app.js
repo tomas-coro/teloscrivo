@@ -33,6 +33,7 @@
       if (navigator.share) { await navigator.share({ title: document.title, url }); return; }
       await navigator.clipboard.writeText(url);
       toast('Link copiato');
+      $$('[data-share]').forEach(b => { const l = $('[data-share-lbl]', b); if (!l) return; const t = l.textContent; l.textContent = 'Link copiato'; b.classList.add('done'); setTimeout(() => { l.textContent = t; b.classList.remove('done'); }, 2200); });
     } catch (err) {
       if (err && err.name === 'AbortError') return; // ha chiuso il pannello: non e' un errore
       toast('Non riesco a copiare il link: copialo dalla barra del browser.');
@@ -60,6 +61,14 @@
   // ── Indietro: UN solo modo, usato da tasto, Esc, freccia sinistra, swipe e X della ricerca ──
   // Se si arriva da una pagina del sito torna davvero indietro (cosi' l'apertura si richiude nella scheda),
   // altrimenti (link da Google, link condiviso) va al collegamento di riserva: la categoria o la home.
+  // ── logo: se sono gia' in questa pagina, risale dolcemente invece di ricaricarla ──
+  const brandEl = $('.brand');
+  if (brandEl) brandEl.addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    if (new URL(brandEl.href).pathname.replace(/index\.html$/, '') !== location.pathname.replace(/index\.html$/, '')) return;
+    e.preventDefault();
+    scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
   // ── Home: serve solo quando Indietro non ci porta gia' alla home ──
   // Scritto: si nasconde se arrivo dalla home. Categoria: Indietro porta alla home, quindi compare solo se arrivo da un altro scritto.
   const homeBtn = $('[data-home]');
@@ -131,6 +140,7 @@
         clearTimeout(autoTimer); clearTimeout(pressTimer); clearTimeout(expandTimer); clearTimeout(endTimer);
         const focused = opening.contains(document.activeElement);
         opening.hidden = true;
+        document.dispatchEvent(new Event('teloscrivo:opened')); // la home puo' iniziare a scrivere
         document.body.style.overflow = '';
         content.inert = header.inert = skipLink.inert = false;
         if (focused) {
@@ -213,7 +223,12 @@
       if (auto) play(current);
       else { ++tok; draw(LATEST[current], LATEST[current].t.length + LATEST[current].x.length); }
     });
-    if (LATEST.length > 1) play(0); else meta(LATEST[0], 0);
+    // se l'apertura copre la pagina, il blocco aspetta che sparisca e poi inizia a scrivere (non parte gia' scritto)
+    const start = () => { if (LATEST.length > 1) play(0); else { meta(LATEST[0], 0); draw(LATEST[0], LATEST[0].t.length + LATEST[0].x.length); } };
+    if (opening && !opening.hidden) {
+      draw(LATEST[0], 0); meta(LATEST[0], 0);
+      document.addEventListener('teloscrivo:opened', start, { once: true });
+    } else start();
   }
 
   $$('[data-slide]').forEach(button => button.addEventListener('click', () => $('.desk-phones').scrollBy({ left: Number(button.dataset.slide) * 147, behavior: reduced ? 'instant' : 'smooth' })));

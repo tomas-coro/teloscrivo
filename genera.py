@@ -32,6 +32,8 @@ BASE_URL = "https://tomas-coro.github.io/teloscrivo/"
 SITE = "teloscrivo"
 # Sezione TikTok: resta nascosta finche' TIKTOK_URL e' vuoto (il profilo non esiste ancora).
 TIKTOK_URL = ""
+# Profili social mostrati in fondo a ogni scritto ("Trovami su"): chiave = icona, valore = (link, nome mostrato). Per aggiungerne uno, serve anche l'icona in SOCIAL_ICONS.
+SOCIAL = {"instagram": ("https://www.instagram.com/teloscrivo.it/", "@teloscrivo.it")}
 TIKTOK_VIDEOS = []  # elenco di (titolo, sottotitolo, link al video), facoltativo
 
 ROOT = Path(__file__).resolve().parent
@@ -58,6 +60,12 @@ GLYPH = {
 ARROW_CTA = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_BACK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10H5M9 5l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_HOME = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 9.5L10 4l6.5 5.5M5.5 8.5V16h9V8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+ICON_SHARE = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 12.5V3M6.5 6.5L10 3l3.5 3.5M4.5 10v5.5a1.5 1.5 0 0 0 1.5 1.5h8a1.5 1.5 0 0 0 1.5-1.5V10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+SOCIAL_ICONS = {
+    "instagram": ("Instagram", '<rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor"/>'),
+    "facebook": ("Facebook", '<path d="M13.6 21v-8h2.7l.5-3.2h-3.2V7.9c0-.9.4-1.7 1.8-1.7h1.5V3.4S15.6 3.2 14.4 3.2c-2.6 0-4.1 1.5-4.1 4.3v2.3H7.6V13h2.7v8z" fill="currentColor"/>'),
+    "tiktok": ("TikTok", '<path d="M16.6 3c.3 2.4 1.7 3.9 4 4.1v3c-1.4.1-2.6-.3-4-1.1v6.2c0 3.9-3.2 6-6.3 5.4-2.6-.5-4.5-2.8-4.3-5.6.2-3.2 3.2-5.2 6.3-4.6v3.1c-1.5-.5-3.2.3-3.2 2 0 1.5 1.4 2.4 2.7 2 1-.3 1.6-1.2 1.6-2.3V3z" fill="currentColor"/>'),
+}
 ICON_DOWN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_UP = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V4M5 9l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 ICON_SEARCH = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg>'
@@ -336,9 +344,18 @@ def page_reader(p, posts):
     name = SECTIONS[p.cat][0]
     rel = [x for x in posts if x is not p and x.cat == p.cat] + [x for x in posts if x is not p and x.cat != p.cat]
     rel_html = "".join(
-        f'<a class="ra" href="{root}{x.url}"><b>{esc(x.title)}</b><small>{SECTIONS[x.cat][1]} · {x.short_date()}</small></a>'
+        f'<a class="rcard" data-cat="{x.cat}" href="{root}{x.url}"><span class="desk-photo" aria-hidden="true"></span>'
+        f'<span class="rcb"><span class="rcm"><b>{esc(SECTIONS[x.cat][0])}</b>{x.short_date()}</span>'
+        f'<span class="rct">{esc(x.title)}</span><span class="rcx">{esc(x.excerpt).replace(chr(10), " ")}</span>'
+        f'<span class="rcgo">Leggi{ARROW_CTA}</span></span></a>'
         for x in rel[:2]
     )
+    soc = "".join(
+        f'<a class="soc-a" href="{esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="{SOCIAL_ICONS[k][0]}: {esc(label)}">'
+        f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span>{esc(label)}</span></a>'
+        for k, (url, label) in SOCIAL.items() if url
+    )
+    find_html = f'<div class="rfind"><span class="wm2 wm-find">scrivoanchesu<span class="dot" aria-hidden="true"></span></span><div class="soc">{soc}</div></div>' if soc else ""
     spotify = (f'<a class="cta" href="{esc(p.spotify)}" target="_blank" rel="noopener">Ascolta su Spotify{ICON_EXT}</a>' if p.spotify else "")
     canon = f"{BASE_URL}{p.url}"
     desc = p.flat[:155]
@@ -357,11 +374,10 @@ def page_reader(p, posts):
 <div class="rprog" aria-hidden="true"></div>
 <header class="rbar"><div class="rbtns"><a class="rbtn rbtn-home" data-home="scritto" href="{root}" aria-label="Torna alla home">{ICON_HOME}<span>Home</span></a><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a></div></header>
 <main id="contenuto" class="rsc"><article class="rart">
-  <header class="rhead"><span class="rphoto" aria-hidden="true"></span><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div><h1 class="rt">{esc(p.title)}</h1><p class="cue" data-cue aria-hidden="true"><span>Scorri per leggere</span>{ICON_DOWN}</p></header>
+  <header class="rhead"><span class="rphoto" aria-hidden="true"></span><div class="rcard-b"><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div><h1 class="rt">{esc(p.title)}</h1></div></header>
   <div class="rbody">{p.body_html()}</div>
-  <footer class="rend"><span class="cap">Leggi anche</span>{rel_html}{spotify}
-    <div class="sh2"><button type="button" class="rbtn" data-share hidden>Condividi</button><a class="rbtn" href="{root}">Torna alla home</a></div>
-    <nav class="reader-links" aria-label="Esplora gli scritti">{links}<a href="{root}cerca/">Cerca</a></nav>
+  <footer class="rend"><span class="cap">Leggi anche</span><div class="rcards">{rel_html}</div>{spotify}
+    <div class="rfoot"><button type="button" class="sharebtn" data-share hidden>{ICON_SHARE}<span data-share-lbl>Condividi</span></button>{find_html}</div>
   </footer>
 </article></main>
 {tail_html(root)}"""
