@@ -103,8 +103,8 @@ body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-ca
 .search-pop input{width:100%;min-width:0;height:100%;padding:0 60px 0 16px;border:0;background:none;color:var(--fg);font:400 1rem Poppins,sans-serif;outline:0}
 .search-pop input::placeholder{color:var(--muted)}
 .search-pop input::-webkit-search-cancel-button{display:none}
-.search-pop .search-results{position:absolute;top:54px;right:0;width:min(640px,100%);max-height:calc(100vh - 78px);overflow:auto;padding:8px;border:1px solid var(--line);border-radius:16px;background:#123862;box-shadow:0 22px 40px -18px #000a;opacity:0;transform:translateY(-8px);transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1)}
-.tbar.searching .search-results{opacity:1;transform:none;transition-delay:.15s}
+.search-pop .search-results{position:absolute;top:54px;left:50%;width:min(640px,100%);max-height:calc(100vh - 78px);overflow:auto;padding:8px;border:1px solid var(--line);border-radius:16px;background:#123862;box-shadow:0 22px 40px -18px #000a;opacity:0;transform:translate(-50%,-8px);transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1)}
+.tbar.searching .search-results{opacity:1;transform:translateX(-50%);transition-delay:.15s}
 @media(min-width:640px){.search-pop{top:10px;right:36px}.tbar.searching .search-pop{width:calc(100% - 72px)}}
 @media (min-width:640px){.tbar{padding:0 36px}}
 
