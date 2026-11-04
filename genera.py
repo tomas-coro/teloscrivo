@@ -215,7 +215,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/fibonacci.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="{root}style.css">
+<link rel="stylesheet" href="{root}style.css?v=2">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -238,7 +238,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=2" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
