@@ -56,10 +56,10 @@ ROOT = Path(__file__).resolve().parent
 BASE_PATH = urlparse(BASE_URL).path  # "/teloscrivo/" su GitHub Pages, "/" sul dominio vero
 
 SECTIONS = {  # ordine = ordine nel menu; (nome lungo, nome nel menu, frase). Le sezioni senza scritti restano nascoste
-    "pensieri": ("Pensieri", "Pensieri", "Pensieri che non stanno in una frase."),
-    "poesie": ("Poesie", "Poesie", "Poche righe, dette piano."),
+    "pensieri": ("Pensiero", "Pensiero", "Pensieri che non stanno in una frase."),
+    "poesie": ("Poesia", "Poesia", "Poche righe, dette piano."),
     "citazioni": ("daCitazione", "daCitazione", "Parole di altri che mi sono rimaste addosso."),
-    "racconti": ("Racconti brevi", "Racconti", "Storie brevi, da leggere in un respiro."),
+    "racconti": ("Racconto breve", "Racconto", "Storie brevi, da leggere in un respiro."),
     "canzoni": ("daCanzone", "daCanzone", "Quello che ho scritto cantando sottovoce."),
 }
 LINE_SECTIONS = {"poesie", "canzoni"}  # qui ogni riga e' un verso
@@ -452,7 +452,7 @@ def page_section(k, posts):
     root = "../"
     name, _, opening = SECTIONS[k]
     items = [p for p in posts if k in p.cats]
-    desc = f"{opening} {plural(len(items), 'scritto', 'scritti')} in {name.lower()}."
+    desc = f"{opening} {plural(len(items), 'scritto', 'scritti')} nella categoria {name}."
     canon = f"{BASE_URL}{k}/"
     ld = [{"@context": "https://schema.org", "@type": "CollectionPage", "name": f"{name} | {SITE}", "url": canon, "inLanguage": "it", "description": desc}]
     cards = "".join(card_html(p, root) for p in items)
@@ -600,8 +600,8 @@ def main():
         write(f"scritti/{p.slug}/index.html", page_reader(p, posts))
     write("testi/index.html", f'''<!DOCTYPE html><html lang="it"><head><meta charset="utf-8">
 <meta http-equiv="refresh" content="0;url={BASE_PATH}pensieri/">
-<link rel="canonical" href="{BASE_URL}pensieri/"><title>Pensieri | {SITE}</title>
-</head><body><p>La pagina Testi si chiama ora <a href="{BASE_PATH}pensieri/">Pensieri</a>.</p></body></html>
+<link rel="canonical" href="{BASE_URL}pensieri/"><title>Pensiero | {SITE}</title>
+</head><body><p>La pagina Testi si chiama ora <a href="{BASE_PATH}pensieri/">Pensiero</a>.</p></body></html>
 ''')
     write("404.html", page_404())
     write("sitemap.xml", sitemap(posts))
