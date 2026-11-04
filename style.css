@@ -80,7 +80,7 @@ body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-ca
 .brand{display:flex;align-items:center;gap:9px;color:var(--fg);text-decoration:none;min-height:44px}
 .brand img{height:34px;width:auto;display:block}
 .cap{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-/* bottone Cerca: la lente ruota in X sulla pagina Cerca */
+/* Cerca: il pulsante si allarga in un campo; senza JS rimane un link alla pagina Cerca */
 .sbtn{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 16px;border:1px solid var(--dockline);border-radius:14px;background:var(--pink);color:var(--navy);text-decoration:none;cursor:pointer;font:600 .8rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 0 4px color-mix(in srgb,var(--fg) 9%,transparent);transition:box-shadow .25s,transform .15s}
 .sbtn:active{transform:scale(.96)}
 @media(hover:hover){.sbtn:hover{box-shadow:0 0 0 7px color-mix(in srgb,var(--pink) 22%,transparent)}.sbtn:hover .lens{transform:rotate(-14deg) scale(1.1)}}
@@ -92,6 +92,20 @@ body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-ca
 .sbtn[data-open] .lens{opacity:0;transform:rotate(90deg) scale(.4)}
 .sbtn[data-open] .x{opacity:1;transform:none}
 .sbtn[data-open] .lbl{max-width:0;margin:0;opacity:0}
+.tbar.searching .brand{opacity:0;pointer-events:none}
+.tbar .brand{transition:opacity .25s}
+.tbar.searching .sbtn{position:relative;z-index:2;padding:0}
+.search-pop{position:absolute;top:10px;right:18px;width:104px;z-index:1;pointer-events:none;visibility:hidden;transition:width .5s cubic-bezier(.2,.8,.2,1),visibility 0s .5s}
+.tbar.searching .search-pop{width:calc(100% - 36px);visibility:visible;pointer-events:auto;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.search-pop .search-field{height:44px;display:flex;align-items:center;border:1px solid var(--dockline);border-radius:14px;background:#123862;opacity:0;transition:opacity .2s}
+.tbar.searching .search-field{opacity:1}
+.search-pop .search-field:focus-within{border-color:var(--pink)}
+.search-pop input{width:100%;min-width:0;height:100%;padding:0 60px 0 16px;border:0;background:none;color:var(--fg);font:400 1rem Poppins,sans-serif;outline:0}
+.search-pop input::placeholder{color:var(--muted)}
+.search-pop input::-webkit-search-cancel-button{display:none}
+.search-pop .search-results{position:absolute;top:54px;right:0;width:min(640px,100%);max-height:calc(100vh - 78px);overflow:auto;padding:8px;border:1px solid var(--line);border-radius:16px;background:#123862;box-shadow:0 22px 40px -18px #000a;opacity:0;transform:translateY(-8px);transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1)}
+.tbar.searching .search-results{opacity:1;transform:none;transition-delay:.15s}
+@media(min-width:640px){.search-pop{top:10px;right:36px}.tbar.searching .search-pop{width:calc(100% - 72px)}}
 @media (min-width:640px){.tbar{padding:0 36px}}
 
 /* ── struttura pagina ── */
@@ -105,8 +119,7 @@ body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-ca
 .hero-h{font-family:"Instrument Serif",Poppins,sans-serif;font-weight:400;font-size:clamp(3rem,17vw,5.6rem);line-height:1;margin:0;display:flex;align-items:baseline;gap:.06em;text-shadow:0 0 70px color-mix(in oklab,var(--pink) 28%,transparent)}
 .hero-h .dot{width:.2em;height:.2em;flex:none;transform:translateY(-.02em)}
 .hero-sub{font-family:"Instrument Serif",Poppins,sans-serif;font-style:italic;font-weight:400;font-size:clamp(1.5rem,5.6vw,2.1rem);line-height:1.15;color:color-mix(in srgb,var(--fg) 88%,transparent);margin:.9rem 0 0}
-.hero-rule{display:flex;align-items:center;gap:12px;margin:26px 0 0}
-.hero-rule::before{content:"";width:44px;height:2px;border-radius:2px;background:var(--pink)}
+.hero-rule{margin:26px 0 0}
 .hero-rule .cap{color:color-mix(in srgb,var(--fg) 78%,transparent)}
 @media (min-width:640px){
   .hero{grid-template-columns:1fr 1.1fr;column-gap:64px;align-items:center}

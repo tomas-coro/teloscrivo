@@ -246,15 +246,13 @@
 
   $$('[data-slide]').forEach(button => button.addEventListener('click', () => $('.desk-phones').scrollBy({ left: Number(button.dataset.slide) * 147, behavior: reduced ? 'instant' : 'smooth' })));
 
-  // ── pagina Cerca: legge cerca.json e filtra mentre scrivi ──
-  const sp = $('[data-searchpage]');
-  if (sp) {
-    const input = $('input', sp), out = $('[data-results]', sp), root = sp.dataset.root;
+  // ── Cerca: stesso indice e stessi risultati nella pagina dedicata e nel campo espandibile ──
+  function initSearch(input, out, root, updateUrl = false) {
     let DATA = null;
     const row = p => `<li><a href="${root}${p.u}"><span class="cap cat">${esc(p.s)} · ${esc(p.d)}</span><b>${esc(p.t)}</b><small>${esc(p.x)}</small></a></li>`;
     const show = () => {
       const raw = input.value.trim(), q = norm(raw);
-      history.replaceState(null, '', q ? '?q=' + encodeURIComponent(raw) : location.pathname);
+      if (updateUrl) history.replaceState(null, '', q ? '?q=' + encodeURIComponent(raw) : location.pathname);
       if (!q) { out.innerHTML = '<span class="cap scount">Gli ultimi scritti</span><ul class="sres">' + DATA.slice(0, 4).map(row).join('') + '</ul>'; return; }
       const terms = q.split(/\s+/);
       const hits = DATA.filter(p => terms.every(t => p.h.includes(t)));
@@ -262,19 +260,56 @@
         ? `<span class="cap scount">${hits.length} ${hits.length === 1 ? 'risultato' : 'risultati'}</span><ul class="sres">${hits.map(row).join('')}</ul>`
         : `<p class="msg">Nessun risultato per «${esc(raw)}». Prova con una parola più semplice.</p>`;
     };
+    out.innerHTML = '<p class="msg">Caricamento degli scritti…</p>';
     fetch(root + 'cerca.json')
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(rows => {
         DATA = rows.map(p => Object.assign(p, { h: norm(p.t + ' ' + p.b + ' ' + p.s) }));
-        const q0 = new URLSearchParams(location.search).get('q');
-        if (q0) input.value = q0;
+        if (updateUrl) input.value = new URLSearchParams(location.search).get('q') || '';
         input.addEventListener('input', show);
         input.disabled = false;
         show();
-        input.focus({ preventScroll: true });
+        if (getComputedStyle(input).visibility === 'visible') input.focus({ preventScroll: true });
       })
       .catch(err => { // errore visibile, niente finta "nessun risultato"
         out.innerHTML = '<p class="msg err">La ricerca non si e\' caricata (' + esc(err.message) + '). Riprova tra poco o torna alla home.</p>';
       });
+  }
+  const sp = $('[data-searchpage]');
+  if (sp) initSearch($('input', sp), $('[data-results]', sp), sp.dataset.root, true);
+  const searchBtn = $('.tbar .sbtn:not([data-search-close])');
+  if (searchBtn && !sp) {
+    const bar = $('.tbar'), root = new URL(searchBtn.href).pathname.replace(/cerca\/$/, '');
+    const pop = document.createElement('div');
+    pop.className = 'search-pop';
+    pop.setAttribute('role', 'search');
+    pop.setAttribute('aria-label', 'Cerca negli scritti');
+    pop.innerHTML = '<div class="search-field"><input type="search" aria-label="Cerca tra gli scritti" placeholder="Cerca un titolo o una parola" disabled></div><div class="search-results" data-results aria-live="polite"></div>';
+    bar.appendChild(pop);
+    const input = $('input', pop), out = $('[data-results]', pop);
+    let loaded = false;
+    const close = (restoreFocus = true) => {
+      bar.classList.remove('searching'); searchBtn.removeAttribute('data-open');
+      $('.brand', bar).inert = false;
+      searchBtn.setAttribute('aria-label', 'Apri la ricerca'); searchBtn.setAttribute('aria-expanded', 'false');
+      input.blur(); if (restoreFocus) searchBtn.focus({ preventScroll: true });
+    };
+    searchBtn.setAttribute('aria-expanded', 'false');
+    searchBtn.addEventListener('click', e => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+      e.preventDefault();
+      if (bar.classList.contains('searching')) { close(); return; }
+      bar.classList.add('searching'); searchBtn.setAttribute('data-open', '');
+      $('.brand', bar).inert = true;
+      searchBtn.setAttribute('aria-label', 'Chiudi la ricerca'); searchBtn.setAttribute('aria-expanded', 'true');
+      if (!loaded) { loaded = true; initSearch(input, out, root); }
+      else input.focus({ preventScroll: true });
+    });
+    addEventListener('keydown', e => {
+      if (e.key === 'Escape' && bar.classList.contains('searching')) { e.preventDefault(); e.stopImmediatePropagation(); close(); }
+    }, true);
+    document.addEventListener('pointerdown', e => {
+      if (bar.classList.contains('searching') && !bar.contains(e.target)) close(false);
+    });
   }
 })();

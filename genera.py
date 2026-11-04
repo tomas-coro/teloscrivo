@@ -294,7 +294,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=7">
+<link rel="stylesheet" href="{root}style.css?v=8">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -317,7 +317,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=5" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=6" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
