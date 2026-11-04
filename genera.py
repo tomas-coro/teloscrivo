@@ -302,7 +302,7 @@ def page_home(posts):
     <article class="last">
       <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · {SECTIONS[newest.cat][0]} · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
       <div class="wbody"><p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p></div>
-      <div class="lf"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
+      <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
     </article>
   </section>
   <section class="sec" aria-labelledby="h-pick"><div class="sh"><span class="sn">01</span><h2 class="st" id="h-pick">Scegli cosa leggere</h2></div><div class="pick">{pick}</div></section>

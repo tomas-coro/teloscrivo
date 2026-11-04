@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aperture · teloscrivo</title>
+<style>
+@font-face{font-family:Fibonacci;src:url('../assets/fonts/fibonacci.ttf') format('truetype');font-display:swap}
+@font-face{font-family:Poppins;src:url('../assets/fonts/poppins-400.woff2') format('woff2');font-display:swap}
+:root{font-family:Poppins,Arial,sans-serif;color:#dbf2fc;background:#072d59}
+*{box-sizing:border-box}
+body{margin:0}
+button,a{font:inherit}
+.toolbar{position:fixed;z-index:10;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;max-width:calc(100% - 24px);padding:5px;border:1px solid #dbf2fc65;border-radius:40px;background:#072d59ee;box-shadow:0 8px 30px #072d59a8;white-space:nowrap}
+.toolbar button{border:0;border-radius:30px;padding:10px 13px;color:#dbf2fc;background:transparent;cursor:pointer;font-size:12px}
+.toolbar button[aria-current="true"]{background:#fd6e88;color:#072d59}
+.toolbar .replay{border-left:1px solid #dbf2fc65;border-radius:0;padding-left:13px}
+.toolbar button:focus-visible,.skip:focus-visible{outline:2px solid #fd6e88;outline-offset:2px}
+.frame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#072d59}
+.stage{position:fixed;z-index:3;inset:0;display:grid;place-items:center;overflow:hidden;background:#072d59;pointer-events:none}
+.skip{position:fixed;z-index:11;right:15px;bottom:70px;border:1px solid #dbf2fc88;border-radius:30px;padding:10px 17px;color:#dbf2fc;background:#072d59;cursor:pointer}
+.intro{position:relative;text-align:center;padding:24px}
+.mark{font-family:Fibonacci,serif;font-size:clamp(3.3rem,13vw,7.8rem);line-height:1;margin:0;font-weight:400;letter-spacing:-.045em}
+.mark span{color:#fd6e88}
+.sub{font-family:Fibonacci,serif;font-style:italic;font-size:clamp(1.3rem,4vw,2rem);margin:14px 0 0}
+.hint{font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-top:30px;color:#dbf2fcb0}
+/* A: la firma appare prima che si illumini la pagina */
+.v1 .mark{animation:write .85s .15s both;clip-path:inset(0 100% 0 0)}
+.v1 .mark span{animation:light .6s 1s both}
+.v1 .sub{animation:rise .7s 1.05s both}
+.v1 .stage{animation:vanish .75s 1.9s forwards}
+.v1 .frame{animation:fadein .85s 2s both}
+/* B: la luna diventa un'apertura verso la home */
+.v2 .stage{background:radial-gradient(circle at 50% 46%,#164573,#072d59 58%)}
+.v2 .moon{width:clamp(125px,28vw,240px);aspect-ratio:1;border-radius:50%;background:#dbf2fc;box-shadow:0 0 75px #fd6e8880,inset -38px 6px 0 #fd6e88;animation:moonrise 1s .2s both,moongone .5s 1.55s forwards}
+.v2 .sub{animation:rise .7s .75s both}
+.v2 .frame{z-index:4;clip-path:circle(0 at 50% 46%);animation:openmoon 1.25s 1.65s forwards}
+/* C: la finestra del blog si apre sulla pagina */
+.v3 .stage{background:#072d59}
+.v3 .window,.v4 .window{width:min(430px,calc(100vw - 44px));border:1px solid #dbf2fc6b;border-radius:17px;overflow:hidden;background:#183f6a;box-shadow:0 30px 90px #0006;animation:windowin .7s .15s both}
+.v3 .bar,.v4 .bar{display:flex;gap:6px;padding:14px;border-bottom:1px solid #dbf2fc3c}
+.v3 .bar i,.v4 .bar i{width:9px;height:9px;border-radius:50%;background:#dbf2fc50}.v3 .bar i:first-child,.v4 .bar i:first-child{background:#fd6e88}
+.v3 .content,.v4 .content{padding:35px 30px 45px;text-align:left}
+.v3 .content p{font:400 clamp(2.3rem,8vw,3.6rem)/1.1 Fibonacci,serif;margin:0}
+.v3 .content small{display:block;font-size:12px;margin-top:18px;color:#dbf2fcb0}
+.v3 .frame{z-index:4;clip-path:inset(50% 50% 50% 50% round 17px);animation:openwindow .95s 1.45s forwards}
+/* D: la firma prende forma nella finestra, che si apre sul blog */
+.v4 .content .mark{font-size:clamp(2.3rem,8vw,3.6rem);text-align:left;clip-path:inset(0 100% 0 0);animation:write .9s .8s both}
+.v4 .content .mark span{animation:light .5s 1.65s both}
+.v4 .content .sub{font-size:clamp(1.2rem,4vw,1.55rem);text-align:left;animation:rise .55s 1.85s both}
+.v4 .stage{pointer-events:none}
+.v4 .window{position:relative}
+.v4 .bar{align-items:center;padding:7px 12px}
+.v4 .fullscreen{width:11px;height:11px;padding:0;display:grid;place-items:center;border:0;border-radius:50%;background:#28c840;color:#145a29;cursor:pointer;pointer-events:auto}
+.v4 .fullscreen svg{width:8px;height:8px;opacity:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.v4 .fullscreen:hover svg,.v4 .fullscreen:focus-visible svg,.v4 .fullscreen.pressed svg{opacity:1}
+.v4 .fullscreen.pressed{background:#1da632;transform:scale(.85)}
+.v4 .pointer{position:absolute;z-index:2;top:10px;left:43px;width:21px;height:25px;pointer-events:none;filter:drop-shadow(1px 2px 2px #072d59);animation:cursorin .85s 2.45s both}
+.v4 .frame{z-index:2;opacity:0;pointer-events:none}
+.v4 .stage.opening .intro{padding:0}
+.v4 .stage.opening .window{width:100vw;height:100dvh;border-radius:0;transition:width 1s cubic-bezier(.2,.7,.1,1),height 1s cubic-bezier(.2,.7,.1,1),border-radius 1s}
+.v4 .stage.opening .content,.v4 .stage.opening .pointer{opacity:0;transition:opacity .25s}
+@keyframes write{to{clip-path:inset(0)}}
+@keyframes light{from{opacity:0;filter:blur(14px)}to{opacity:1;filter:blur(0)}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes vanish{to{opacity:0;visibility:hidden}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes moonrise{from{opacity:0;transform:scale(.68)}to{opacity:1;transform:scale(1)}}
+@keyframes moongone{to{transform:scale(.4);opacity:0}}
+@keyframes openmoon{to{clip-path:circle(150vmax at 50% 46%)}}
+@keyframes windowin{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes openwindow{to{clip-path:inset(0 0 0 0 round 0)}}
+@keyframes cursorin{from{opacity:0;transform:translate(70px,85px)}25%{opacity:1}to{opacity:1;transform:none}}
+@media(max-width:480px){.toolbar button{padding:10px 9px;font-size:11px}.toolbar .replay{padding-left:9px}}
+@media(prefers-reduced-motion:reduce){.stage{display:none!important}.frame{opacity:1!important;clip-path:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<nav class="toolbar" aria-label="Confronta le aperture">
+<button type="button" data-version="1">01 · Firma</button><button type="button" data-version="2">02 · Luna</button><button type="button" data-version="3">03 · Finestra</button><button type="button" data-version="4">04 · Mix</button><button type="button" class="replay" id="replay">Rivedi</button>
+</nav>
+<iframe class="frame" src="../index.html" title="Anteprima del sito teloscrivo"></iframe>
+<div class="stage" aria-hidden="true"><div class="intro" id="intro"></div></div>
+<button type="button" class="skip" id="skip">Salta l'apertura</button>
+<script>
+const views = [
+  '<h1 class="mark">teloscrivo<span>.</span></h1><p class="sub">la luna porta consiglio</p>',
+  '<div class="moon"></div><p class="sub">la luna porta consiglio</p>',
+  '<div class="window"><div class="bar"><i></i><i></i><i></i></div><div class="content"><p>teloscrivo<span style="color:#fd6e88">.</span></p><small>Un posto dove restano le parole.</small></div></div>',
+  '<div class="window"><div class="bar"><i></i><i></i><button class="fullscreen" type="button" aria-label="Apri a schermo intero"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 9V5h4m6 6v4h-4"/></svg></button></div><div class="content"><h1 class="mark">teloscrivo<span>.</span></h1><p class="sub">la luna porta consiglio</p></div><svg class="pointer" viewBox="0 0 24 28" aria-hidden="true"><path d="M2 2v21l5-5 4 8 4-2-4-8 8-1z" fill="#dbf2fc" stroke="#072d59" stroke-width="2"/></svg></div>'
+];
+const version = Math.min(4, Math.max(1, Number(new URLSearchParams(location.search).get('v')) || 1));
+const body = document.body, frame = document.querySelector('.frame'), stage = document.querySelector('.stage'), skip = document.querySelector('#skip');
+function start(v){
+  body.className = 'v' + v;
+  document.querySelector('#intro').innerHTML = views[v - 1];
+  document.querySelectorAll('[data-version]').forEach(b => b.setAttribute('aria-current', String(Number(b.dataset.version) === v)));
+  skip.hidden = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  skip.textContent = v === 4 ? 'Entra subito' : "Salta l'apertura";
+  stage.classList.remove('opening');
+  stage.setAttribute('aria-hidden', String(v !== 4));
+  stage.style.display = stage.style.opacity = stage.style.pointerEvents = stage.style.transition = frame.style.clipPath = frame.style.opacity = frame.style.pointerEvents = frame.style.transition = '';
+  frame.style.animation = stage.style.animation = 'none';
+  void frame.offsetWidth;
+  frame.style.animation = stage.style.animation = '';
+  clearTimeout(start.timer);
+  clearTimeout(start.openTimer);
+  clearTimeout(start.pressTimer);
+  if (v === 4 && !skip.hidden) start.timer = setTimeout(() => document.querySelector('.fullscreen')?.click(), 3400);
+  else if (v !== 4) start.timer = setTimeout(() => { skip.hidden = true; }, v === 2 ? 3100 : 2600);
+}
+function enter(){
+  if (!body.classList.contains('v4') || stage.classList.contains('opening') || stage.style.display === 'none') return;
+  clearTimeout(start.timer);
+  document.querySelector('.fullscreen').classList.add('pressed');
+  skip.hidden = true;
+  start.pressTimer = setTimeout(() => {
+    stage.classList.add('opening');
+    start.openTimer = setTimeout(() => {
+      frame.style.opacity = '1';
+      frame.style.pointerEvents = 'auto';
+      stage.style.transition = 'opacity .3s';
+      stage.style.opacity = '0';
+      start.openTimer = setTimeout(() => { stage.style.display = 'none'; }, 300);
+    }, 1000);
+  }, 160);
+}
+stage.addEventListener('click', e => { if (e.target.closest('.fullscreen')) enter(); });
+document.querySelectorAll('[data-version]').forEach(b => b.addEventListener('click', () => { history.replaceState(null, '', '?v=' + b.dataset.version); start(Number(b.dataset.version)); }));
+document.querySelector('#replay').addEventListener('click', () => start(Number(body.className.slice(1))));
+skip.addEventListener('click', () => { clearTimeout(start.timer); clearTimeout(start.pressTimer); clearTimeout(start.openTimer); frame.style.animation = 'none'; frame.style.clipPath = 'none'; frame.style.opacity = '1'; frame.style.pointerEvents = 'auto'; stage.style.display = 'none'; skip.hidden = true; });
+start(version);
+</script>
+</body>
+</html>

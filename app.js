@@ -85,7 +85,7 @@
   const latestEl = $('#latest');
   if (latestEl) {
     const LATEST = JSON.parse(latestEl.textContent);
-    const lk = $('[data-lk]'), lt = $('[data-lt]'), lx = $('[data-lx]'), pg = $('[data-pg]'), cta = $('[data-cta]');
+    const lk = $('[data-lk]'), lt = $('[data-lt]'), lx = $('[data-lx]'), pg = $('[data-pg]'), cta = $('[data-cta]'), pause = $('[data-pause]');
     const cr = '<i class="cr"></i>';
     // il testo intero e' sempre nel layout (parte invisibile): le righe non saltano mentre scrive
     const part = (str, n, showCr) => br(str.slice(0, n)) + (showCr ? cr : '') + '<span class="gh">' + br(str.slice(n)) + '</span>';
@@ -94,7 +94,12 @@
       lt.innerHTML = part(p.t, nt, nx <= 0);
       lx.innerHTML = part(p.x, nx, nx > 0);
     };
-    let tok = 0, auto = !reduced;
+    let tok = 0, auto = !reduced, current = 0;
+    if (!reduced && LATEST.length > 1) pause.hidden = false;
+    const syncPause = () => {
+      pause.textContent = auto ? '❚❚' : '▶';
+      pause.setAttribute('aria-label', auto ? 'Metti in pausa gli ultimi scritti' : 'Riprendi gli ultimi scritti');
+    };
     pg.innerHTML = LATEST.map((p, i) => `<button type="button" data-i="${i}" aria-label="Scritto ${i + 1}: ${esc(p.t)}" aria-pressed="false"></button>`).join('');
     function meta(p, i) {
       lk.textContent = (i === 0 ? 'Ultimo scritto' : 'Prima ancora') + ' · ' + p.k + ' · ' + p.d;
@@ -104,6 +109,7 @@
     function play(i) {
       const my = ++tok, p = LATEST[i], full = p.t.length + p.x.length;
       let n = 0;
+      current = i;
       meta(p, i);
       if (reduced) { draw(p, full); return; }
       const live = () => my === tok;
@@ -119,7 +125,13 @@
         else if (auto) setTimeout(erase, 3600); // se l'utente sceglie un pallino smette di girare da solo
       })();
     }
-    pg.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { auto = false; play(+b.dataset.i); } });
+    pg.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { auto = false; syncPause(); play(+b.dataset.i); } });
+    pause.addEventListener('click', () => {
+      auto = !auto;
+      syncPause();
+      if (auto) play(current);
+      else { ++tok; draw(LATEST[current], LATEST[current].t.length + LATEST[current].x.length); }
+    });
     if (LATEST.length > 1) play(0); else meta(LATEST[0], 0);
   }
 
