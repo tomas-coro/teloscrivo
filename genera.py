@@ -267,6 +267,8 @@ def entries_html(posts, root, newest=None, heading="h3"):
 def page_home(posts):
     root = ""
     newest = posts[0]
+    latest = [{"t": p.title, "k": SECTIONS[p.cat][0], "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
+    first = latest[0]
     windows = "".join(
         f'<article class="desk-window" data-cat="{p.cat}"><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
         f'<a href="{p.url}" data-preview><span class="desk-photo" role="img" aria-label="Segnaposto per la foto di {esc(p.title)}"></span>'
@@ -284,6 +286,7 @@ def page_home(posts):
                   f'<p>Le poesie e i testi, letti a voce.</p><div class="desk-phones">{cards}</div></section>')
     desc = "Poesie, testi, racconti brevi e testi di canzoni, da leggere scorrendo. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
+    latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
     body = f"""<body id="inizio">
 <div class="opening" data-opening role="dialog" aria-modal="true" aria-label="Apertura di teloscrivo" tabindex="-1" hidden>
   <div class="opening-window">
@@ -298,11 +301,12 @@ def page_home(posts):
     <div class="hero-l">
       <h1 class="hero-h">{SITE}<span class="dot" aria-hidden="true"></span></h1>
       <p class="hero-sub">la luna porta consiglio</p>
-      <p class="hero-rule"><span class="cap">Ultimo scritto · {esc(newest.title)}</span></p>
+      <p class="hero-rule"><span class="cap">Ultimo scritto il {newest.long_date()} · {plural(len(posts), "scritto", "scritti")}</span></p>
     </div>
-    <article class="desk-latest">
-      <div class="desk-bar"><i></i><i></i><i></i><span>ultimo scritto.txt</span></div>
-      <a href="{newest.url}"><strong>{esc(newest.title)}</strong><small>{esc(newest.excerpt).replace(chr(10), '<br>')}</small></a>
+    <article class="last">
+      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · {SECTIONS[newest.cat][0]} · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
+      <div class="wbody"><p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p></div>
+      <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
     </article>
   </section>
   <section class="desk-section" aria-labelledby="h-all"><h2 id="h-all">Gli scritti</h2><p>Le finestre sulla scrivania, due alla volta.</p>
@@ -315,6 +319,7 @@ def page_home(posts):
   <div class="desk-reading"><div class="desk-photo" role="img" aria-label="Segnaposto della foto dello scritto"></div><div class="desk-meta" data-reader-meta></div>
   <h2 id="desk-reader-title"></h2><p data-reader-excerpt></p><a class="cta" data-reader-link href="{newest.url}">Leggi il testo completo ↗</a>
   <p class="desk-disclaimer">Questa è un'anteprima. Il testo completo si legge nella pagina dello scritto.</p></div></dialog>
+<script type="application/json" id="latest">{latest_json}</script>
 {tail_html(root)}"""
     return head_html(root, f"{SITE} · poesie, testi e racconti brevi", desc, BASE_URL, jsonld=ld) + body
 

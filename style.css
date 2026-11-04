@@ -208,14 +208,11 @@ body[data-cat="testi"]{--sx:14%}body[data-cat="poesie"]{--sx:38%}body[data-cat="
 /* ── home Scrivania: finestre e anteprima ── */
 body:has(.desk-shelf) .wrapin{max-width:1000px}
 body:has(.desk-shelf) .hero{margin-bottom:68px}
-.desk-latest,.desk-window{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#123862}
+.desk-window{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#123862}
 .desk-bar{display:flex;align-items:center;gap:6px;min-height:39px;padding:7px 15px;border-bottom:1px solid var(--line);background:#ffffff0a}
 .desk-bar i{width:9px;height:9px;flex:none;background:var(--line);border-radius:50%}
 .desk-bar i:first-child{background:var(--pink)}
 .desk-bar span{margin:auto;color:var(--muted);font:600 .72rem 'Roboto Condensed',sans-serif}
-.desk-latest a{display:block;padding:24px 28px;text-decoration:none}
-.desk-latest strong{display:block;font:400 2.4rem Fibonacci,Poppins,sans-serif}
-.desk-latest small{display:block;margin-top:12px;color:var(--fg);font-size:.94rem;line-height:1.7}
 .desk-section h2,.desk-videos h2{font:400 clamp(2.4rem,6vw,3.5rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0}
 .desk-section>p{color:var(--muted);font-size:.88rem;margin:5px 0 20px}
 .desk-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:23px}
