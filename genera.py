@@ -178,13 +178,9 @@ def load_posts():
 
 # ═══ PEZZI DI PAGINA ═══
 def nav_html(root, current=None):
-    links = "".join(
-        f'<a href="{root}{k}/"{" aria-current=\"page\"" if k == current else ""}>{short}</a>'
-        for k, (_, short, _) in SECTIONS.items()
-    )
     cur = ' aria-current="page"' if current == "cerca" else ""
-    return (f'<nav class="mn" aria-label="Sezioni">{links}'
-            f'<a href="{root}cerca/" data-search aria-label="Cerca"{cur}>{ICON_SEARCH}<span>Cerca</span></a></nav>')
+    return (f'<nav class="mn" aria-label="Ricerca">'
+            f'<a href="{root}cerca/" data-search{cur}>{ICON_SEARCH}<span>Cerca</span></a></nav>')
 
 
 def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=False):
@@ -215,7 +211,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/fibonacci.ttf" as="font" type="font/ttf" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=2">
+<link rel="stylesheet" href="{root}style.css?v=3">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -370,6 +366,7 @@ def page_reader(p, posts):
   <div class="rbody">{p.body_html()}</div>
   <footer class="rend"><span class="cap">Leggi anche</span>{rel_html}{spotify}
     <div class="sh2"><button type="button" class="rbtn" data-share hidden>Condividi</button><a class="rbtn" href="{root}">Torna alla home</a></div>
+    <nav class="reader-links" aria-label="Esplora gli scritti">{''.join(f'<a href="{root}{k}/">{esc(short)}</a>' for k, (_, short, _) in SECTIONS.items())}<a href="{root}cerca/">Cerca</a></nav>
   </footer>
 </article></main>
 {tail_html(root)}"""
@@ -385,7 +382,7 @@ def page_search():
   <header class="phead"><span class="cap">Cerca</span><h1>Cerca</h1><p>Un titolo, una parola, un verso.</p></header>
   <div data-searchpage data-root="{root}">
     <label class="qbox"><span class="sr">Cerca tra i testi</span>{ICON_SEARCH}<input type="search" placeholder="Cerca tra i testi" autocomplete="off" disabled></label>
-    <div data-results aria-live="polite"><noscript><p class="msg">La ricerca ha bisogno di JavaScript. Puoi comunque sfogliare le sezioni dal menu.</p></noscript></div>
+    <div data-results aria-live="polite"><noscript><p class="msg">La ricerca ha bisogno di JavaScript. Puoi comunque sfogliare le sezioni dalla home.</p></noscript></div>
   </div>
   {foot_html(root)}
 </div></main>

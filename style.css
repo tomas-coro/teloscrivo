@@ -79,19 +79,15 @@ body[data-cat="testi"]{--sx:14%}body[data-cat="poesie"]{--sx:38%}body[data-cat="
 .brand{display:flex;align-items:center;gap:9px;color:var(--fg);text-decoration:none;min-height:44px}
 .brand img{height:34px;width:auto;display:block}
 .cap{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.mn{flex:1 1 0;min-width:0;margin-left:14px;display:flex;justify-content:space-between;align-items:center;padding:3px;border:1px solid var(--dockline);border-radius:14px;background:color-mix(in srgb,var(--fg) 9%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mn{margin-left:auto;display:flex;align-items:center;padding:3px;border:1px solid var(--dockline);border-radius:14px;background:color-mix(in srgb,var(--fg) 9%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .mn a{flex:1 1 auto;min-width:0;min-height:38px;padding:0 2px;border-radius:10px;font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;color:color-mix(in srgb,var(--fg) 92%,transparent);display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .2s,color .2s}
 .mn a:hover{background:color-mix(in srgb,var(--fg) 14%,transparent);color:var(--fg)}
 .mn a[aria-current="page"]{background:var(--pink);color:var(--navy)}
-.mn a[data-search]{flex:0 0 38px}
-.mn a[data-search] span{display:none}
+.mn a[data-search]{padding:0 14px;font-size:.8rem;letter-spacing:.08em}
 .mn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 @media (min-width:640px){
   .tbar{padding:0 36px}
-  .mn{flex:none;margin:0 0 0 auto;gap:4px;padding:4px}
-  .mn a{flex:none;padding:0 18px;font-size:.8rem;letter-spacing:.12em}
-  .mn a[data-search]{flex:none}
-  .mn a[data-search] span{display:inline}
+  .mn a[data-search]{padding:0 18px;letter-spacing:.12em}
 }
 
 /* ── struttura pagina ── */
@@ -215,9 +211,10 @@ body:has(.desk-shelf) .hero{margin-bottom:68px}
 .desk-bar span{margin:auto;color:var(--muted);font:600 .72rem 'Roboto Condensed',sans-serif}
 .desk-section h2,.desk-videos h2{font:400 clamp(2.4rem,6vw,3.5rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0}
 .desk-section>p{color:var(--muted);font-size:.88rem;margin:5px 0 20px}
-.desk-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:23px}
-.desk-filters a{display:inline-flex;align-items:center;min-height:44px;padding:9px 16px;border:1px solid var(--line);border-radius:99px;text-decoration:none;font-size:.82rem}
-.desk-filters a:hover{border-color:var(--pink)}
+.desk-filters,.reader-links{display:flex;gap:8px;flex-wrap:wrap}
+.desk-filters{margin-bottom:23px}
+.desk-filters a,.reader-links a{display:inline-flex;align-items:center;min-height:44px;padding:9px 16px;border:1px solid var(--line);border-radius:99px;text-decoration:none;font-size:.82rem}
+.desk-filters a:hover,.reader-links a:hover{border-color:var(--pink)}
 .desk-shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .desk-window{min-width:0;display:flex;flex-direction:column}
 .desk-window>a{display:flex;flex-direction:column;flex:1;color:inherit;text-decoration:none}
@@ -316,6 +313,7 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .ra small{color:var(--muted);font-size:.8rem;font-weight:300}
 .rend .cta{margin-top:22px}
 .sh2{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.reader-links{margin-top:30px}
 @media (min-width:640px){.rbar{padding:0 28px}.rsc{padding:64px 36px 120px}}
 
 /* ── avviso (condividi) ── */
