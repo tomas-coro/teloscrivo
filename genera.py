@@ -292,6 +292,14 @@ def page_home(posts):
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
     latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
     body = f"""<body id="inizio">
+<div class="opening" data-opening role="dialog" aria-modal="true" aria-label="Apertura di teloscrivo" tabindex="-1" hidden>
+  <div class="opening-window">
+    <div class="opening-bar"><i></i><i></i><button type="button" class="opening-max" data-opening-max aria-label="Apri a schermo intero"></button></div>
+    <div class="opening-content"><p class="opening-sign">teloscrivo<span>.</span></p><p class="opening-sub">la luna porta consiglio</p></div>
+    <svg class="opening-pointer" viewBox="0 0 24 28" aria-hidden="true"><path d="M2 2v21l5-5 4 8 4-2-4-8 8-1z" fill="#DBF2FC" stroke="#072D59" stroke-width="2"/></svg>
+  </div>
+  <button type="button" class="opening-skip" data-opening-skip>Salta l'apertura</button>
+</div>
 {top_html(root)}<main id="contenuto" class="page"><div class="wrapin">
   <section class="hero">
     <div class="hero-l">

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gli scritti · proposta blog | teloscrivo</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+body{background:var(--navy)}
+.preview{max-width:880px;margin:auto;padding:50px 20px 100px}
+.preview-note{padding-bottom:32px;border-bottom:1px solid var(--line);color:var(--muted);font-size:.84rem}
+.preview-note strong{color:var(--fg);font-weight:500}
+.blog-head{margin:75px 0 32px}
+.blog-head h1{font:400 clamp(2.8rem,9vw,5rem)/1 Fibonacci,Poppins,sans-serif;margin:0 0 14px}
+.blog-head p{max-width:54ch;margin:0;color:var(--muted);font-size:.95rem}
+.blog-cats{display:flex;gap:9px;flex-wrap:wrap;margin:26px 0 36px}
+.blog-cats a{padding:9px 16px;border:1px solid var(--line);border-radius:99px;text-decoration:none;font-size:.84rem;min-height:44px;display:inline-flex;align-items:center}
+.blog-cats a:hover{border-color:var(--pink)}
+.blog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.post{display:flex;flex-direction:column;min-height:255px;padding:28px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--fg) 5%,transparent);color:var(--fg);text-decoration:none;transition:background .2s,border-color .2s}
+.post:hover{background:var(--soft);border-color:var(--pink)}
+.post:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.post-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.75rem}
+.tag{padding:4px 10px;border:1px solid color-mix(in srgb,var(--pink) 50%,transparent);border-radius:99px;color:var(--pink);font-weight:500}
+.post h2{font:400 clamp(1.85rem,4vw,2.6rem)/1.1 Fibonacci,Poppins,sans-serif;margin:22px 0 12px}
+.post p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.6;max-width:48ch}
+.post-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:22px;font-size:.8rem;color:var(--fg)}
+.post-foot span:last-child{font-size:1.3rem;color:var(--pink)}
+@media(max-width:620px){.preview{padding:30px 18px 70px}.blog-head{margin:48px 0 28px}.blog-grid{grid-template-columns:1fr}.post{min-height:220px;padding:22px}}
+</style>
+</head>
+<body><main class="preview">
+<p class="preview-note"><strong>Prova, non home pubblicata.</strong> Qui immaginiamo di avere solo Testi e Poesie: nessuna card o filtro per Racconti e Canzoni. I titoli sotto sono quelli di prova già presenti nel progetto, non i tuoi nuovi testi.</p>
+<header class="blog-head"><h1>Gli scritti<span style="color:var(--pink)">.</span></h1><p>Apri quello che ti incuriosisce. Se cerchi qualcosa in particolare, scegli una categoria.</p></header>
+<nav class="blog-cats" aria-label="Categorie disponibili"><a href="../testi/">Testi</a><a href="../poesie/">Poesie</a></nav>
+<section aria-label="Scritti recenti" class="blog-grid">
+<a class="post" href="../scritti/sale/"><div class="post-meta"><span class="tag">Poesie</span><time datetime="2026-11-03">3 novembre 2026</time></div><h2>Sale</h2><p>Il mare mi ha insegnato a restare, anche quando la riva dice di andare.</p><span class="post-foot"><span>Leggi la poesia</span><span aria-hidden="true">↗</span></span></a>
+<a class="post" href="../scritti/lettera-a-chi-resta/"><div class="post-meta"><span class="tag">Testi</span><time datetime="2026-11-01">1 novembre 2026</time></div><h2>Lettera a chi resta</h2><p>Non ti chiedo di capire. Ti chiedo di lasciare la luce accesa in corridoio.</p><span class="post-foot"><span>Leggi il testo</span><span aria-hidden="true">↗</span></span></a>
+<a class="post" href="../scritti/casa/"><div class="post-meta"><span class="tag">Poesie</span><time datetime="2026-10-25">25 ottobre 2026</time></div><h2>Casa</h2><p>Casa non è un posto. È il rumore delle chiavi che ti aspetta.</p><span class="post-foot"><span>Leggi la poesia</span><span aria-hidden="true">↗</span></span></a>
+<a class="post" href="../scritti/piove-da-giorni/"><div class="post-meta"><span class="tag">Testi</span><time datetime="2026-10-22">22 ottobre 2026</time></div><h2>Piove da giorni</h2><p>Le giornate grigie hanno un vantaggio: non fingono di essere altro.</p><span class="post-foot"><span>Leggi il testo</span><span aria-hidden="true">↗</span></span></a>
+</section>
+</main></body></html>

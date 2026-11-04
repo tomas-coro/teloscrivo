@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scegli cosa leggere · tre proposte | teloscrivo</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+/* Pagina di confronto: le regole sono locali, non modificano la home. */
+body{background:#072D59}
+.proposals{max-width:920px;margin:auto;padding:48px 22px 110px}
+.intro{max-width:670px;margin-bottom:64px}
+.intro h1{font:400 clamp(3rem,9vw,5rem)/1 Fibonacci,Poppins,sans-serif;margin:12px 0 18px}
+.intro p{color:var(--muted);max-width:58ch}
+.compare{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.compare a{border:1px solid var(--line);border-radius:99px;padding:10px 17px;text-decoration:none;font-size:.86rem}
+.compare a:hover{border-color:var(--pink)}
+.proposal{padding:48px 0 65px;border-top:1px solid var(--line);scroll-margin-top:20px}
+.proposal-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.proposal-head .sn{font-size:.86rem}
+.proposal-head h2{font:400 clamp(2rem,6vw,3rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0}
+.note{margin:0 0 28px;color:var(--muted);font-size:.87rem}
+.section-title{font:400 clamp(1.8rem,5vw,2.6rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0 0 22px}
+.link-card{color:inherit;text-decoration:none;min-width:0}
+.link-card:focus-visible{outline:2px solid var(--pink);outline-offset:4px}
+.link-card:hover .latest,.link-card:hover .go{color:var(--pink)}
+/* A: quattro porte, testo breve che distingue i generi. */
+.a-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.a-grid .link-card{display:flex;flex-direction:column;min-height:245px;padding:20px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--seal) 5%,transparent)}
+.a-grid .label{font:400 1.65rem/1.1 Fibonacci,Poppins,sans-serif;margin:18px 0 12px}
+.a-grid .description{font-size:.82rem;line-height:1.5;color:var(--muted)}
+.a-grid .latest{margin-top:auto;padding-top:24px;font-size:.8rem;line-height:1.4;transition:color .2s}
+.a-grid .count{font-size:.7rem;color:var(--pink)}
+.a-grid .ic{width:40px;height:40px}
+.a-grid .ic svg{width:22px;height:22px}
+/* B: indice di un libro. Il titolo dell'ultimo scritto diventa protagonista. */
+.b-list{border-top:1px solid var(--line)}
+.b-list .link-card{display:grid;grid-template-columns:165px minmax(0,1fr) auto;align-items:center;gap:26px;padding:20px 4px;border-bottom:1px solid var(--line)}
+.b-list .genre{font:400 1.6rem/1.1 Fibonacci,Poppins,sans-serif}
+.b-list .reading{display:flex;flex-direction:column;gap:4px;min-width:0}
+.b-list .latest{font-size:1.05rem;transition:color .2s}
+.b-list .description{font-size:.79rem;color:var(--muted)}
+.b-list .go{font-size:1.4rem;transition:color .2s}
+/* C: la scelta per tipo di lettura, non per numero di pezzi. */
+.c-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.c-grid .link-card{display:flex;flex-direction:column;min-height:200px;padding:24px;border:1px solid var(--line);border-radius:6px;background:color-mix(in srgb,var(--navy) 70%,var(--seal))}
+.c-grid .link-card:nth-child(2){background:color-mix(in srgb,var(--navy) 80%,var(--pink))}
+.c-grid .link-card:nth-child(3){background:color-mix(in srgb,var(--navy) 88%,var(--seal))}
+.c-grid .link-card:nth-child(4){background:color-mix(in srgb,var(--navy) 84%,var(--pink))}
+.c-grid .label{font:400 clamp(1.7rem,3vw,2.5rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0 0 10px}
+.c-grid .description{font-size:.88rem;color:var(--seal)}
+.c-grid .latest{font-size:.8rem;margin-top:auto;padding-top:25px;color:var(--muted);transition:color .2s}
+.c-grid .go{align-self:flex-end;font-size:1.3rem;transition:color .2s}
+@media(max-width:740px){.a-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.a-grid .link-card{min-height:215px}.b-list .link-card{grid-template-columns:130px minmax(0,1fr) auto;gap:12px}}
+@media(max-width:480px){.proposals{padding:32px 18px 80px}.intro{margin-bottom:45px}.proposal{padding:38px 0 54px}.a-grid .link-card{padding:15px;min-height:220px}.a-grid .label{font-size:1.4rem}.b-list .link-card{grid-template-columns:1fr auto;gap:8px}.b-list .genre{grid-column:1/-1;font-size:1.35rem}.b-list .reading{grid-column:1}.b-list .go{grid-column:2}.c-grid{grid-template-columns:1fr}.c-grid .link-card{min-height:170px}}
+</style>
+</head>
+<body>
+<main class="proposals">
+<header class="intro"><span class="cap">Teloscrivo · prove per la home</span><h1>Scegli cosa leggere<span style="color:var(--pink)">.</span></h1><p>Tre modi diversi di presentare le stesse quattro sezioni. Titoli e quantità sono quelli del sito attuale; le frasi descrittive sono proposte da valutare, non testi pubblicati.</p><nav class="compare" aria-label="Vai alla proposta"><a href="#a">A · Tessere</a><a href="#b">B · Indice</a><a href="#c">C · Atmosfere</a></nav></header>
+<section class="proposal" id="a" aria-labelledby="title-a"><div class="proposal-head"><span class="sn">A</span><h2 id="title-a">Tessere più chiare</h2></div><p class="note">La disposizione attuale, ma meno etichette e una frase che spiega davvero cosa trovi.</p><h3 class="section-title">Scegli cosa leggere</h3><div class="a-grid">
+<a class="link-card" href="../testi/"><span class="ic ic-testi" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6.5 3h7.5l4 4v13.5h-11.5zM14 3v4h4M9.5 12h6M9.5 15.5h4"/></svg></span><span class="label">Testi</span><span class="description">Lettere e pensieri a cui serve più spazio.</span><span class="latest"><span class="count">2 scritti · ultimo</span><br>Lettera a chi resta</span></a>
+<a class="link-card" href="../poesie/"><span class="ic ic-poesie" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19.5 4.5c-6.5-.5-11 3-12 9.5L5 19.5l.8.7 3.2-1.8c6.4-1 10-5.5 10.5-12.9zM8 17l7-7"/></svg></span><span class="label">Poesie</span><span class="description">Immagini e pensieri in poche righe.</span><span class="latest"><span class="count">3 scritti · ultimo</span><br>Sale</span></a>
+<a class="link-card" href="../racconti/"><span class="ic ic-racconti" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6c3-1.2 6-.8 9 1.2 3-2 6-2.4 9-1.2v12c-3-1.2-6-.8-9 1.2-3-2-6-2.4-9-1.2zM12 7.2v12"/></svg></span><span class="label">Racconti brevi</span><span class="description">Piccole storie, con un inizio e una fine.</span><span class="latest"><span class="count">2 scritti · ultimo</span><br>Il treno delle 6:40</span></a>
+<a class="link-card" href="../canzoni/"><span class="ic ic-canzoni" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5M9.5 9l10-2"/></svg></span><span class="label">Dalle canzoni</span><span class="description">Parole nate per essere cantate.</span><span class="latest"><span class="count">2 scritti · ultimo</span><br>Quello che non ti ho detto</span></a>
+</div></section>
+<section class="proposal" id="b" aria-labelledby="title-b"><div class="proposal-head"><span class="sn">B</span><h2 id="title-b">Indice di lettura</h2></div><p class="note">Meno riquadri, più spazio ai titoli degli scritti. Ogni riga apre la sezione, non il singolo scritto.</p><h3 class="section-title">Scegli cosa leggere</h3><div class="b-list">
+<a class="link-card" href="../testi/"><span class="genre">Testi</span><span class="reading"><span class="latest">Lettera a chi resta</span><span class="description">Lettere e pensieri a cui serve più spazio · 2 scritti</span></span><span class="go" aria-hidden="true">↗</span></a>
+<a class="link-card" href="../poesie/"><span class="genre">Poesie</span><span class="reading"><span class="latest">Sale</span><span class="description">Immagini e pensieri in poche righe · 3 scritti</span></span><span class="go" aria-hidden="true">↗</span></a>
+<a class="link-card" href="../racconti/"><span class="genre">Racconti brevi</span><span class="reading"><span class="latest">Il treno delle 6:40</span><span class="description">Piccole storie, con un inizio e una fine · 2 scritti</span></span><span class="go" aria-hidden="true">↗</span></a>
+<a class="link-card" href="../canzoni/"><span class="genre">Dalle canzoni</span><span class="reading"><span class="latest">Quello che non ti ho detto</span><span class="description">Parole nate per essere cantate · 2 scritti</span></span><span class="go" aria-hidden="true">↗</span></a>
+</div></section>
+<section class="proposal" id="c" aria-labelledby="title-c"><div class="proposal-head"><span class="sn">C</span><h2 id="title-c">Atmosfere</h2></div><p class="note">Le quattro categorie come inviti alla lettura. Più emozionale, meno da catalogo.</p><h3 class="section-title">Scegli cosa leggere</h3><div class="c-grid">
+<a class="link-card" href="../testi/"><span class="label">Per restare un po’</span><span class="description">Testi · Lettere e pensieri a cui serve più spazio.</span><span class="latest">Ultimo: Lettera a chi resta</span><span class="go" aria-hidden="true">↗</span></a>
+<a class="link-card" href="../poesie/"><span class="label">Per leggere piano</span><span class="description">Poesie · Immagini e pensieri in poche righe.</span><span class="latest">Ultimo: Sale</span><span class="go" aria-hidden="true">↗</span></a>
+<a class="link-card" href="../racconti/"><span class="label">Per entrare in una storia</span><span class="description">Racconti brevi · Piccole storie, con un inizio e una fine.</span><span class="latest">Ultimo: Il treno delle 6:40</span><span class="go" aria-hidden="true">↗</span></a>
+<a class="link-card" href="../canzoni/"><span class="label">Per sentire le parole</span><span class="description">Dalle canzoni · Parole nate per essere cantate.</span><span class="latest">Ultimo: Quello che non ti ho detto</span><span class="go" aria-hidden="true">↗</span></a>
+</div></section>
+<p class="note">Bozze: nessuna proposta è stata applicata alla home.</p>
+</main>
+</body>
+</html>

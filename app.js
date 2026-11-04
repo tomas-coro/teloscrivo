@@ -81,6 +81,50 @@
     } catch (_) { /* referrer non leggibile: resta il link normale */ }
   });
 
+  // ── apertura della home: una volta per scheda, senza bloccare chi riduce il movimento ──
+  const opening = $('[data-opening]');
+  if (opening && !reduced) {
+    let seen = false;
+    try { seen = sessionStorage.getItem('teloscrivo-opening') === '1'; sessionStorage.setItem('teloscrivo-opening', '1'); } catch (_) { /* storage disabilitato: mostra comunque l'apertura */ }
+    if (!seen) {
+      const max = $('[data-opening-max]', opening), skip = $('[data-opening-skip]', opening);
+      const content = $('#contenuto'), header = $('.tbar'), skipLink = $('.skip');
+      let autoTimer, pressTimer, expandTimer, endTimer;
+      function finish(manual = false) {
+        clearTimeout(autoTimer); clearTimeout(pressTimer); clearTimeout(expandTimer); clearTimeout(endTimer);
+        const focused = opening.contains(document.activeElement);
+        opening.hidden = true;
+        document.body.style.overflow = '';
+        content.inert = header.inert = skipLink.inert = false;
+        if (focused) {
+          if (manual) $('.brand').focus({ preventScroll: true });
+          else opening.blur();
+        }
+      }
+      function expand() {
+        if (max.classList.contains('pressed')) return;
+        clearTimeout(autoTimer);
+        opening.classList.add('clicked');
+        max.classList.add('pressed');
+        skip.hidden = true;
+        pressTimer = setTimeout(() => {
+          opening.classList.add('expanding');
+          expandTimer = setTimeout(() => {
+            opening.classList.add('leaving');
+            endTimer = setTimeout(finish, 300);
+          }, 1000);
+        }, 160);
+      }
+      opening.hidden = false;
+      document.body.style.overflow = 'hidden';
+      content.inert = header.inert = skipLink.inert = true;
+      opening.focus({ preventScroll: true });
+      max.addEventListener('click', expand);
+      skip.addEventListener('click', () => finish(true));
+      autoTimer = setTimeout(() => max.click(), 3400);
+    }
+  }
+
   // ── home: il blocco che si scrive da solo, dal piu' recente ──
   const latestEl = $('#latest');
   if (latestEl) {

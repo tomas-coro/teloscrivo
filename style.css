@@ -38,6 +38,33 @@ ul{list-style:none;margin:0;padding:0}
 .skip{position:absolute;left:12px;top:-60px;z-index:50;padding:10px 14px;border-radius:10px;background:var(--pink);color:var(--navy);font-weight:600;text-decoration:none}
 .skip:focus{top:12px}
 
+/* ── apertura della home: il terzo controllo della finestra la porta a schermo intero ── */
+.opening{position:fixed;inset:0;z-index:40;display:grid;place-items:center;overflow:hidden;background:var(--navy);transition:opacity .3s}
+.opening.leaving{opacity:0}
+.opening:focus{outline:none}
+.opening-window{position:relative;width:min(430px,calc(100vw - 44px));border:1px solid color-mix(in srgb,var(--seal) 42%,transparent);border-radius:17px;overflow:hidden;background:#183f6a;box-shadow:0 30px 90px #0006;animation:opening-in .7s .15s both}
+.opening-bar{display:flex;align-items:center;gap:6px;padding:7px 12px;border-bottom:1px solid var(--line)}
+.opening-bar i,.opening-max{width:11px;height:11px;border-radius:50%;flex:none}
+.opening-bar i{background:var(--line)}
+.opening-bar i:first-child{background:var(--pink)}
+.opening-max{padding:0;border:0;background:#28c840;cursor:pointer}
+.opening-max.pressed{background:#1da632;transform:scale(.85)}
+.opening-content{padding:35px 30px 45px}
+.opening-sign{font:400 clamp(2.3rem,8vw,3.6rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0;clip-path:inset(0 100% 0 0);animation:opening-write .9s .8s both}
+.opening-sign span{color:var(--pink);animation:opening-dot .5s 1.65s both}
+.opening-sub{font:italic 400 clamp(1.2rem,4vw,1.55rem)/1.3 Fibonacci,Poppins,sans-serif;margin:14px 0 0;animation:opening-rise .55s 1.85s both}
+.opening-pointer{position:absolute;top:10px;left:49px;width:21px;height:25px;pointer-events:none;filter:drop-shadow(1px 2px 2px var(--navy));animation:opening-cursor 1s 2.25s cubic-bezier(.25,.65,.2,1) both}
+.opening.clicked .opening-pointer{animation:none;opacity:0}
+.opening-skip{position:absolute;right:15px;bottom:15px;padding:10px 17px;border:1px solid color-mix(in srgb,var(--seal) 53%,transparent);border-radius:30px;background:var(--navy);color:var(--seal);cursor:pointer}
+.opening.expanding .opening-window{width:100vw;height:100dvh;border-radius:0;transition:width 1s cubic-bezier(.2,.7,.1,1),height 1s cubic-bezier(.2,.7,.1,1),border-radius 1s}
+.opening.expanding .opening-content,.opening.expanding .opening-pointer{opacity:0;transition:opacity .25s}
+@keyframes opening-in{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes opening-write{to{clip-path:inset(0)}}
+@keyframes opening-dot{from{opacity:0;filter:blur(14px)}to{opacity:1;filter:blur(0)}}
+@keyframes opening-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes opening-cursor{from{opacity:0;transform:translate(110px,90px)}20%{opacity:1}75%{transform:translate(14px,6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.opening{display:none!important}}
+
 /* ── cielo: le tre tinte fuse. Il rosa si sposta in basso secondo la sezione (--sx) ── */
 .sky{position:fixed;inset:0;z-index:0;pointer-events:none;background:
   radial-gradient(38% 34% at 74% 22%,color-mix(in oklab,var(--seal) 15%,transparent),transparent 72%),
