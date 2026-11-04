@@ -54,7 +54,9 @@ ul{list-style:none;margin:0;padding:0}
 .opening-sub{font:italic 400 clamp(1.2rem,4vw,1.55rem)/1.3 Fibonacci,Poppins,sans-serif;margin:14px 0 0;animation:opening-rise .55s 1.85s both}
 .opening-pointer{position:absolute;top:10px;left:49px;width:21px;height:25px;pointer-events:none;filter:drop-shadow(1px 2px 2px var(--navy));animation:opening-cursor 1s 2.25s cubic-bezier(.25,.65,.2,1) both}
 .opening.clicked .opening-pointer{animation:none;opacity:0}
-.opening-skip{position:absolute;right:15px;bottom:15px;padding:10px 17px;border:1px solid color-mix(in srgb,var(--seal) 53%,transparent);border-radius:30px;background:var(--navy);color:var(--seal);cursor:pointer}
+.opening-skip{position:absolute;right:15px;bottom:15px;padding:10px 17px;border:1px solid color-mix(in srgb,var(--seal) 40%,transparent);border-radius:30px;background:transparent;color:var(--seal);font:inherit;font-size:.82rem;cursor:pointer;animation:opening-rise .7s 1.2s cubic-bezier(.2,.8,.2,1) both;transition:background .25s,border-color .25s,color .25s}
+.opening-skip:hover{background:color-mix(in srgb,var(--seal) 14%,transparent);border-color:var(--seal)}
+.opening-skip:active{transform:scale(.97)}
 .opening.expanding .opening-window{width:100vw;height:100dvh;border-radius:0;transition:width 1s cubic-bezier(.2,.7,.1,1),height 1s cubic-bezier(.2,.7,.1,1),border-radius 1s}
 .opening.expanding .opening-content,.opening.expanding .opening-pointer{opacity:0;transition:opacity .25s}
 @keyframes opening-in{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
@@ -79,8 +81,9 @@ body[data-cat="testi"]{--sx:14%}body[data-cat="poesie"]{--sx:38%}body[data-cat="
 .brand img{height:34px;width:auto;display:block}
 .cap{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 /* bottone Cerca: la lente ruota in X sulla pagina Cerca */
-.sbtn{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 16px;border:1px solid var(--dockline);border-radius:14px;background:var(--pink);color:var(--navy);text-decoration:none;cursor:pointer;font:600 .8rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 0 4px color-mix(in srgb,var(--fg) 9%,transparent);transition:padding .25s,transform .15s}
+.sbtn{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0 16px;border:1px solid var(--dockline);border-radius:14px;background:var(--pink);color:var(--navy);text-decoration:none;cursor:pointer;font:600 .8rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;box-shadow:0 0 0 4px color-mix(in srgb,var(--fg) 9%,transparent);transition:box-shadow .25s,transform .15s}
 .sbtn:active{transform:scale(.96)}
+@media(hover:hover){.sbtn:hover{box-shadow:0 0 0 7px color-mix(in srgb,var(--pink) 22%,transparent)}.sbtn:hover .lens{transform:rotate(-14deg) scale(1.1)}}
 .sbtn .ico{position:relative;width:18px;height:18px;flex:none}
 .sbtn .ico svg{position:absolute;inset:0;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .2s}
 .sbtn .x{opacity:0;transform:rotate(-90deg) scale(.4)}
@@ -213,7 +216,10 @@ body:has(.desk-shelf) .hero{margin-bottom:68px}
 .desk-meta b{color:var(--pink);font-weight:500;margin-right:10px}
 .desk-title{display:block;font:400 clamp(1.7rem,2.4vw,2.05rem)/1.1 Fibonacci,Poppins,sans-serif;margin:13px 0 9px}
 .desk-excerpt{font-size:.84rem;line-height:1.6;color:var(--muted)}
-.desk-more{font-size:.76rem;margin-top:auto;padding-top:19px}
+.desk-more{font-size:.76rem;margin-top:auto;padding-top:19px;display:flex;align-items:center;gap:7px}
+.desk-more .arr{display:inline-block;font-style:normal;transition:transform .25s cubic-bezier(.2,.8,.2,1),color .2s}
+.desk-more .t{background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;padding-bottom:2px;transition:background-size .3s cubic-bezier(.2,.8,.2,1)}
+@media(hover:hover){.desk-window a:hover .desk-more .t{background-size:100% 1px}.desk-window a:hover .desk-more .arr{transform:translate(3px,-3px);color:var(--pink)}}
 .desk-videos{width:100vw;margin:60px 0 0 calc(50% - 50vw);padding:35px max(18px,calc((100vw - 1180px)/2));border-top:1px solid var(--line);background:#0a305b}
 .desk-videos>p{font-size:.83rem;color:var(--muted)}
 .desk-slider-top{display:flex;justify-content:space-between;align-items:center;gap:15px}
@@ -277,12 +283,19 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .catchip svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .catchip .ac{stroke:var(--pink);transition:stroke .2s}
 .catchip:hover .ac{stroke:var(--navy)}
-.rphoto{aspect-ratio:16/8;border:0;border-radius:0;margin:0}
+.rphoto{aspect-ratio:16/10;border:0;border-radius:0;margin:0}
+/* foto filtrata (duotono blu, fatta da genera.py): riempie il riquadro 16:10; nelle schede il ritaglio segue il riquadro */
+.desk-photo img,.rphoto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.desk-photo.has-img::before,.rphoto.has-img::before{display:none}
+/* testata Sfumata: la foto parte dal bordo, si scioglie nel fondo e il titolo sta sopra (con o senza foto) */
+.rhero{position:relative}
+.rphoto{-webkit-mask-image:linear-gradient(180deg,#000 52%,transparent 100%);mask-image:linear-gradient(180deg,#000 52%,transparent 100%)}
+.rhero .rt{position:absolute;left:22px;right:22px;bottom:10px;z-index:2;text-shadow:0 2px 22px color-mix(in srgb,var(--navy) 80%,transparent)}
 .rsc{position:relative;z-index:1;padding:64px 22px 90px}
 .rart{max-width:36rem;margin:0 auto}
 /* testata a blocco unico: foto, data e titolo stanno nella stessa scheda e il testo parte subito sotto */
-.rhead{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:color-mix(in srgb,var(--bg) 60%,transparent);margin:0 0 30px}
-.rcard-b{padding:16px 18px 20px}
+.rhead{margin:0 -22px 14px}
+.rcard-b{padding:6px 22px 0}
 .rt{font-family:Fibonacci,Poppins,sans-serif;font-weight:400;font-size:clamp(2.2rem,11vw,2.8rem);line-height:1;margin:0;text-wrap:balance}
 .cue{display:flex;align-items:center;gap:10px;margin:44px 0 0;font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);transition:opacity .3s}
 .cue svg{width:18px;height:18px;animation:bob 1.6s ease-in-out infinite;color:var(--pink)}
@@ -320,9 +333,6 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 
 /* ── passaggio tra le pagine: dissolvenza semplice (View Transitions, dove il browser le supporta) ── */
 @view-transition{navigation:auto}
-/* Cerca: il bottone e il campo di ricerca sono lo stesso elemento per il browser, quindi uno "diventa" l'altro */
-.sbtn:not([data-open]),.sfield{view-transition-name:srch}
-::view-transition-group(srch){animation-duration:.5s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.25s}
 /* dove non ci sono, il titolo sale da solo */
 @supports not (view-transition-name:a){.rt{animation:trise .9s cubic-bezier(.2,.8,.2,1) .15s both}}
@@ -366,8 +376,10 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 
 @media (min-width:700px){
   .rart{max-width:46rem}
-  .rphoto{aspect-ratio:21/8}
-  .rcard-b{padding:22px 28px 26px}
+  .rhead{margin:0 0 14px}
+  .rphoto{border-radius:16px 16px 0 0}
+  .rhero .rt{left:36px;right:36px;bottom:14px}
+  .rcard-b{padding:6px 36px 0}
   .rt{font-size:3.6rem}
   .rbody{max-width:36rem;margin:0 auto}
 }

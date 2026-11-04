@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intestazione scritto e Cerca · teloscrivo</title>
+<link rel="stylesheet" href="../style.css?v=4">
+<style>
+/* ═══ Mockup 23: intestazione dello scritto + animazione di "Cerca" ═══
+   Tre direzioni, ognuna con la sua intestazione E il suo modo di aprire la ricerca.
+   Usa style.css del sito. Il riquadro e' un container: Mobile | Desktop funziona su qualsiasi finestra. */
+body{padding:20px 16px 60px}
+.mk{position:relative;z-index:1;max-width:1180px;margin:0 auto}
+.mk h1{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--pink);margin:0 0 4px}
+.mk .lead{margin:0 0 16px;color:var(--muted);font-size:.9rem;font-weight:300;max-width:62ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar .grow{flex:1}
+.chip{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--fg);font:500 .85rem Poppins,sans-serif;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--pink);background:color-mix(in srgb,var(--pink) 14%,transparent)}
+.why{margin:0 0 14px;color:var(--muted);font-size:.84rem;font-weight:300;max-width:76ch}
+.why b{color:var(--fg);font-weight:500}
+
+/* il riquadro: container per le misure; dentro, .scroll scorre e la barra + gli overlay restano fermi */
+.stage{container-type:inline-size;position:relative;margin:0 auto;width:390px;max-width:100%;height:720px;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:var(--navy)}
+.stage.desk{width:100%;height:660px}
+.fsky{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 40% at 80% 12%,color-mix(in oklab,var(--pink) 18%,transparent),transparent 70%)}
+.scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.stage.open .scroll{overflow:hidden}
+
+/* barra in alto: logo + Cerca */
+.mbar{position:absolute;top:0;left:0;right:0;height:64px;padding:8px 14px 0;display:flex;align-items:center;justify-content:space-between;z-index:30;background:linear-gradient(180deg,var(--navy) 58%,transparent);pointer-events:none}
+.mbar>*{pointer-events:auto}
+.mb{font-family:Fibonacci,Poppins,sans-serif;font-size:1.6rem;line-height:1;display:flex;align-items:baseline;gap:.06em;transition:opacity .25s,transform .35s}
+.sbtn{transition:padding .28s,box-shadow .25s,transform .15s;font-family:"Roboto Condensed",sans-serif}
+.mbar .sbtn{margin-left:auto}
+@media(hover:hover){.sbtn:hover{box-shadow:0 0 0 7px color-mix(in srgb,var(--pink) 22%,transparent)}.sbtn:hover .lens{transform:rotate(-14deg) scale(1.1)}}
+
+/* pezzi comuni */
+.ph{--ph:linear-gradient(135deg,#ae8aa3,#5b4b78 55%,#132c51);display:block;position:relative;overflow:hidden;background:var(--ph)}
+.ph::before{content:'';position:absolute;inset:20% -30%;background:radial-gradient(ellipse at 70% 20%,#dbf2fc66,transparent 35%),linear-gradient(140deg,transparent 40%,#071c3b88 41%,transparent 70%)}
+.ttl{font-family:Fibonacci,Poppins,sans-serif;font-weight:400;line-height:1;margin:0;text-wrap:balance}
+.txt{font-weight:300;line-height:1.85;font-size:1.15rem}
+.txt span{display:block}
+.txt .g{height:1.1em}
+.fade{opacity:.5}
+.val{font:400 .95rem Poppins,sans-serif;color:var(--fg)}
+
+/* ───────── 1 · FRONTESPIZIO: scheda tecnica dello scritto + la ricerca si apre sul posto ───────── */
+.D1 .w1{max-width:36rem;margin:0 auto;padding:84px 20px 70px}
+.D1 .card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:color-mix(in srgb,var(--bg) 60%,transparent)}
+.D1 .ph{aspect-ratio:16/8}
+.D1 .cb{padding:18px 18px 4px;display:grid;gap:16px}
+.D1 .ttl{font-size:2.7rem}
+.D1 .facts{display:grid;grid-template-columns:repeat(3,1fr);margin:6px -18px 0;border-top:1px solid var(--line)}
+.D1 .f{padding:12px 14px 14px 18px;display:grid;gap:3px;border-left:1px solid var(--line)}
+.D1 .f:first-child{border-left:0}
+.D1 .txt{padding-top:30px}
+@container (min-width:700px){
+  .D1 .w1{max-width:50rem;padding-top:96px}
+  .D1 .ph{aspect-ratio:21/7}
+  .D1 .cb{padding:26px 0 0 30px;grid-template-columns:1fr 230px;grid-template-areas:"m f" "t f";align-items:start;gap:14px 0}
+  .D1 .cb .m{grid-area:m}
+  .D1 .cb .ttl{grid-area:t;font-size:4.2rem;align-self:end;padding-bottom:30px}
+  .D1 .facts{grid-area:f;grid-template-columns:1fr;margin:0;border-top:0;border-left:1px solid var(--line);align-self:stretch}
+  .D1 .f{border-left:0;border-top:1px solid var(--line);padding:16px 22px}
+  .D1 .f:first-child{border-top:0}
+  .D1 .txt{max-width:36rem;margin:0 auto;font-size:1.3rem}
+}
+/* ricerca 1: il bottone si allarga e diventa il campo, senza cambiare pagina */
+.sx{position:absolute;right:14px;top:8px;height:44px;width:var(--w0,104px);z-index:31;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.stage.open .sx{width:calc(100cqw - 28px)}
+.sx .sbtn{position:absolute;right:0;top:0;height:44px;margin:0;border:0;cursor:pointer}
+.fld{position:absolute;inset:0;display:flex;align-items:center;border:1px solid var(--dockline);border-radius:14px;background:#123862;opacity:0;pointer-events:none;transition:opacity .2s}
+.stage.open .fld{opacity:1;pointer-events:auto;transition-delay:.12s}
+.fld input,.big input{flex:1;min-width:0;height:100%;padding:0 54px 0 16px;border:0;background:none;color:var(--fg);font:400 1rem Poppins,sans-serif;outline:0}
+.fld input::placeholder,.big input::placeholder{color:var(--muted)}
+.stage.open .mb{opacity:0;transform:translateX(-10px)}
+.res{position:absolute;top:62px;left:14px;right:14px;z-index:29;padding:8px;border:1px solid var(--line);border-radius:16px;background:#123862;box-shadow:0 22px 40px -18px #000a;opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s .35s}
+.stage.open .res{opacity:1;visibility:visible;transform:none;transition-delay:.15s,.15s,0s}
+.res .cap,.cmd .cap,.big .cap{display:block;padding:6px 12px 4px}
+
+/* ───────── 2 · FINESTRA .txt: l'intestazione e' una finestra dell'editor + la ricerca e' una finestra che scende ───────── */
+.D2 .w2{max-width:36rem;margin:0 auto;padding:84px 20px 70px}
+.win{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#123862}
+.wb{display:flex;align-items:center;gap:6px;min-height:39px;padding:7px 15px;border-bottom:1px solid var(--line);background:#ffffff0a}
+.wb i{width:9px;height:9px;flex:none;background:var(--line);border-radius:50%}
+.wb i:first-child{background:var(--pink)}
+.wb span{margin:auto;color:var(--muted);font:600 .72rem "Roboto Condensed",sans-serif}
+.D2 .ph{aspect-ratio:16/7;border-bottom:1px solid var(--line)}
+.D2 .lines{padding:6px 0 16px}
+.D2 .ln{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:0 6px;min-height:38px;padding:0 18px 0 6px}
+.D2 .ln>b{font:600 .68rem "Roboto Condensed",sans-serif;color:color-mix(in srgb,var(--fg) 34%,transparent);text-align:right;padding-right:10px;border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center;justify-content:flex-end}
+.D2 .ln>:last-child{padding-left:8px}
+.D2 .ln .cm{font:600 .74rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.D2 .ln .cm em{font-style:normal;color:var(--fg)}
+.D2 .ttl{font-size:2.7rem;padding:10px 0 4px 8px}
+.D2 .ttl .cr{height:.72em}
+.D2 .txt{padding-top:30px}
+@container (min-width:700px){
+  .D2 .w2{max-width:56rem;padding-top:96px}
+  .D2 .win .wbody{display:grid;grid-template-columns:36% 1fr}
+  .D2 .ph{aspect-ratio:auto;min-height:280px;border-bottom:0;border-right:1px solid var(--line)}
+  .D2 .lines{align-self:center;padding:22px 0}
+  .D2 .ln{min-height:44px}
+  .D2 .ttl{font-size:4.2rem;padding:14px 0 10px 8px}
+  .D2 .txt{max-width:36rem;margin:0 auto;font-size:1.3rem}
+}
+/* ricerca 2: sfondo che si abbassa + finestra "cerca.txt" che scende dall'alto */
+.bd{position:absolute;inset:0;z-index:40;background:#04162ecc;opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+.stage.open .bd{opacity:1;visibility:visible;transition-delay:0s}
+.cmd{position:absolute;z-index:41;top:84px;left:50%;width:min(540px,calc(100% - 28px));margin-left:calc(min(540px,100% - 28px) / -2);border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#123862;box-shadow:0 30px 70px -20px #000c;opacity:0;visibility:hidden;transform:translateY(-18px) scale(.97);transition:opacity .2s,transform .2s,visibility 0s .2s}
+.stage.open .cmd{opacity:1;visibility:visible;transform:none;transition:opacity .25s,transform .45s cubic-bezier(.2,1.1,.3,1)}
+.cmd .row{display:flex;align-items:center;gap:10px;padding:4px 14px;border-bottom:1px solid var(--line)}
+.cmd .row svg{width:20px;height:20px;flex:none;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round}
+.cmd input{flex:1;min-width:0;height:54px;border:0;background:none;color:var(--fg);font:400 1rem Poppins,sans-serif;outline:0}
+.cmd input::placeholder{color:var(--muted)}
+.cmd .foot2{display:flex;justify-content:space-between;gap:10px;padding:10px 16px;border-top:1px solid var(--line);background:#ffffff08}
+.kx{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--fg);font:600 .7rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+
+/* ───────── 3 · LUNA: cielo con la fase di luna del giorno + la ricerca si apre come un cerchio ───────── */
+.D3 .w3{max-width:36rem;margin:0 auto;padding:84px 20px 70px}
+.card3{position:relative;isolation:isolate;display:grid;grid-template-rows:auto 1fr auto;min-height:360px;padding:18px;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.card3 .ph{position:absolute;inset:0;z-index:-2}
+.card3::after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#072d5900 30%,#072d59d9 88%)}
+.card3 .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.moon{width:104px;height:104px;flex:none}
+.moon .dk{fill:#072d5955;stroke:color-mix(in srgb,var(--seal) 40%,transparent);stroke-width:.8}
+.moon .lt{fill:var(--seal)}
+.moon .mr{fill:#072d59;opacity:.2}
+.card3 .ttl{font-size:2.9rem;margin-top:auto;padding-top:20px}
+.card3 .sub{margin:8px 0 0;color:color-mix(in srgb,var(--seal) 82%,transparent);display:flex;flex-wrap:wrap;gap:4px 14px}
+.D3 .txt{padding-top:30px}
+@container (min-width:700px){
+  .D3 .w3{max-width:52rem;padding-top:96px}
+  .card3{min-height:400px;padding:28px 32px;grid-template-columns:1fr auto;grid-template-rows:auto 1fr}
+  .card3 .top{grid-column:1;grid-row:1}
+  .card3 .moonbox{grid-column:2;grid-row:1/3;align-self:center;display:grid;gap:12px;justify-items:center;text-align:center}
+  .moon{width:200px;height:200px}
+  .card3 .tb{grid-column:1;grid-row:2;align-self:end}
+  .card3 .ttl{font-size:5rem}
+  .D3 .txt{max-width:36rem;margin:0 auto;font-size:1.3rem}
+}
+.card3 .moonbox{display:grid;gap:8px;justify-items:end;text-align:right}
+.card3 .moonbox .cap{color:color-mix(in srgb,var(--seal) 78%,transparent);max-width:none;white-space:nowrap}
+@container (min-width:700px){.card3 .moonbox{justify-items:center;text-align:center}.card3 .moonbox .cap{max-width:none}}
+/* ricerca 3: cerchio che parte dal bottone e riempie tutto, il bottone resta sopra e diventa X */
+.D3 .mbar{z-index:60}
+.circ{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;padding:92px 22px 24px;background:radial-gradient(60% 40% at 80% 0,color-mix(in oklab,var(--pink) 24%,transparent),transparent 72%),var(--navy);clip-path:circle(0px at var(--ox,340px) var(--oy,30px));visibility:hidden;transition:clip-path .65s cubic-bezier(.7,0,.2,1),visibility 0s .65s;overflow-y:auto}
+.stage.open .circ{clip-path:circle(var(--r,900px) at var(--ox,340px) var(--oy,30px));visibility:visible;transition:clip-path .75s cubic-bezier(.7,0,.2,1)}
+.big{display:flex;flex-direction:column;gap:10px;width:100%;max-width:640px;margin:0 auto}
+.big .q{display:flex;border-bottom:2px solid var(--pink)}
+.big input{height:64px;padding:0;font:400 1.9rem Fibonacci,Poppins,sans-serif}
+.big .ri b{font-size:1.1rem}
+@container (min-width:700px){.big input{font-size:3rem;height:84px}.circ{padding-top:110px}}
+
+/* righe dei risultati (uguali nelle tre direzioni) */
+.ri{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:8px 12px;border-radius:10px;color:inherit;text-decoration:none;transition:background .2s}
+.ri:hover{background:var(--soft)}
+.ri b{font:500 .92rem Poppins,sans-serif}
+.ri small{font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);white-space:nowrap}
+.empty{padding:14px 12px;color:var(--muted);font-size:.9rem}
+.enter .ri{animation:rise .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 55ms + 160ms)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+body.nt *,body.nt *::before{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body class="reader">
+<div class="sky" aria-hidden="true"></div>
+<div class="mk">
+  <h1>Mockup 23 · Intestazione dello scritto + Cerca</h1>
+  <p class="lead">Tre direzioni, ognuna con la sua intestazione (la scheda con titolo e categoria) e il suo modo di aprire Cerca. Tocca <b>Cerca</b> nel riquadro per vedere l'animazione: Esc o il tasto di chiusura la chiudono.</p>
+  <div class="bar" role="tablist" aria-label="Direzioni">
+    <button class="chip" data-dir="1" aria-pressed="true">1 · Frontespizio</button>
+    <button class="chip" data-dir="2" aria-pressed="false">2 · Finestra .txt</button>
+    <button class="chip" data-dir="3" aria-pressed="false">3 · Luna</button>
+    <span class="grow"></span>
+    <button class="chip" data-view="m" aria-pressed="true">Mobile</button>
+    <button class="chip" data-view="d" aria-pressed="false">Desktop</button>
+  </div>
+  <p class="why" id="why"></p>
+
+  <div class="stage D1" id="stage">
+    <div class="fsky" aria-hidden="true"></div>
+    <div class="scroll" id="scroll"><div id="sheet"></div></div>
+    <div class="mbar" id="mbar"></div>
+    <div id="ovl"></div>
+  </div>
+</div>
+
+<!-- Intestazioni: stesso scritto (Casa), tre modi di presentarlo -->
+<template id="h1">
+  <div class="w1"><div class="card">
+    <span class="ph" aria-hidden="true"></span>
+    <div class="cb">
+      <div class="m"><span class="catchip">Poesie</span></div>
+      <h2 class="ttl">Casa</h2>
+      <div class="facts">
+        <div class="f"><span class="cap">Scritta il</span><span class="val">25 ottobre</span></div>
+        <div class="f"><span class="cap">Lettura</span><span class="val">1 minuto</span></div>
+        <div class="f"><span class="cap">Poesia</span><span class="val">2 di 3</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="txt">POEM</div></div>
+</template>
+<template id="h2">
+  <div class="w2"><div class="win">
+    <div class="wb"><i></i><i></i><i></i><span>casa.txt</span></div>
+    <div class="wbody">
+      <span class="ph" aria-hidden="true"></span>
+      <div class="lines">
+        <div class="ln"><b>1</b><span class="cm">// categoria · <em>Poesie</em></span></div>
+        <div class="ln"><b>2</b><span class="cm">// scritta il <em>25 ottobre</em> · <em>1 min</em></span></div>
+        <div class="ln"><b>3</b><span class="cm">// poesia <em>2 di 3</em></span></div>
+        <div class="ln"><b>4</b><h2 class="ttl">Casa<i class="cr" aria-hidden="true"></i></h2></div>
+      </div>
+    </div>
+  </div>
+  <div class="txt">POEM</div></div>
+</template>
+<template id="h3">
+  <div class="w3"><div class="card3">
+    <span class="ph" aria-hidden="true"></span>
+    <div class="top"><span class="catchip">Poesie</span><div class="moonbox"><svg class="moon" viewBox="-50 -50 100 100" role="img" aria-label="MOONLBL"><circle class="dk" r="48"/><path class="lt" d="MOONPATH"/><clipPath id="mc"><path d="MOONPATH"/></clipPath><g clip-path="url(#mc)"><circle class="mr" cx="-16" cy="-14" r="11"/><circle class="mr" cx="14" cy="-26" r="6"/><circle class="mr" cx="20" cy="8" r="13"/><circle class="mr" cx="-10" cy="22" r="8"/><circle class="mr" cx="-28" cy="6" r="5"/></g></svg><span class="cap">MOONLBL</span></div></div>
+    <div class="tb"><h2 class="ttl">Casa</h2><p class="sub cap"><span>25 ottobre</span><span>1 min</span><span>Poesia 2 di 3</span></p></div>
+  </div>
+  <div class="txt">POEM</div></div>
+</template>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const POEM = `<span>Casa non &egrave; un posto.</span><span>&Egrave; il rumore delle chiavi</span><span>che ti aspetta.</span><span class="g"></span><span class="fade">&Egrave; il piatto lasciato sul fuoco,</span><span class="fade">la luce della cucina,</span>`;
+// scritti veri del sito, dal piu' recente
+const SC = [['Sale','Poesie'],['Lettera a chi resta','Testi'],['Il treno delle 6:40','Racconti brevi'],['Quello che non ti ho detto','Dalle canzoni'],['Casa','Poesie'],['Piove da giorni','Testi'],['La stanza in fondo','Racconti brevi'],['Luce bassa','Poesie'],['Ritornello','Dalle canzoni']];
+const WHY = {
+  1: '<b>Frontespizio</b> · la scheda diventa una pagina di libro: foto, titolo grande e una "scheda tecnica" (data, lettura, posizione tra le poesie) che riempie lo spazio vuoto con dati veri. <b>Cerca</b>: il bottone si allarga sul posto e diventa il campo, i risultati scendono sotto. Niente cambio pagina, il movimento è uno solo.',
+  2: '<b>Finestra .txt</b> · riprende le finestre della home: barra con i tre pallini, numeri di riga, titolo con il cursore che lampeggia. Foto e testo stanno affiancati su desktop. <b>Cerca</b>: lo sfondo si abbassa e una finestra "cerca.txt" scende dall\'alto con un piccolo rimbalzo; la pagina dietro resta ferma.',
+  3: '<b>Luna</b> · "la luna porta consiglio" è la frase del sito: la scheda è un cielo con la fase di luna del giorno in cui è stato scritto (fase calcolata, con circa un giorno di margine). <b>Cerca</b>: un cerchio parte dal bottone e riempie tutto lo schermo, il campo è grande come un titolo e il bottone diventa X.'
+};
+
+// fase di luna: ciclo sinodico di 29,53 giorni da una luna nuova nota (6 gen 2000)
+function moon(ts) {
+  const p = ((((ts - Date.UTC(2000, 0, 6, 18, 14)) / 864e5) / 29.530588853) % 1 + 1) % 1;
+  const k = Math.cos(2 * Math.PI * p), r = 48, rx = Math.abs(k) * r, waxing = p < .5;
+  const s1 = waxing ? 1 : 0, s2 = waxing ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0);
+  const pct = Math.round((1 - k) / 2 * 100);
+  const name = pct >= 93 ? 'Luna quasi piena' : pct <= 7 ? 'Luna nuova' : (waxing ? 'Luna crescente' : 'Luna calante');
+  return { path: `M0 ${-r} A${r} ${r} 0 0 ${s1} 0 ${r} A${rx} ${r} 0 0 ${s2} 0 ${-r} Z`, label: name }; // senza percentuale: il calcolo e' medio, con circa un giorno di margine
+}
+
+const stage = $('#stage'), sheet = $('#sheet'), mbar = $('#mbar'), ovl = $('#ovl');
+let dir = 1, isOpen = false, sbtn, input, list;
+
+const lensBtn = () => `<button type="button" class="sbtn" aria-label="Apri la ricerca" aria-expanded="false"><span class="ico"><svg class="lens" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg><svg class="x" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg></span><span class="lbl">Cerca</span></button>`;
+const brand = `<span class="mb">teloscrivo<span class="dot"></span></span>`;
+
+// risultati: i 4 piu' recenti, oppure il filtro su quello che scrivi
+function fill(el, q) {
+  el.innerHTML = '';
+  const t = q.trim().toLowerCase();
+  const hits = t ? SC.filter(s => (s[0] + ' ' + s[1]).toLowerCase().includes(t)) : SC.slice(0, 4);
+  const cap = document.createElement('span'); cap.className = 'cap';
+  cap.textContent = t ? (hits.length ? hits.length + (hits.length === 1 ? ' risultato' : ' risultati') : '') : 'Più recenti';
+  el.append(cap);
+  if (!hits.length) { const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'Niente per «' + q.trim() + '». Prova con una parola del titolo.'; el.append(e); return; }
+  hits.forEach((s, i) => { const a = document.createElement('a'); a.className = 'ri'; a.href = '#'; a.style.setProperty('--i', i); a.innerHTML = '<b></b><small></small>'; a.firstChild.textContent = s[0]; a.lastChild.textContent = s[1]; a.addEventListener('click', e => e.preventDefault()); el.append(a); });
+}
+
+function build() {
+  const m = moon(Date.UTC(2026, 9, 25, 12));
+  sheet.innerHTML = $('#h' + dir).innerHTML.replace('POEM', POEM).replaceAll('MOONPATH', m.path).replaceAll('MOONLBL', m.label);
+  $('#why').innerHTML = WHY[dir];
+  stage.className = 'stage D' + dir + (stage.classList.contains('desk') ? ' desk' : '');
+  isOpen = false;
+  if (dir === 1) {
+    mbar.innerHTML = brand;
+    ovl.innerHTML = `<div class="sx" id="sx"><div class="fld"><input type="search" placeholder="Cerca un titolo o una parola" aria-label="Cerca"></div>${lensBtn()}</div><div class="res" id="res" role="listbox"></div>`;
+    mbar.append($('#sx', ovl)); // il campo vive nella barra, sopra tutto
+    input = $('input', mbar); list = $('#res', ovl);
+  } else if (dir === 2) {
+    mbar.innerHTML = brand + lensBtn();
+    ovl.innerHTML = `<div class="bd" id="bd"></div><div class="cmd" role="dialog" aria-label="Cerca"><div class="wb"><i></i><i></i><i></i><span>cerca.txt</span></div><div class="row"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg><input type="search" placeholder="Cerca un titolo o una parola" aria-label="Cerca"><button type="button" class="kx" data-close>Esc</button></div><div id="res"></div><div class="foot2"><span class="cap">Filtra mentre scrivi</span><span class="cap">Esc chiude</span></div></div>`;
+    input = $('input', ovl); list = $('#res', ovl);
+    $('#bd', ovl).addEventListener('click', () => setOpen(false));
+  } else {
+    mbar.innerHTML = brand + lensBtn();
+    ovl.innerHTML = `<div class="circ" id="circ" role="dialog" aria-label="Cerca"><div class="big"><div class="q"><input type="search" placeholder="Cosa cerchi?" aria-label="Cerca"></div><div id="res"></div></div></div>`;
+    input = $('input', ovl); list = $('#res', ovl);
+  }
+  sbtn = $('.sbtn', mbar);
+  sbtn.addEventListener('click', () => setOpen(!isOpen));
+  const c = $('[data-close]', ovl); if (c) c.addEventListener('click', () => setOpen(false));
+  input.addEventListener('input', () => fill(list, input.value));
+  fill(list, '');
+  $('#scroll').scrollTop = 0;
+  const w0 = () => stage.style.setProperty('--w0', sbtn.offsetWidth + 'px');
+  w0(); if (document.fonts) document.fonts.ready.then(w0);
+}
+
+function setOpen(v) {
+  if (v === isOpen) return;
+  isOpen = v;
+  if (v && dir === 3) { // il cerchio parte dal centro del bottone
+    const s = sbtn.getBoundingClientRect(), b = stage.getBoundingClientRect();
+    const ox = s.left + s.width / 2 - b.left, oy = s.top + s.height / 2 - b.top;
+    stage.style.setProperty('--ox', ox + 'px'); stage.style.setProperty('--oy', oy + 'px');
+    stage.style.setProperty('--r', Math.hypot(Math.max(ox, b.width - ox), Math.max(oy, b.height - oy)) + 'px');
+  }
+  stage.classList.toggle('open', v);
+  sbtn.setAttribute('aria-expanded', v);
+  if (dir !== 2) sbtn.toggleAttribute('data-open', v);
+  if (v) {
+    input.value = ''; fill(list, '');
+    list.classList.add('enter'); setTimeout(() => list.classList.remove('enter'), 900);
+    setTimeout(() => input.focus({ preventScroll: true }), dir === 3 ? 380 : 120);
+  } else { input.blur(); sbtn.focus({ preventScroll: true }); }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen) setOpen(false); });
+
+$$('[data-dir]').forEach(b => b.addEventListener('click', () => { dir = +b.dataset.dir; $$('[data-dir]').forEach(x => x.setAttribute('aria-pressed', x === b)); build(); }));
+$$('[data-view]').forEach(b => b.addEventListener('click', () => {
+  stage.classList.toggle('desk', b.dataset.view === 'd');
+  $$('[data-view]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  if (isOpen) { isOpen = true; setOpen(false); }
+  build(); // le misure della ricerca si ricalcolano
+}));
+// per i controlli rapidi: #d=2&v=d&o=1
+const H = new URLSearchParams(location.hash.slice(1));
+if (H.get('nt')) document.body.classList.add('nt');
+if (H.get('v') === 'd') { stage.classList.add('desk'); $$('[data-view]').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === 'd')); }
+if (H.get('d')) { dir = +H.get('d'); $$('[data-dir]').forEach(x => x.setAttribute('aria-pressed', x.dataset.dir == dir)); }
+build();
+if (H.get('o') === '1') setTimeout(() => setOpen(true), 100);
+</script>
+</body>
+</html>

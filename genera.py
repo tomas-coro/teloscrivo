@@ -6,7 +6,10 @@ Legge: scritti/*.md  (uno per scritto, con intestazione tra due righe `---`)
 Scrive: index.html, <sezione>/index.html (solo sezioni con almeno uno scritto), scritti/<slug>/index.html, cerca/index.html,
         404.html, cerca.json, sitemap.xml, robots.txt, .nojekyll
 
-Nessuna dipendenza: solo libreria standard di Python 3.
+Dipendenze: libreria standard di Python 3 + Pillow (solo per le foto: pip3 install pillow).
+
+Foto: una per scritto in foto/<slug>.jpg (anche .jpeg .png .webp), orizzontale. Lo script la ritaglia a 16:10,
+le applica il filtro duotono blu del sito e scrive assets/foto/<slug>-800.webp e -1600.webp.
 
 Intestazione di uno scritto (tutto su una riga ciascuno):
     titolo:   obbligatorio
@@ -14,6 +17,7 @@ Intestazione di uno scritto (tutto su una riga ciascuno):
     sezione:  obbligatorio, una tra testi | poesie | racconti | canzoni
     estratto: facoltativo (se manca: prime righe per poesie/canzoni, prima frase per il resto)
     spotify:  facoltativo, link https:// (compare il bottone "Ascolta su Spotify")
+    foto-focus: facoltativo, punto da tenere nel ritaglio, es. `30% 50%` (default: centro)
 Righe che iniziano con # nell'intestazione sono commenti.
 Il corpo: righe = versi (poesie, canzoni); righe vuote = pausa/paragrafo.
 """
@@ -35,6 +39,16 @@ TIKTOK_URL = ""
 # Profili social mostrati in fondo a ogni scritto ("Trovami su"): chiave = icona, valore = (link, nome mostrato). Per aggiungerne uno, serve anche l'icona in SOCIAL_ICONS.
 SOCIAL = {"instagram": ("https://www.instagram.com/teloscrivo.it/", "@teloscrivo.it")}
 TIKTOK_VIDEOS = []  # elenco di (titolo, sottotitolo, link al video), facoltativo
+
+# Foto: cartella sorgente, misure in uscita e regola "nessuno scritto senza foto".
+# REQUIRE_PHOTOS resta False finche' le foto vere non ci sono tutte: intanto lo script ELENCA gli scritti senza foto
+# (e il sito usa il segnaposto colorato). Quando le foto ci sono tutte, mettilo True: uno scritto senza foto blocca la generazione.
+PHOTO_DIR = "foto"
+PHOTO_OUT = "assets/foto"
+PHOTO_SIZES = (800, 1600)  # larghezze in uscita, sempre 16:10
+REQUIRE_PHOTOS = False
+# Filtro duotono: ombre = Navy, luci = Seal Blue; prima della tinta si aumenta un po' il contrasto (stessa resa del mockup 27)
+DUO_DARK, DUO_LIGHT = (0x07, 0x2D, 0x59), (0xDB, 0xF2, 0xFC)
 
 ROOT = Path(__file__).resolve().parent
 BASE_PATH = urlparse(BASE_URL).path  # "/teloscrivo/" su GitHub Pages, "/" sul dominio vero
@@ -107,7 +121,7 @@ class Post:
                 raise SiteError(f"{path.name}, riga {n}: atteso 'chiave: valore', trovato '{line}'")
             k, v = line.split(":", 1)
             k = k.strip().lower()
-            if k not in ("titolo", "data", "sezione", "estratto", "spotify"):
+            if k not in ("titolo", "data", "sezione", "estratto", "spotify", "foto-focus"):
                 raise SiteError(f"{path.name}, riga {n}: chiave sconosciuta '{k}'")
             meta[k] = v.strip()
         for k in ("titolo", "data", "sezione"):
@@ -124,6 +138,10 @@ class Post:
         self.spotify = meta.get("spotify", "")
         if self.spotify and not self.spotify.startswith("https://"):
             raise SiteError(f"{path.name}: il link spotify deve iniziare con https://")
+        self.focus = meta.get("foto-focus", "50% 50%")
+        if not re.fullmatch(r"\d{1,3}% \d{1,3}%", self.focus) or any(int(v) > 100 for v in re.findall(r"\d+", self.focus)):
+            raise SiteError(f"{path.name}: foto-focus '{self.focus}' non valido (esempio: 30% 50%, valori da 0 a 100)")
+        self.has_photo = False  # lo decide bake_photos()
         self.body = m.group(2).strip("\n")
         if not self.body.strip():
             raise SiteError(f"{path.name}: il testo e' vuoto")
@@ -262,10 +280,88 @@ def icon(k):
 def card_html(p, root):
     """Una scheda della griglia: il clic apre subito lo scritto (niente anteprima)."""
     return (f'<article class="desk-window" data-cat="{p.cat}"><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
-            f'<a href="{root}{p.url}" data-card><span class="desk-photo" aria-hidden="true"></span>'
+            f'<a href="{root}{p.url}" data-card><span class="desk-photo{" has-img" if p.has_photo else ""}" aria-hidden="true">{photo_img(p, root, "(min-width:900px) 380px, 90vw")}</span>'
             f'<span class="desk-info"><span class="desk-meta"><b>{esc(SECTIONS[p.cat][0])}</b>{p.long_date()}</span>'
             f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
-            f'<span class="desk-more">Apri lo scritto ↗</span></span></a></article>')
+            f'<span class="desk-more"><span class="t">Apri lo scritto</span><i class="arr" aria-hidden="true">↗</i></span></span></a></article>')
+
+
+# ═══ FOTO ═══
+def duotone(img):
+    """Grigi -> contrasto -> ombre Navy e luci Seal Blue: qualunque foto prende la stessa tinta del sito."""
+    from PIL import ImageOps
+    gray = img.convert("L")
+    gray = gray.point(lambda v: max(0, min(255, round(1.4 * v - 0.2 * 255))))  # pendenza 1.4, intercetta -0.2 (come il mockup)
+    return ImageOps.colorize(gray, black=DUO_DARK, white=DUO_LIGHT)
+
+
+def crop_16_10(img, focus):
+    """Taglia al rapporto 16:10 tenendo vicino il punto focale ('x% y%')."""
+    fx, fy = (int(v) / 100 for v in re.findall(r"\d+", focus))
+    w, h = img.size
+    if w / h > 1.6:  # troppo larga: si taglia ai lati
+        cw, ch = round(h * 1.6), h
+    else:  # troppo alta: si taglia sopra e sotto
+        cw, ch = w, round(w / 1.6)
+    left = min(max(round((w - cw) * fx), 0), w - cw)
+    top = min(max(round((h - ch) * fy), 0), h - ch)
+    return img.crop((left, top, left + cw, top + ch))
+
+
+def bake_photos(posts):
+    """Per ogni scritto con foto/<slug>.* scrive le due misure filtrate. Ritorna gli slug senza foto."""
+    out = ROOT / PHOTO_OUT
+    sources = {}
+    for f in (ROOT / PHOTO_DIR).glob("*") if (ROOT / PHOTO_DIR).is_dir() else []:
+        if f.suffix.lower() in (".jpg", ".jpeg", ".png", ".webp"):
+            if f.stem in sources:
+                raise SiteError(f"{PHOTO_DIR}/: due foto per lo stesso scritto ({sources[f.stem].name} e {f.name})")
+            sources[f.stem] = f
+    slugs = {p.slug for p in posts}
+    for stem in sources:
+        if stem not in slugs:
+            raise SiteError(f"{PHOTO_DIR}/{sources[stem].name}: non c'e' nessuno scritto con questo nome (scritti/{stem}.md)")
+    if out.is_dir():  # niente foto orfane: se la foto sorgente e' stata tolta, spariscono anche le versioni generate
+        for f in out.glob("*.webp"):
+            if f.name.rsplit("-", 1)[0] not in sources:
+                f.unlink()
+    missing = []
+    for p in posts:
+        src = sources.get(p.slug)
+        if not src:
+            missing.append(p.slug)
+            continue
+        try:
+            from PIL import Image
+        except ImportError:
+            raise SiteError("serve Pillow per le foto: pip3 install pillow")
+        try:
+            with Image.open(src) as im:
+                im = im.convert("RGB")
+        except Exception as e:
+            raise SiteError(f"{PHOTO_DIR}/{src.name}: non riesco ad aprirla ({e})")
+        w, h = im.size
+        if w < h:
+            raise SiteError(f"{PHOTO_DIR}/{src.name}: e' verticale ({w}x{h}). Le foto devono essere orizzontali.")
+        if w < PHOTO_SIZES[0]:
+            raise SiteError(f"{PHOTO_DIR}/{src.name}: troppo piccola ({w}px di larghezza, minimo {PHOTO_SIZES[0]}).")
+        cropped = duotone(crop_16_10(im, p.focus))
+        out.mkdir(parents=True, exist_ok=True)
+        for size in PHOTO_SIZES:
+            target = cropped.resize((size, round(size / 1.6)), Image.LANCZOS) if cropped.width > size else cropped
+            target.save(out / f"{p.slug}-{size}.webp", "WEBP", quality=80, method=6)
+        p.has_photo = True
+    return missing
+
+
+def photo_img(p, root, sizes, eager=False):
+    """<img> della foto filtrata (vuoto se lo scritto non ha foto: resta il segnaposto colorato)."""
+    if not p.has_photo:
+        return ""
+    srcset = ", ".join(f"{root}{PHOTO_OUT}/{p.slug}-{s}.webp {s}w" for s in PHOTO_SIZES)
+    load = 'fetchpriority="high"' if eager else 'loading="lazy" decoding="async"'
+    return (f'<img src="{root}{PHOTO_OUT}/{p.slug}-{PHOTO_SIZES[0]}.webp" srcset="{srcset}" sizes="{sizes}" alt="" '
+            f'width="{PHOTO_SIZES[-1]}" height="{round(PHOTO_SIZES[-1] / 1.6)}" {load} style="object-position:{p.focus}">')
 
 
 # ═══ PAGINE ═══
@@ -344,7 +440,7 @@ def page_reader(p, posts):
     name = SECTIONS[p.cat][0]
     rel = [x for x in posts if x is not p and x.cat == p.cat] + [x for x in posts if x is not p and x.cat != p.cat]
     rel_html = "".join(
-        f'<a class="rcard" data-cat="{x.cat}" href="{root}{x.url}"><span class="desk-photo" aria-hidden="true"></span>'
+        f'<a class="rcard" data-cat="{x.cat}" href="{root}{x.url}"><span class="desk-photo{" has-img" if x.has_photo else ""}" aria-hidden="true">{photo_img(x, root, "(min-width:640px) 340px, 120px")}</span>'
         f'<span class="rcb"><span class="rcm"><b>{esc(SECTIONS[x.cat][0])}</b>{x.short_date()}</span>'
         f'<span class="rct">{esc(x.title)}</span><span class="rcx">{esc(x.excerpt).replace(chr(10), " ")}</span>'
         f'<span class="rcgo">Leggi{ARROW_CTA}</span></span></a>'
@@ -374,7 +470,7 @@ def page_reader(p, posts):
 <div class="rprog" aria-hidden="true"></div>
 <header class="rbar"><div class="rbtns"><a class="rbtn rbtn-home" data-home="scritto" href="{root}" aria-label="Torna alla home">{ICON_HOME}<span>Home</span></a><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a></div></header>
 <main id="contenuto" class="rsc"><article class="rart">
-  <header class="rhead"><span class="rphoto" aria-hidden="true"></span><div class="rcard-b"><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div><h1 class="rt">{esc(p.title)}</h1></div></header>
+  <header class="rhead"><div class="rhero"><div class="rphoto{" has-img" if p.has_photo else ""}">{photo_img(p, root, "(min-width:700px) 736px, 100vw", eager=True)}</div><h1 class="rt">{esc(p.title)}</h1></div><div class="rcard-b"><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div></div></header>
   <div class="rbody">{p.body_html()}</div>
   <footer class="rend"><span class="cap">Leggi anche</span><div class="rcards">{rel_html}</div>{spotify}
     <div class="rfoot"><button type="button" class="sharebtn" data-share hidden>{ICON_SHARE}<span data-share-lbl>Condividi</span></button>{find_html}</div>
@@ -473,6 +569,9 @@ def main():
         if d.is_dir() and d.name not in slugs and (d / "index.html").is_file():
             shutil.rmtree(d)
             print(f"  rimossa pagina orfana: scritti/{d.name}/")
+    missing = bake_photos(posts)
+    if missing and REQUIRE_PHOTOS:
+        raise SiteError("scritti senza foto (in foto/<nome>.jpg): " + ", ".join(missing))
     write("index.html", page_home(posts))
     live = present_cats(posts)
     for k in SECTIONS:  # una sezione senza scritti non ha pagina: se ce n'era una vecchia, sparisce solo il suo index.html generato
@@ -494,6 +593,8 @@ def main():
     n_html = sum(1 for w in written if w.endswith(".html"))
     print(f"OK: {len(posts)} pagine scritto, {len(live)} pagine sezione, cerca, 404, home ({n_html} pagine HTML), "
           f"cerca.json, sitemap.xml, robots.txt. Link interni controllati. URL base: {BASE_URL}")
+    if missing:
+        print(f"AVVISO: {len(missing)} scritti senza foto (usano il segnaposto): {', '.join(missing)}. Mettile in {PHOTO_DIR}/<nome>.jpg", file=sys.stderr)
 
 
 if __name__ == "__main__":

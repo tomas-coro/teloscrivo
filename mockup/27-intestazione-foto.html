@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intestazione con foto · teloscrivo</title>
+<link rel="stylesheet" href="../style.css?v=4">
+<style>
+/* ═══ Mockup 24: intestazione e Cerca, a pezzi separati ═══
+   Tre direzioni, ognuna con la sua intestazione E il suo modo di aprire la ricerca.
+   Usa style.css del sito. Il riquadro e' un container: Mobile | Desktop funziona su qualsiasi finestra. */
+body{padding:20px 16px 60px}
+.mk{position:relative;z-index:1;max-width:1180px;margin:0 auto}
+.mk h1{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--pink);margin:0 0 4px}
+.mk .lead{margin:0 0 16px;color:var(--muted);font-size:.9rem;font-weight:300;max-width:62ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.bar .grow{flex:1}
+.chip{min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:var(--soft);color:var(--fg);font:500 .85rem Poppins,sans-serif;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--pink);background:color-mix(in srgb,var(--pink) 14%,transparent)}
+.why{margin:0 0 14px;color:var(--muted);font-size:.84rem;font-weight:300;max-width:76ch}
+.why b{color:var(--fg);font-weight:500}
+
+/* il riquadro: container per le misure; dentro, .scroll scorre e la barra + gli overlay restano fermi */
+.stage{container-type:inline-size;position:relative;margin:0 auto;width:390px;max-width:100%;height:720px;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:var(--navy)}
+.stage.desk{width:100%;height:660px}
+.fsky{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 40% at 80% 12%,color-mix(in oklab,var(--pink) 18%,transparent),transparent 70%)}
+.scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.stage.open .scroll{overflow:hidden}
+
+/* barra in alto: logo + Cerca */
+.mbar{position:absolute;top:0;left:0;right:0;height:64px;padding:8px 14px 0;display:flex;align-items:center;justify-content:space-between;z-index:30;background:linear-gradient(180deg,var(--navy) 58%,transparent);pointer-events:none}
+.mbar>*{pointer-events:auto}
+.mb{font-family:Fibonacci,Poppins,sans-serif;font-size:1.6rem;line-height:1;display:flex;align-items:baseline;gap:.06em;transition:opacity .25s,transform .35s}
+.sbtn{transition:padding .28s,box-shadow .25s,transform .15s;font-family:"Roboto Condensed",sans-serif}
+.mbar .sbtn{margin-left:auto}
+@media(hover:hover){.sbtn:hover{box-shadow:0 0 0 7px color-mix(in srgb,var(--pink) 22%,transparent)}.sbtn:hover .lens{transform:rotate(-14deg) scale(1.1)}}
+
+/* pezzi comuni */
+.ph{--ph:linear-gradient(135deg,#ae8aa3,#5b4b78 55%,#132c51);display:block;position:relative;overflow:hidden;background:var(--ph)}
+.ph::before{content:'';position:absolute;inset:20% -30%;background:radial-gradient(ellipse at 70% 20%,#dbf2fc66,transparent 35%),linear-gradient(140deg,transparent 40%,#071c3b88 41%,transparent 70%)}
+.ttl{font-family:Fibonacci,Poppins,sans-serif;font-weight:400;line-height:1;margin:0;text-wrap:balance}
+.txt{font-weight:300;line-height:1.85;font-size:1.15rem}
+.txt span{display:block}
+.txt .g{height:1.1em}
+.fade{opacity:.5}
+.val{font:400 .95rem Poppins,sans-serif;color:var(--fg)}
+
+.sub{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hd{max-width:40rem;margin:0 auto;padding:96px 22px 70px}
+.hd .cat{display:block;margin:0 0 14px;color:var(--pink)}
+.hd .ttl{font-size:3.6rem}
+.hd .info{display:flex;flex-wrap:wrap;gap:4px 14px;margin:16px 0 0}
+.hd .info a{color:var(--fg);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--pink) 70%,transparent);transition:color .2s,border-color .2s}
+.hd .info a:hover{color:var(--pink);border-color:var(--pink)}
+.hd .rule{height:1px;margin:26px 0 0;background:var(--line)}
+/* ═══ intestazione: la foto e il titolo sono UN blocco. Foto sempre 16:10; --fx = punto focale ═══ */
+.hd .cov{position:relative}
+.ph{--fx:50% 50%}
+.hd .ph{position:relative;display:block;margin:0;aspect-ratio:16/10;overflow:hidden;background:#123862}
+.hd .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--fx)}
+/* filtro: la tinta e' applicata all'immagine; il velo in basso e' uguale per tutte */
+.hd .ph .veil{position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,color-mix(in srgb,var(--navy) 55%,transparent) 62%,var(--navy) 100%);pointer-events:none}
+.F1 .ph img{filter:url(#duo)}
+.F2 .ph img{filter:url(#tri)}
+.F3 .ph img{filter:saturate(.5) contrast(1.06)}
+.F3 .ph::before{content:'';position:absolute;inset:0;z-index:1;background:var(--navy);mix-blend-mode:color;opacity:.55;pointer-events:none}
+.hd .ct{position:absolute;left:20px;right:20px;bottom:18px;z-index:2}
+.hd .ct .cat{margin:0 0 8px}
+.hd .ttl{font-size:clamp(2.3rem,9.5cqw,3.4rem);text-shadow:0 2px 22px color-mix(in srgb,var(--navy) 80%,transparent)}
+.hd .info{margin:16px 0 0}
+.hd .rule{height:1px;margin:22px 0 0;background:var(--line)}
+.hd .txt{padding-top:30px}
+/* direzione 1 · Copertina: angoli morbidi, titolo sulla foto */
+.D1 .ph{border-radius:16px}
+/* direzione 2 · Finestra: stessa scheda delle finestre della home (barra con i tre puntini e il nome del file) */
+.D2 .cov{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--navy) 70%,#000)}
+.D2 .bar2{display:flex;align-items:center;gap:6px;min-height:34px;padding:0 14px;border-bottom:1px solid var(--line);font:500 .68rem "Roboto Condensed",sans-serif;letter-spacing:.12em;color:var(--muted)}
+.D2 .bar2 i{width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--fg) 28%,transparent)}
+.D2 .bar2 span{margin-left:8px}
+.D2 .info{margin:0;padding:12px 20px 14px;border-top:1px solid var(--line)}
+.D1 .bar2,.D3 .bar2{display:none}
+/* direzione 3 · Sfumata: la foto parte da sopra, sotto il logo, e si scioglie nel fondo */
+.D3 .cov{margin:-96px -22px 0}
+.D3 .ph img{-webkit-mask-image:linear-gradient(180deg,#000 50%,transparent 100%);mask-image:linear-gradient(180deg,#000 50%,transparent 100%)}
+.D3 .info{padding-left:22px}
+.D3 .veil{display:none}
+.D3 .ct{left:22px;right:22px;bottom:6px}
+.D3 .info{margin:0}
+.D3 .ph{background:none}
+@container (min-width:800px){
+  .hd{padding-top:110px}
+  /* la foto esce dalla colonna del testo per respirare; titolo e testo restano allineati */
+  .D1 .cov,.D2 .cov{margin:0 -70px}
+  .D1 .ct{left:70px;right:70px;bottom:26px}
+  .D1 .info{padding-left:70px}
+  .D2 .ct{left:70px;right:70px;bottom:26px}
+  .D2 .info{padding:12px 70px 14px}
+  .D3 .cov{margin:0 -70px}
+  .D3 .ph{border-radius:16px 16px 0 0}
+  .D3 .ph img{-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 55%,transparent 100%)}
+  .D3 .ct{z-index:2}
+  .D3 .ct{left:70px;right:70px}
+  .D3 .info{padding-left:70px}
+  .hd .txt{font-size:1.3rem}
+}
+/* Condividi (menu come altraparte) e scritto precedente/successivo */
+.share{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:38px;padding-top:22px;border-top:1px solid var(--line)}
+.share-box{position:relative}
+.sbt{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--fg);font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:border-color .2s,background .2s,transform .15s}
+.sbt:hover{border-color:var(--pink);background:var(--soft)}
+.sbt:active{transform:scale(.97)}
+.sbt svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sbt .chev{width:11px;transition:transform .25s}
+.share-box.open .chev{transform:rotate(180deg)}
+.smenu{position:absolute;left:0;bottom:calc(100% + 8px);z-index:20;min-width:13rem;padding:6px;border:1px solid var(--line);border-radius:14px;background:#0d3560;box-shadow:0 18px 36px -14px #000a;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .2s,transform .25s,visibility 0s .25s}
+.share-box.open .smenu{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+.smenu button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:9px;background:none;color:var(--fg);font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;text-align:left}
+.smenu button:hover{background:var(--soft);color:var(--pink)}
+.smenu svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.smenu .done{color:var(--pink)}
+.pn{display:grid;gap:10px;margin-top:22px}
+@container (min-width:700px){.pn{grid-template-columns:1fr 1fr}}
+.pn a{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;color:inherit;text-decoration:none;transition:border-color .2s,background .2s}
+.pn a:hover{border-color:var(--pink);background:var(--soft)}
+.pn .ph{margin:0;width:96px;border-radius:9px}
+.pn .sub{display:block;margin-bottom:5px;color:var(--pink)}
+.pn b{font:400 1.2rem/1.1 Fibonacci,Poppins,sans-serif}
+.pn a.nx{text-align:right;grid-template-columns:1fr 96px}
+.pn a.nx .ph{order:2}
+/* ricerca b: cassetto che scende dalla barra, riga rosa che si disegna, nessuno sfondo scuro */
+.in2{position:absolute;top:8px;left:14px;right:70px;height:44px;z-index:31;padding:0;border:0;background:none;color:var(--fg);font:400 1.5rem Fibonacci,Poppins,sans-serif;outline:0;opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .2s,transform .2s}
+.in2::placeholder{color:var(--muted)}
+.stage.open .in2{opacity:1;transform:none;pointer-events:auto;transition:opacity .3s .2s,transform .4s .2s cubic-bezier(.2,.8,.2,1)}
+.ln2{position:absolute;left:14px;right:14px;top:56px;height:2px;z-index:31;background:var(--pink);transform:scaleX(0);transform-origin:right;transition:transform .45s cubic-bezier(.7,0,.2,1)}
+.stage.open .ln2{transform:none}
+.res2{position:absolute;left:0;right:0;top:58px;z-index:29;padding:12px 14px 14px;background:var(--navy);border-bottom:1px solid var(--line);clip-path:inset(0 0 100% 0);visibility:hidden;transition:clip-path .35s cubic-bezier(.2,.8,.2,1),visibility 0s .35s}
+.stage.open .res2{clip-path:inset(0);visibility:visible;transition:clip-path .5s cubic-bezier(.2,.8,.2,1) .18s}
+.res2 .cap{display:block;padding:6px 12px 4px}
+.stage.open .mb{opacity:0;transform:translateX(-10px)}
+body.nt *,body.nt *::before{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ricerca 1: il bottone si allarga e diventa il campo, senza cambiare pagina */
+.sx{position:absolute;right:14px;top:8px;height:44px;width:var(--w0,104px);z-index:31;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.stage.open .sx{width:calc(100cqw - 28px)}
+.sx .sbtn{position:absolute;right:0;top:0;height:44px;margin:0;border:0;cursor:pointer}
+.fld{position:absolute;inset:0;display:flex;align-items:center;border:1px solid var(--dockline);border-radius:14px;background:#123862;opacity:0;pointer-events:none;transition:opacity .2s}
+.stage.open .fld{opacity:1;pointer-events:auto;transition-delay:.12s}
+.fld input,.big input{flex:1;min-width:0;height:100%;padding:0 54px 0 16px;border:0;background:none;color:var(--fg);font:400 1rem Poppins,sans-serif;outline:0}
+.fld input::placeholder,.big input::placeholder{color:var(--muted)}
+.stage.open .mb{opacity:0;transform:translateX(-10px)}
+.res{position:absolute;top:62px;left:14px;right:14px;z-index:29;padding:8px;border:1px solid var(--line);border-radius:16px;background:#123862;box-shadow:0 22px 40px -18px #000a;opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1),visibility 0s .35s}
+.stage.open .res{opacity:1;visibility:visible;transform:none;transition-delay:.15s,.15s,0s}
+.res .cap,.cmd .cap,.big .cap{display:block;padding:6px 12px 4px}
+
+
+/* righe dei risultati (uguali nelle tre direzioni) */
+.ri{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:8px 12px;border-radius:10px;color:inherit;text-decoration:none;transition:background .2s}
+.ri:hover{background:var(--soft)}
+.ri b{font:500 .92rem Poppins,sans-serif}
+.ri small{font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);white-space:nowrap}
+.empty{padding:14px 12px;color:var(--muted);font-size:.9rem}
+.enter .ri{animation:rise .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 55ms + 160ms)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+body.nt *,body.nt *::before{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+</style>
+</head>
+<body class="reader">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="duo" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".46 .83 .15 0 -.2 .46 .83 .15 0 -.2 .46 .83 .15 0 -.2 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues="0.027 0.859"/><feFuncG type="table" tableValues="0.176 0.949"/><feFuncB type="table" tableValues="0.349 0.988"/></feComponentTransfer></filter>
+<filter id="tri" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".46 .83 .15 0 -.2 .46 .83 .15 0 -.2 .46 .83 .15 0 -.2 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues="0.027 0.80 0.859"/><feFuncG type="table" tableValues="0.176 0.40 0.949"/><feFuncB type="table" tableValues="0.349 0.50 0.988"/></feComponentTransfer></filter>
+</defs></svg>
+
+<div class="sky" aria-hidden="true"></div>
+<div class="mk">
+  <h1>Mockup 27 · Intestazione con foto e filtro</h1>
+  <p class="lead">La foto e il titolo sono un blocco solo. Tre direzioni (Copertina, Finestra, Sfumata) e quattro filtri da provare sulla stessa foto. Foto di prova: sul sito vero la tinta si applica in automatico a ogni foto.</p>
+  <div class="bar" role="group" aria-label="Intestazione">
+    <span class="grow"></span>
+    <button class="chip" data-d="1" aria-pressed="true">1 · Copertina</button>
+    <button class="chip" data-d="2" aria-pressed="false">2 · Finestra</button>
+    <button class="chip" data-d="3" aria-pressed="false">3 · Sfumata</button>
+    <button class="chip" data-t="0" aria-pressed="true">Titolo corto</button>
+    <button class="chip" data-t="1" aria-pressed="false">Titolo lungo</button>
+    <button class="chip" data-view="m" aria-pressed="true">Mobile</button>
+    <button class="chip" data-view="d" aria-pressed="false">Desktop</button>
+  </div>
+  <div class="bar" role="group" aria-label="Filtro foto"><span class="sub">Filtro foto</span>
+    <button class="chip" data-f="0" aria-pressed="true">Originale</button>
+    <button class="chip" data-f="1" aria-pressed="false">A · Duotono blu</button>
+    <button class="chip" data-f="2" aria-pressed="false">B · Blu e rosa</button>
+    <button class="chip" data-f="3" aria-pressed="false">C · Tinta morbida</button></div>
+  <p class="why" id="why"></p>
+
+  <div class="stage H1 S1" id="stage">
+    <div class="fsky" aria-hidden="true"></div>
+    <div class="scroll" id="scroll"><div id="sheet"></div></div>
+    <div class="mbar" id="mbar"></div>
+    <div id="ovl"></div>
+  </div>
+</div>
+
+<!-- Intestazioni: stesso scritto (Casa), tre modi di presentarlo. PGR = paginatore "Poesia 2 di 3" -->
+<template id="h1">
+  <div class="hd"><div class="cov"><div class="bar2"><i></i><i></i><i></i><span>casa.txt</span></div>
+    <figure class="ph"><img src="img/test-casa.jpg" alt=""><span class="veil"></span><div class="ct"><span class="cap cat">Poesie</span><h2 class="ttl">TITLE</h2></div></figure>
+    <p class="info sub"><span>25 ottobre</span><span>1 min</span></p></div><div class="rule"></div>
+    <div class="txt">POEM</div>
+    <div class="share">
+      <div class="share-box" id="sbox"><button class="sbt" type="button" aria-haspopup="true" aria-expanded="false" id="sbtn"><svg viewBox="0 0 20 20"><path d="M10 13V3M6 7l4-4 4 4M4 11v5h12v-5"/></svg>Condividi<svg class="chev" viewBox="0 0 12 12"><path d="M2 8l4-4 4 4"/></svg></button>
+        <div class="smenu" role="menu"><button type="button" role="menuitem" data-a="copy"><svg viewBox="0 0 20 20"><rect x="7" y="7" width="9" height="9" rx="2"/><path d="M13 7V5a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2"/></svg><span>Copia link</span></button>
+        <button type="button" role="menuitem" data-a="wa"><svg viewBox="0 0 20 20"><path d="M3 17l1.2-3.6A7 7 0 1110 17a7 7 0 01-3.2-.8z"/></svg>WhatsApp</button></div></div>
+      <a class="sbt" href="#" aria-label="Instagram"><svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="4"/><circle cx="10" cy="10" r="3.2"/><circle cx="14.2" cy="5.8" r=".6"/></svg>Instagram</a>
+    </div>
+    <nav class="pn" aria-label="Altre poesie"><a href="#"><span class="ph"></span><span><span class="sub">Precedente</span><b>Sale</b></span></a><a class="nx" href="#"><span class="ph"></span><span><span class="sub">Successivo</span><b>Luce bassa</b></span></a></nav></div>
+</template>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const POEM = `<span>Casa non &egrave; un posto.</span><span>&Egrave; il rumore delle chiavi</span><span>che ti aspetta.</span><span class="g"></span><span class="fade">&Egrave; il piatto lasciato sul fuoco,</span><span class="fade">la luce della cucina,</span>`;
+// scritti veri del sito, dal piu' recente
+const SC = [['Sale','Poesie'],['Lettera a chi resta','Testi'],['Il treno delle 6:40','Racconti brevi'],['Quello che non ti ho detto','Dalle canzoni'],['Casa','Poesie'],['Piove da giorni','Testi'],['La stanza in fondo','Racconti brevi'],['Luce bassa','Poesie'],['Ritornello','Dalle canzoni']];
+const POESIE = ['Sale', 'Casa', 'Luce bassa']; // l'ordine vero delle poesie, dalla piu' recente
+const L = ['Sale', 'Casa', 'Luce bassa'];
+const WS = { 1: '<b>Cerca a</b> · il bottone si allarga sul posto e diventa il campo; i risultati scendono sotto.', 2: '' };
+
+const stage = $('#stage'), sheet = $('#sheet'), mbar = $('#mbar'), ovl = $('#ovl');
+let dr = 1, fl = 0, tl = 0, hd = 1, sv = 1, isOpen = false, sbtn, input, list;
+const lensBtn = () => `<button type="button" class="sbtn" aria-label="Apri la ricerca" aria-expanded="false"><span class="ico"><svg class="lens" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l5 5"/></svg><svg class="x" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"/></svg></span><span class="lbl">Cerca</span></button>`;
+const brand = `<span class="mb">teloscrivo<span class="dot"></span></span>`;
+
+// risultati: i 4 piu' recenti, oppure il filtro su quello che scrivi
+function fill(el, q) {
+  el.innerHTML = '';
+  const t = q.trim().toLowerCase();
+  const hits = t ? SC.filter(s => (s[0] + ' ' + s[1]).toLowerCase().includes(t)) : SC.slice(0, 4);
+  const cap = document.createElement('span'); cap.className = 'cap';
+  cap.textContent = t ? (hits.length ? hits.length + (hits.length === 1 ? ' risultato' : ' risultati') : '') : 'Più recenti';
+  el.append(cap);
+  if (!hits.length) { const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'Niente per «' + q.trim() + '». Prova con una parola del titolo.'; el.append(e); return; }
+  hits.forEach((s, i) => { const a = document.createElement('a'); a.className = 'ri'; a.href = '#'; a.style.setProperty('--i', i); a.innerHTML = '<b></b><small></small>'; a.firstChild.textContent = s[0]; a.lastChild.textContent = s[1]; a.addEventListener('click', e => e.preventDefault()); el.append(a); });
+}
+
+function build() {
+  if (isOpen) { isOpen = false; stage.classList.remove('open'); }
+  sheet.innerHTML = $('#h1').innerHTML.replace('POEM', POEM).replace('TITLE', tl ? 'Quello che non ti ho detto' : 'Casa');
+  $('.hd', sheet).className = 'hd D' + dr + ' F' + fl;
+  $('#why').innerHTML = WS[sv];
+  stage.className = 'stage H' + hd + ' S' + sv + (stage.classList.contains('desk') ? ' desk' : '');
+  if (sv === 1) {
+    mbar.innerHTML = brand;
+    ovl.innerHTML = `<div class="sx" id="sx"><div class="fld"><input type="search" placeholder="Cerca un titolo o una parola" aria-label="Cerca"></div>${lensBtn()}</div><div class="res" id="res" role="listbox"></div>`;
+    mbar.append($('#sx', ovl));
+    input = $('input', mbar); list = $('#res', ovl);
+  } else {
+    mbar.innerHTML = brand + lensBtn();
+    ovl.innerHTML = `<input class="in2" type="search" placeholder="Cosa cerchi?" aria-label="Cerca"><span class="ln2" aria-hidden="true"></span><div class="res2" id="res" role="listbox"></div>`;
+    input = $('input', ovl); list = $('#res', ovl);
+  }
+  sbtn = $('.sbtn', mbar);
+  sbtn.addEventListener('click', () => setOpen(!isOpen));
+  input.addEventListener('input', () => fill(list, input.value));
+  fill(list, '');
+  $$('.info a', sheet).forEach(a => a.addEventListener('click', e => e.preventDefault()));
+
+  // Condividi: menu a tendina; su telefono si apre quello del sistema (come altraparte)
+  const box = $('#sbox', sheet), sb = $('#sbtn', sheet);
+  const url = 'https://teloscrivo.it/scritti/casa/';
+  sb.addEventListener('click', () => {
+    if (navigator.share && matchMedia('(pointer:coarse)').matches) { navigator.share({ title: 'Casa', url }).catch(() => {}); return; }
+    const o = box.classList.toggle('open'); sb.setAttribute('aria-expanded', o);
+  });
+  $$('.smenu button', sheet).forEach(b => b.addEventListener('click', async () => {
+    if (b.dataset.a === 'wa') { window.open('https://wa.me/?text=' + encodeURIComponent('Casa ' + url), '_blank', 'noopener'); return; }
+    const l = $('span', b); try { await navigator.clipboard.writeText(url); l.textContent = 'Link copiato'; } catch (e) { l.textContent = 'Copia non riuscita'; }
+    b.classList.add('done'); setTimeout(() => { l.textContent = 'Copia link'; b.classList.remove('done'); }, 1800);
+  }));
+  $('#scroll').scrollTop = 0;
+  const w0 = () => stage.style.setProperty('--w0', sbtn.offsetWidth + 'px');
+  w0(); if (document.fonts) document.fonts.ready.then(w0);
+}
+
+function setOpen(v) {
+  if (v === isOpen) return;
+  isOpen = v;
+  stage.classList.toggle('open', v);
+  sbtn.setAttribute('aria-expanded', v);
+  sbtn.toggleAttribute('data-open', v);
+  if (v) {
+    input.value = ''; fill(list, '');
+    list.classList.add('enter'); setTimeout(() => list.classList.remove('enter'), 900);
+    setTimeout(() => input.focus({ preventScroll: true }), 160);
+  } else { input.blur(); sbtn.focus({ preventScroll: true }); }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen) setOpen(false); });
+
+$$('[data-t]').forEach(b => b.addEventListener('click', () => { tl = +b.dataset.t; $$('[data-t]').forEach(x => x.setAttribute('aria-pressed', x === b)); build(); }));
+$$('[data-d]').forEach(b => b.addEventListener('click', () => { dr = +b.dataset.d; $$('[data-d]').forEach(x => x.setAttribute('aria-pressed', x === b)); build(); }));
+$$('[data-f]').forEach(b => b.addEventListener('click', () => { fl = +b.dataset.f; $$('[data-f]').forEach(x => x.setAttribute('aria-pressed', x === b)); build(); }));
+$$('[data-h]').forEach(b => b.addEventListener('click', () => { hd = +b.dataset.h; $$('[data-h]').forEach(x => x.setAttribute('aria-pressed', x === b)); build(); }));
+$$('[data-s]').forEach(b => b.addEventListener('click', () => { sv = +b.dataset.s; $$('[data-s]').forEach(x => x.setAttribute('aria-pressed', x === b)); build(); }));
+$$('[data-view]').forEach(b => b.addEventListener('click', () => {
+  stage.classList.toggle('desk', b.dataset.view === 'd');
+  $$('[data-view]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  build();
+}));
+// per i controlli rapidi: #h=2&s=2&v=d&o=1&nt=1
+const H = new URLSearchParams(location.hash.slice(1));
+if (H.get('nt')) document.body.classList.add('nt');
+if (H.get('v') === 'd') { stage.classList.add('desk'); $$('[data-view]').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === 'd')); }
+if (H.get('t')) { tl = +H.get('t'); $$('[data-t]').forEach(x => x.setAttribute('aria-pressed', x.dataset.t == tl)); }
+if (H.get('d')) { dr = +H.get('d'); $$('[data-d]').forEach(x => x.setAttribute('aria-pressed', x.dataset.d == dr)); }
+if (H.get('f')) { fl = +H.get('f'); $$('[data-f]').forEach(x => x.setAttribute('aria-pressed', x.dataset.f == fl)); }
+if (H.get('h')) { hd = +H.get('h'); $$('[data-h]').forEach(x => x.setAttribute('aria-pressed', x.dataset.h == hd)); }
+if (H.get('s')) { sv = +H.get('s'); $$('[data-s]').forEach(x => x.setAttribute('aria-pressed', x.dataset.s == sv)); }
+build();
+if (H.get('o') === '1') setTimeout(() => setOpen(true), 100);
+</script>
+</body>
+</html>
