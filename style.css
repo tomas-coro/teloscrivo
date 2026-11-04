@@ -117,7 +117,7 @@ body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-ca
 /* ── hero ── */
 .hero{display:grid;gap:34px}
 .hero-h{font-family:"Instrument Serif",Poppins,sans-serif;font-weight:400;font-size:clamp(3rem,17vw,5.6rem);line-height:1;margin:0;display:flex;align-items:baseline;gap:.06em;text-shadow:0 0 70px color-mix(in oklab,var(--pink) 28%,transparent)}
-.hero-h .dot{width:.2em;height:.2em;flex:none;transform:translateY(-.02em)}
+.hero-h .dot{width:.12em;height:.12em;flex:none;transform:translateY(-.02em)}
 .hero-sub{font-family:"Instrument Serif",Poppins,sans-serif;font-style:italic;font-weight:400;font-size:clamp(1.5rem,5.6vw,2.1rem);line-height:1.15;color:color-mix(in srgb,var(--fg) 88%,transparent);margin:.9rem 0 0}
 .hero-rule{margin:26px 0 0}
 .hero-rule .cap{color:color-mix(in srgb,var(--fg) 78%,transparent)}
