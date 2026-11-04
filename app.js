@@ -128,7 +128,7 @@
     const settle = (dx, commit) => {
       page.style.transform = '';
       if (commit) { goBack(); return; }
-      if (!reduced) page.animate([{ transform: `translateX(${dx}px)` }, { transform: 'none' }], { duration: 240, easing: EASE });
+      if (!reduced) page.animate([{ transform: `translateX(${dx}px)` }, { transform: 'none' }], { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' });
     };
     page.addEventListener('pointerup', e => {
       if (!sw) return;

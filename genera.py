@@ -4,7 +4,7 @@
 Uso:   python3 genera.py
 Legge: scritti/*.md  (uno per scritto, con intestazione tra due righe `---`)
 Scrive: index.html, <sezione>/index.html (solo sezioni con almeno uno scritto), scritti/<slug>/index.html, cerca/index.html,
-        404.html, cerca.json, sitemap.xml, robots.txt, .nojekyll
+        testi/index.html (rimando a pensieri), 404.html, cerca.json, sitemap.xml, robots.txt, .nojekyll
 
 Dipendenze: libreria standard di Python 3 + Pillow (solo per le foto: pip3 install pillow).
 
@@ -317,7 +317,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=4" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=5" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -637,6 +637,11 @@ def main():
     for p in posts:
         write(f"scritti/{p.slug}/index.html", page_reader(p, posts))
     write("cerca/index.html", page_search())
+    write("testi/index.html", f'''<!DOCTYPE html><html lang="it"><head><meta charset="utf-8">
+<meta http-equiv="refresh" content="0;url={BASE_PATH}pensieri/">
+<link rel="canonical" href="{BASE_URL}pensieri/"><title>Pensieri | {SITE}</title>
+</head><body><p>La pagina Testi si chiama ora <a href="{BASE_PATH}pensieri/">Pensieri</a>.</p></body></html>
+''')
     write("404.html", page_404())
     write("cerca.json", search_index(posts))
     write("sitemap.xml", sitemap(posts))
