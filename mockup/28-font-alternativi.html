@@ -1,0 +1,23 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Font alternativi a Fibonacci</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Libre+Caslon+Display&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:Fib;src:url(../assets/fonts/fibonacci.ttf)}
+@font-face{font-family:Fib;font-style:italic;src:url(../assets/fonts/fibonacci-italic.ttf)}
+:root{--navy:#072D59;--seal:#DBF2FC;--pink:#FD6E88}
+body{margin:0;background:var(--navy);color:var(--seal);font:15px/1.4 Poppins,system-ui,sans-serif;padding:24px 16px}
+.g{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));max-width:1200px;margin:0 auto}
+.c{border:1px solid color-mix(in srgb,var(--seal) 22%,transparent);border-radius:14px;padding:20px}
+.n{font:600 12px "Roboto Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin:0 0 10px}
+.h{font-size:clamp(3rem,12vw,4.6rem);line-height:1;margin:0}
+.s{font-size:1.7rem;font-style:italic;margin:.5rem 0 1rem}
+.t{font-size:2rem;line-height:1.1;margin:0}
+.h span{color:var(--pink)}
+</style>
+<div class="g">
+<div class="c"><p class="n">0 · Attuale (Fibonacci Demo, senza accenti)</p><div style="font-family:Fib"><p class="h">teloscrivo<span>.</span></p><p class="s">la luna porta consiglio</p><p class="t">Perche e gia cosi</p></div></div>
+<div class="c"><p class="n">1 · Instrument Serif (la più vicina)</p><div style="font-family:'Instrument Serif'"><p class="h">teloscrivo<span>.</span></p><p class="s">la luna porta consiglio</p><p class="t">Perché è già così, città</p></div></div>
+<div class="c"><p class="n">2 · Cormorant Garamond</p><div style="font-family:'Cormorant Garamond';font-weight:500"><p class="h">teloscrivo<span>.</span></p><p class="s">la luna porta consiglio</p><p class="t">Perché è già così, città</p></div></div>
+<div class="c"><p class="n">3 · Libre Caslon Display</p><div style="font-family:'Libre Caslon Display'"><p class="h">teloscrivo<span>.</span></p><p class="s" style="font-style:normal">la luna porta consiglio</p><p class="t">Perché è già così, città</p></div></div>
+<div class="c"><p class="n">4 · Bodoni Moda</p><div style="font-family:'Bodoni Moda'"><p class="h">teloscrivo<span>.</span></p><p class="s">la luna porta consiglio</p><p class="t">Perché è già così, città</p></div></div>
+</div></html>

@@ -103,3 +103,10 @@
 - **Verificato**: `python3 genera.py` (link interni ok), `node --check app.js`, nessun errore in console su home/categoria/scritto/cerca, screenshot a 390 e 1440 px di home, categoria, scritto, cerca. **NON ancora fatti**: `/ui-check`, check A/B, prova gesture e transizioni su telefono, commit.
 - Hero della home lasciato com'era (blocco "ultimo scritto" che si scrive da solo): il mockup non lo mostrava, da confermare con Tomas.
 - Per vedere il mockup da fuori casa: screenshot con Brave headless (iframe 390px, window 700 px, niente `--force-device-scale-factor`, ritaglio sips centrale).
+
+## Sessione 04/11/2026 (sera): font e decisioni di Tomas
+- **Font titoli: Instrument Serif** (OFL, accenti ok, in locale `assets/fonts/instrumentserif-*.woff2`) al posto di Fibonacci Demo (tolto, licenza non valida). Scelto su `mockup/28-font-alternativi.html`. `style.css?v=5`. Verificato con screenshot home e scritto a 1200 px.
+- Tolti `vetro.otf` e `balligesta.otf` (inutilizzati). Restano nella storia git del repo pubblico: riscrivere la storia solo con ok di Tomas.
+- Dominio: Tomas compra `teloscrivo.it`; poi cambiare `BASE_URL` in `genera.py`. Hosting (Pages o Plesk) ancora da decidere.
+- TikTok: si aspetta (`TIKTOK_URL` vuoto). Spotify: solo negli scritti ispirati a una canzone, col link nel frontmatter.
+- Da fare: `/ui-check` + check A/B sul sito (ora con il font nuovo), prova gesti/transizioni su telefono (la fa Tomas).
