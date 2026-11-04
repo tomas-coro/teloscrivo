@@ -196,6 +196,27 @@
     });
   }
 
+  // ── anteprima scritti: la pagina completa resta raggiungibile anche senza JS ──
+  const deskReader = $('.desk-reader');
+  if (deskReader) {
+    let source;
+    $$('[data-preview]').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      source = a;
+      const card = a.closest('.desk-window');
+      $('[data-window-name]', deskReader).textContent = $('.desk-bar span', card).textContent;
+      $('#desk-reader-title', deskReader).textContent = $('.desk-title', card).textContent;
+      $('[data-reader-meta]', deskReader).textContent = $('.desk-meta b', card).textContent + ' · ' + $('.desk-meta', card).textContent.replace($('.desk-meta b', card).textContent, '');
+      $('[data-reader-excerpt]', deskReader).textContent = $('.desk-excerpt', card).textContent;
+      $('[data-reader-link]', deskReader).href = a.href;
+      deskReader.showModal();
+      $('[data-close]', deskReader).focus();
+    }));
+    $('[data-close]', deskReader).addEventListener('click', () => deskReader.close());
+    deskReader.addEventListener('close', () => source?.focus());
+  }
+  $$('[data-slide]').forEach(button => button.addEventListener('click', () => $('.desk-phones').scrollBy({ left: Number(button.dataset.slide) * 147, behavior: reduced ? 'instant' : 'smooth' })));
+
   // ── pagina Cerca: legge cerca.json e filtra mentre scrivi ──
   const sp = $('[data-searchpage]');
   if (sp) {

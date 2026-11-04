@@ -205,6 +205,66 @@ body[data-cat="testi"]{--sx:14%}body[data-cat="poesie"]{--sx:38%}body[data-cat="
   .tk{flex:1 1 0;width:auto;max-width:210px}
 }
 
+/* ── home Scrivania: finestre e anteprima ── */
+body:has(.desk-shelf) .wrapin{max-width:1000px}
+body:has(.desk-shelf) .hero{margin-bottom:68px}
+.desk-latest,.desk-window{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#123862}
+.desk-bar{display:flex;align-items:center;gap:6px;min-height:39px;padding:7px 15px;border-bottom:1px solid var(--line);background:#ffffff0a}
+.desk-bar i{width:9px;height:9px;flex:none;background:var(--line);border-radius:50%}
+.desk-bar i:first-child{background:var(--pink)}
+.desk-bar span{margin:auto;color:var(--muted);font:600 .72rem 'Roboto Condensed',sans-serif}
+.desk-latest a{display:block;padding:24px 28px;text-decoration:none}
+.desk-latest strong{display:block;font:400 2.4rem Fibonacci,Poppins,sans-serif}
+.desk-latest small{display:block;margin-top:12px;color:var(--fg);font-size:.94rem;line-height:1.7}
+.desk-section h2,.desk-videos h2{font:400 clamp(2.4rem,6vw,3.5rem)/1.1 Fibonacci,Poppins,sans-serif;margin:0}
+.desk-section>p{color:var(--muted);font-size:.88rem;margin:5px 0 20px}
+.desk-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:23px}
+.desk-filters a{display:inline-flex;align-items:center;min-height:44px;padding:9px 16px;border:1px solid var(--line);border-radius:99px;text-decoration:none;font-size:.82rem}
+.desk-filters a:hover{border-color:var(--pink)}
+.desk-shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.desk-window{min-width:0;display:flex;flex-direction:column}
+.desk-window>a{display:flex;flex-direction:column;flex:1;color:inherit;text-decoration:none}
+.desk-window a:hover .desk-title{color:var(--pink)}
+.desk-window a:focus-visible{outline:2px solid var(--pink);outline-offset:-3px}
+.desk-photo{display:block;height:190px;position:relative;overflow:hidden;background:linear-gradient(155deg,#8da6b4,#38577e 51%,#17294b)}
+.desk-window:nth-child(3n+2) .desk-photo{background:linear-gradient(135deg,#ae8aa3,#5b4b78 55%,#132c51)}
+.desk-window:nth-child(3n+3) .desk-photo{background:linear-gradient(140deg,#748895,#2a4765 50%,#101a3e)}
+.desk-photo::before{content:'';position:absolute;inset:20% -30%;background:radial-gradient(ellipse at 70% 20%,#dbf2fc66,transparent 35%),linear-gradient(140deg,transparent 40%,#071c3b88 41%,transparent 70%)}
+.desk-photo::after{content:'Foto dello scritto · segnaposto';position:absolute;bottom:14px;left:16px;padding:6px 10px;border-radius:99px;background:#072d59d9;color:var(--seal);font-size:.68rem}
+.desk-info{display:flex;flex-direction:column;flex:1;padding:20px 22px 22px}
+.desk-meta{color:var(--muted);font-size:.75rem}
+.desk-meta b{color:var(--pink);font-weight:500;margin-right:10px}
+.desk-title{display:block;font:400 clamp(1.85rem,3vw,2.35rem)/1.1 Fibonacci,Poppins,sans-serif;margin:13px 0 9px}
+.desk-excerpt{font-size:.84rem;line-height:1.6;color:var(--muted)}
+.desk-more{font-size:.76rem;margin-top:auto;padding-top:19px}
+.desk-videos{width:100vw;margin:60px 0 0 calc(50% - 50vw);padding:35px max(18px,calc((100vw - 1000px)/2));border-top:1px solid var(--line);background:#0a305b}
+.desk-videos>p{font-size:.83rem;color:var(--muted)}
+.desk-slider-top{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.desk-arrows{display:flex;gap:8px}
+.desk-arrows button{width:44px;height:44px;border:1px solid var(--line);border-radius:50%;background:var(--soft);cursor:pointer}
+.desk-phones{display:flex;gap:17px;overflow-x:auto;scroll-snap-type:x mandatory;padding:20px 2px 22px}
+.desk-phone{flex:0 0 130px;aspect-ratio:9/17;scroll-snap-align:start;position:relative;border:5px solid #061b37;border-radius:30px;overflow:hidden;text-decoration:none;background:linear-gradient(150deg,#7897a8,#234469 55%,#813f69);box-shadow:0 12px 25px #0004}
+.desk-phone::before{content:'';position:absolute;top:5px;left:34%;width:32%;height:12px;border-radius:0 0 10px 10px;background:#061b37}
+.desk-screen{display:flex;flex-direction:column;justify-content:space-between;height:100%;padding:30px 14px 19px;color:var(--seal);font-size:.8rem}
+.desk-screen span{font:400 1.2rem/1.1 Fibonacci,Poppins,sans-serif}
+.desk-screen small{display:block;margin-top:10px;color:var(--pink);font:400 .68rem Poppins,sans-serif}
+.desk-reader{position:fixed;inset:0;width:100%;max-width:none;height:100%;max-height:none;margin:0;padding:0;border:0;background:var(--navy);color:var(--fg);overflow-y:auto}
+.desk-reader::backdrop{background:var(--navy)}
+.desk-reader[open]{animation:desk-unfold .42s cubic-bezier(.2,.8,.2,1) both}
+@keyframes desk-unfold{from{opacity:.2;clip-path:inset(12% 18% round 16px)}to{opacity:1;clip-path:inset(0)}}
+.desk-reader .desk-bar{position:sticky;top:0;z-index:2;background:#123862;min-height:60px}
+.desk-reader .desk-bar span{margin:0 auto}
+.desk-close{border:1px solid var(--line);border-radius:9px;padding:7px 12px;background:var(--navy);cursor:pointer;font-size:.8rem}
+.desk-close:hover{border-color:var(--pink)}
+.desk-reading{max-width:600px;margin:auto;padding:45px 24px 100px}
+.desk-reading .desk-photo{height:200px;border-radius:14px;margin:0 0 37px}
+.desk-reading h2{font:400 clamp(3.3rem,10vw,5.5rem)/1 Fibonacci,Poppins,sans-serif;margin:14px 0 30px}
+.desk-reading>p:not(.desk-disclaimer){font:300 1.2rem/1.85 Poppins,sans-serif}
+.desk-reading .cta{margin-top:24px}
+.desk-disclaimer{font-size:.8rem;color:var(--muted);margin-top:22px}
+@media(max-width:560px){.desk-shelf{grid-template-columns:1fr;gap:15px}.desk-window .desk-photo{height:180px}.desk-window .desk-title{font-size:2rem}.desk-videos h2{font-size:2.4rem}}
+@media(prefers-reduced-motion:reduce){.desk-reader[open]{animation:none}}
+
 /* ── pagine sezione / cerca ── */
 .phead{margin:0 0 8px}
 .phead h1{font-family:Fibonacci,Poppins,sans-serif;font-weight:400;font-size:clamp(3rem,15vw,5rem);line-height:1;margin:0}

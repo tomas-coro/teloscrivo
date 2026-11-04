@@ -267,30 +267,23 @@ def entries_html(posts, root, newest=None, heading="h3"):
 def page_home(posts):
     root = ""
     newest = posts[0]
-    by_cat = {k: [p for p in posts if p.cat == k] for k in SECTIONS}
-    latest = [{"t": p.title, "k": SECTIONS[p.cat][0], "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
-    first = latest[0]
-    pick = ""
-    for k, (name, _, opening) in SECTIONS.items():
-        items = by_cat[k]
-        ultimo = f'<span class="pl pu">Ultimo: <i>{esc(items[0].title)}</i></span>' if items else ""
-        pick += (f'<a class="pk" href="{k}/">{icon(k)}<b>{name}</b><span class="pl">{opening}</span>{ultimo}'
-                 f'<span class="cap">{plural(len(items), "scritto", "scritti")}</span></a>')
-    chips = f'<button type="button" data-cat="" aria-pressed="true">Tutti<small>{len(posts)}</small></button>' + "".join(
-        f'<button type="button" data-cat="{k}" aria-pressed="false">{short}<small>{len(by_cat[k])}</small></button>'
-        for k, (_, short, _) in SECTIONS.items()
+    windows = "".join(
+        f'<article class="desk-window" data-cat="{p.cat}"><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
+        f'<a href="{p.url}" data-preview><span class="desk-photo" role="img" aria-label="Segnaposto per la foto di {esc(p.title)}"></span>'
+        f'<span class="desk-info"><span class="desk-meta"><b>{esc(SECTIONS[p.cat][0])}</b>{p.long_date()}</span>'
+        f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
+        f'<span class="desk-more">Apri lo scritto ↗</span></span></a></article>'
+        for p in posts
     )
-    names = json.dumps({k: v[0] for k, v in SECTIONS.items()}, ensure_ascii=False)
+    filters = "".join(f'<a href="{k}/">{esc(name)}</a>' for k, (name, _, _) in SECTIONS.items())
     tiktok = ""
-    if TIKTOK_URL:
-        cards = "".join(f'<a class="tk" href="{esc(u)}" target="_blank" rel="noopener"><b>{esc(t)}<br><small>{esc(s)}</small></b></a>' for t, s, u in TIKTOK_VIDEOS)
-        tiktok = (f'<section class="sec" aria-labelledby="h-tk"><div class="sh"><span class="sn">03</span><h2 class="st" id="h-tk">Su TikTok</h2></div>'
-                  f'<div class="tks"><div class="tkintro"><p>Le poesie e i testi, letti a voce.</p>'
-                  f'<a class="cta" href="{esc(TIKTOK_URL)}" target="_blank" rel="noopener">Seguimi su TikTok{ICON_EXT}</a></div>'
-                  f'<div class="tkrow">{cards}</div></div></section>')
+    if TIKTOK_VIDEOS:
+        cards = "".join(f'<a class="desk-phone" href="{esc(u)}" target="_blank" rel="noopener noreferrer"><span class="desk-screen">teloscrivo <span>{esc(t)}<small>{esc(s)}</small></span></span></a>' for t, s, u in TIKTOK_VIDEOS)
+        tiktok = (f'<section class="desk-videos" aria-labelledby="h-tk"><div class="desk-slider-top"><h2 id="h-tk">Le parole, in video</h2>'
+                  f'<div class="desk-arrows"><button type="button" data-slide="-1" aria-label="Video precedenti">←</button><button type="button" data-slide="1" aria-label="Video successivi">→</button></div></div>'
+                  f'<p>Le poesie e i testi, letti a voce.</p><div class="desk-phones">{cards}</div></section>')
     desc = "Poesie, testi, racconti brevi e testi di canzoni, da leggere scorrendo. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
-    latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
     body = f"""<body id="inizio">
 <div class="opening" data-opening role="dialog" aria-modal="true" aria-label="Apertura di teloscrivo" tabindex="-1" hidden>
   <div class="opening-window">
@@ -305,23 +298,23 @@ def page_home(posts):
     <div class="hero-l">
       <h1 class="hero-h">{SITE}<span class="dot" aria-hidden="true"></span></h1>
       <p class="hero-sub">la luna porta consiglio</p>
-      <p class="hero-rule"><span class="cap">Ultimo scritto il {newest.long_date()} · {plural(len(posts), "scritto", "scritti")}</span></p>
+      <p class="hero-rule"><span class="cap">Ultimo scritto · {esc(newest.title)}</span></p>
     </div>
-    <article class="last">
-      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · {SECTIONS[newest.cat][0]} · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
-      <div class="wbody"><p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p></div>
-      <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
+    <article class="desk-latest">
+      <div class="desk-bar"><i></i><i></i><i></i><span>ultimo scritto.txt</span></div>
+      <a href="{newest.url}"><strong>{esc(newest.title)}</strong><small>{esc(newest.excerpt).replace(chr(10), '<br>')}</small></a>
     </article>
   </section>
-  <section class="sec" aria-labelledby="h-pick"><div class="sh"><span class="sn">01</span><h2 class="st" id="h-pick">Scegli cosa leggere</h2></div><div class="pick">{pick}</div></section>
-  <section class="sec" aria-labelledby="h-all"><div class="sh"><span class="sn">02</span><h2 class="st" id="h-all" data-lh>Tutti gli scritti</h2><span class="cap" data-lc>{plural(len(posts), "scritto", "scritti")}</span></div>
-    <div class="chips2" data-chips data-names='{esc(names)}' role="group" aria-label="Filtra per sezione" hidden>{chips}</div>
-    {entries_html(posts, root, newest=newest)}
+  <section class="desk-section" aria-labelledby="h-all"><h2 id="h-all">Gli scritti</h2><p>Le finestre sulla scrivania, due alla volta.</p>
+    <nav class="desk-filters" aria-label="Sezioni">{filters}</nav><div class="desk-shelf">{windows}</div>
   </section>
   {tiktok}
   {foot_html(root)}
 </div></main>
-<script type="application/json" id="latest">{latest_json}</script>
+<dialog class="desk-reader" aria-labelledby="desk-reader-title"><div class="desk-bar"><i></i><i></i><i></i><span data-window-name>lettura.txt</span><button type="button" class="desk-close" data-close aria-label="Chiudi la lettura">Chiudi ✕</button></div>
+  <div class="desk-reading"><div class="desk-photo" role="img" aria-label="Segnaposto della foto dello scritto"></div><div class="desk-meta" data-reader-meta></div>
+  <h2 id="desk-reader-title"></h2><p data-reader-excerpt></p><a class="cta" data-reader-link href="{newest.url}">Leggi il testo completo ↗</a>
+  <p class="desk-disclaimer">Questa è un'anteprima. Il testo completo si legge nella pagina dello scritto.</p></div></dialog>
 {tail_html(root)}"""
     return head_html(root, f"{SITE} · poesie, testi e racconti brevi", desc, BASE_URL, jsonld=ld) + body
 
