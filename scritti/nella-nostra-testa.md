@@ -1,7 +1,7 @@
 ---
 titolo: Nella nostra testa
 data: 2026-11-04
-sezione: testi, poesie
+sezione: pensieri, poesie
 ---
 
 Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.

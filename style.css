@@ -73,7 +73,7 @@ ul{list-style:none;margin:0;padding:0}
   radial-gradient(90% 40% at var(--sx) 118%,color-mix(in oklab,var(--pink) 20%,transparent),transparent 72%),
   linear-gradient(180deg,var(--navy) 0%,color-mix(in oklab,var(--navy) 90%,var(--pink)) 100%)}
 .sky::after{content:"";position:absolute;inset:0;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-body[data-cat="testi"]{--sx:14%}body[data-cat="poesie"]{--sx:38%}body[data-cat="racconti"]{--sx:62%}body[data-cat="canzoni"]{--sx:86%}
+body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-cat="citazioni"]{--sx:50%}body[data-cat="racconti"]{--sx:69%}body[data-cat="canzoni"]{--sx:88%}
 
 /* ── intestazione ── */
 .tbar{position:fixed;top:0;left:0;right:0;height:var(--th);padding:10px 18px 0;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(180deg,var(--navy) 58%,transparent)}
@@ -163,7 +163,8 @@ body[data-cat="testi"]{--sx:14%}body[data-cat="poesie"]{--sx:38%}body[data-cat="
 .ic{--g:var(--seal);--ac:var(--pink);position:relative;width:46px;height:46px;border-radius:13px;display:grid;place-items:center;flex:none;box-shadow:inset 0 1px 0 color-mix(in srgb,var(--seal) 45%,transparent),0 5px 12px color-mix(in srgb,var(--navy) 28%,transparent)}
 .ic svg{width:24px;height:24px;fill:none;stroke:var(--g);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .ic .ac{stroke:var(--ac)}
-.ic-testi{background:linear-gradient(145deg,color-mix(in oklab,var(--navy) 72%,var(--seal)),var(--navy))}
+.ic-citazioni{--g:var(--navy);--ac:var(--pink);background:linear-gradient(145deg,var(--seal),color-mix(in oklab,var(--seal) 60%,var(--pink)))}
+.ic-pensieri{background:linear-gradient(145deg,color-mix(in oklab,var(--navy) 72%,var(--seal)),var(--navy))}
 .ic-poesie{--g:var(--navy);--ac:var(--seal);background:linear-gradient(145deg,var(--pink),color-mix(in oklab,var(--pink) 68%,var(--seal)))}
 .ic-racconti{--g:var(--navy);background:linear-gradient(145deg,color-mix(in oklab,var(--seal) 78%,var(--navy)),color-mix(in oklab,var(--seal) 44%,var(--navy)))}
 .ic-canzoni{background:linear-gradient(145deg,var(--navy),color-mix(in oklab,var(--pink) 58%,var(--navy)))}

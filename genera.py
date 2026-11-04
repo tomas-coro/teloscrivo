@@ -14,7 +14,7 @@ le applica il filtro duotono blu del sito e scrive assets/foto/<slug>-800.webp e
 Intestazione di uno scritto (tutto su una riga ciascuno):
     titolo:   obbligatorio
     data:     obbligatorio, AAAA-MM-GG
-    sezione:  obbligatorio, una tra testi | poesie | racconti | canzoni (anche due, separate da virgola: `testi, poesie`; la prima e' la principale)
+    sezione:  obbligatorio, una tra pensieri | poesie | citazioni | racconti | canzoni (anche due, separate da virgola: `pensieri, poesie`; la prima e' la principale)
     estratto: facoltativo (se manca: prime righe per poesie/canzoni, prima frase per il resto)
     spotify:  facoltativo, link https:// (compare il bottone "Ascolta su Spotify")
     foto-focus: facoltativo, punto da tenere nel ritaglio, es. `30% 50%` (default: centro)
@@ -55,11 +55,12 @@ DUO_DARK, DUO_LIGHT = (0x07, 0x2D, 0x59), (0xDB, 0xF2, 0xFC)
 ROOT = Path(__file__).resolve().parent
 BASE_PATH = urlparse(BASE_URL).path  # "/teloscrivo/" su GitHub Pages, "/" sul dominio vero
 
-SECTIONS = {  # ordine = ordine nel menu
-    "testi": ("Testi", "Testi", "Pensieri che non stanno in una frase."),
+SECTIONS = {  # ordine = ordine nel menu; (nome lungo, nome nel menu, frase). Le sezioni senza scritti restano nascoste
+    "pensieri": ("Pensieri", "Pensieri", "Pensieri che non stanno in una frase."),
     "poesie": ("Poesie", "Poesie", "Poche righe, dette piano."),
+    "citazioni": ("daCitazione", "daCitazione", "Parole di altri che mi sono rimaste addosso."),
     "racconti": ("Racconti brevi", "Racconti", "Storie brevi, da leggere in un respiro."),
-    "canzoni": ("Dalle canzoni", "Canzoni", "Quello che ho scritto cantando sottovoce."),
+    "canzoni": ("daCanzone", "daCanzone", "Quello che ho scritto cantando sottovoce."),
 }
 LINE_SECTIONS = {"poesie", "canzoni"}  # qui ogni riga e' un verso
 MONTHS_SHORT = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
@@ -68,7 +69,8 @@ MONTHS_LONG = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "lu
 BAD_DASHES = (chr(0x2014), chr(0x2013))  # trattini lunghi "da AI": vietati nei testi (chr: l'hook dei trattini riscrive i letterali)
 
 GLYPH = {
-    "testi": '<path d="M6.5 3h7.5l4 4v13.5h-11.5z"/><path d="M14 3v4h4"/><path d="M9.5 12h6"/><path class="ac" d="M9.5 15.5h4"/>',
+    "pensieri": '<path d="M6.5 3h7.5l4 4v13.5h-11.5z"/><path d="M14 3v4h4"/><path d="M9.5 12h6"/><path class="ac" d="M9.5 15.5h4"/>',
+    "citazioni": '<path d="M5 18v-5.5C5 9 6.8 7 10 6.5M13.5 18v-5.5c0-3.5 1.8-5.5 5-6"/><path class="ac" d="M5 18h5v-5.5H5zM13.5 18h5v-5.5h-5z"/>',
     "poesie": '<path d="M19.5 4.5c-6.5-.5-11 3-12 9.5L5 19.5l.8.7 3.2-1.8c6.4-1 10-5.5 10.5-12.9z"/><path class="ac" d="M8 17l7-7"/>',
     "racconti": '<path d="M3 6c3-1.2 6-.8 9 1.2 3-2 6-2.4 9-1.2v12c-3-1.2-6-.8-9 1.2-3-2-6-2.4-9-1.2z"/><path class="ac" d="M12 7.2v12"/>',
     "canzoni": '<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5"/><path class="ac" d="M9.5 9l10-2"/>',
@@ -292,7 +294,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=6">
+<link rel="stylesheet" href="{root}style.css?v=7">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -422,8 +424,8 @@ def page_home(posts):
         cards = "".join(f'<a class="desk-phone" href="{esc(u)}" target="_blank" rel="noopener noreferrer"><span class="desk-screen">teloscrivo <span>{esc(t)}<small>{esc(s)}</small></span></span></a>' for t, s, u in TIKTOK_VIDEOS)
         tiktok = (f'<section class="desk-videos" aria-labelledby="h-tk"><div class="desk-slider-top"><h2 id="h-tk">Le parole, in video</h2>'
                   f'<div class="desk-arrows"><button type="button" data-slide="-1" aria-label="Video precedenti">←</button><button type="button" data-slide="1" aria-label="Video successivi">→</button></div></div>'
-                  f'<p>Le poesie e i testi, letti a voce.</p><div class="desk-phones">{cards}</div></section>')
-    desc = "Poesie, testi, racconti brevi e testi di canzoni, da leggere scorrendo. La luna porta consiglio."
+                  f'<p>Pensieri, poesie e parole che mi porto dietro, lette a voce.</p><div class="desk-phones">{cards}</div></section>')
+    desc = "Pensieri, poesie, citazioni e scritti nati da una canzone, da leggere scorrendo. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
     latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
     body = f"""<body id="inizio">
@@ -456,7 +458,7 @@ def page_home(posts):
 </div></main>
 <script type="application/json" id="latest">{latest_json}</script>
 {tail_html(root)}"""
-    return head_html(root, f"{SITE} · poesie, testi e racconti brevi", desc, BASE_URL, jsonld=ld) + body
+    return head_html(root, f"{SITE} · pensieri, poesie e citazioni", desc, BASE_URL, jsonld=ld) + body
 
 
 def page_section(k, posts):
@@ -534,7 +536,7 @@ def page_reader(p, posts):
 def page_search():
     root = "../"
     canon = f"{BASE_URL}cerca/"
-    desc = "Cerca tra poesie, testi e racconti brevi di teloscrivo."
+    desc = "Cerca tra pensieri, poesie e citazioni di teloscrivo."
     body = f"""<body id="inizio">
 {top_html(root, "cerca")}<main id="contenuto" class="page"><div class="wrapin">
   <h1 class="sr">Cerca</h1>

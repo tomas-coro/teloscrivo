@@ -1,7 +1,7 @@
 ---
 titolo: Limite/Specchio
 data: 2026-11-04
-sezione: testi
+sezione: pensieri, citazioni
 ---
 
 > Supera i tuoi limiti. Fallo qui. Fallo ora.
