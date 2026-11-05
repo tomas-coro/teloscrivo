@@ -250,7 +250,11 @@ body:has(.desk-shelf) .hero{margin-bottom:68px}
 /* ── piede ── */
 .foot{margin-top:72px;padding:22px 0 8px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.78rem}
 .foot .cp{order:3;flex:1 0 100%;font-size:.72rem;opacity:.8}
-@media (min-width:640px){.foot .up{order:3}.foot .cp{order:2;flex:0 0 auto;font-size:.78rem;opacity:1}}
+.foot-soc{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 6px;color:var(--fg);text-decoration:none;font-size:.78rem;transition:color .2s}
+.foot-soc svg{width:18px;height:18px;flex:none}
+.foot-soc:hover{color:var(--pink)}
+/* desktop: a sinistra logo + (c), a destra Instagram + Torna su; il margine automatico spinge il secondo gruppo a destra */
+@media (min-width:640px){.foot{column-gap:28px}.foot .cp{order:1;flex:0 0 auto;font-size:.78rem;opacity:1}.foot-soc{order:2;margin-left:auto}.foot .up{order:3}}
 .wm2{font-family:"Instrument Serif",Poppins,sans-serif;font-size:1.3rem;color:var(--fg);display:inline-flex;align-items:baseline;gap:3px}
 .up{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 6px;font:600 .7rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);text-decoration:none}
 .up svg{width:16px;height:16px;transition:transform .2s}

@@ -382,7 +382,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=43">
+<link rel="stylesheet" href="{root}style.css?v=45">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -398,7 +398,13 @@ def top_html(root):
 
 
 def foot_html(root):
+    # profili social (stessa lista di "Trovami su" in fondo agli scritti): icona + nome, in una riga sola
+    soc = "".join(
+        f'<a class="foot-soc" href="{esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="{SOCIAL_ICONS[k][0]}: {esc(label)}">'
+        f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span>{esc(label)}</span></a>'
+        for k, (url, label) in SOCIAL.items() if url)
     return (f'<footer class="foot"><span class="wm2">{SITE}<span class="dot" aria-hidden="true"></span></span>'
+            f'{soc}'
             f'<a class="up" href="#inizio">Torna su{ICON_UP}</a>'
             f'<small class="cp">© {date.today().year}</small></footer>')
 
