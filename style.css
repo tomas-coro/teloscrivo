@@ -301,7 +301,7 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .u.l{display:block}
 /* il testo e' SEMPRE nel documento (SEO, no-JS): si nasconde solo se il JS e' attivo */
 .js .u{opacity:0;transition:opacity .7s ease,transform .7s ease}
-.js .u.l{transform:translateY(12px)}
+.js .u.l,.js p.u{transform:translateY(12px)}
 .js .u.on{opacity:1;transform:none}
 .rend{border-top:1px solid var(--line);padding-top:26px}
 .js .rend{opacity:0;transform:translateY(14px);transition:opacity .7s,transform .7s}

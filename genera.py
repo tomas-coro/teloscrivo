@@ -277,9 +277,10 @@ class Post:
 
     @staticmethod
     def _plain_html(text):
-        """Capitoli: paragrafi semplici, tutto visibile subito (niente effetto "compare scorrendo")."""
+        """Capitoli: un paragrafo alla volta compare scorrendo (e sparisce se risali). Per paragrafo e non per frase:
+        i capitoli hanno paragrafi lunghi, frase per frase sarebbe un lampeggio continuo."""
         paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
-        return "".join("<p>" + "<br>".join(esc(l.strip()) for l in p.strip().split("\n") if l.strip()) + "</p>" for p in paras)
+        return "".join('<p class="u">' + "<br>".join(esc(l.strip()) for l in p.strip().split("\n") if l.strip()) + "</p>" for p in paras)
 
     def body_html(self):
         """Il testo e' tutto nell'HTML. Ogni riga/frase e' un <span class=u>: il JS la fa comparire scorrendo."""
@@ -357,7 +358,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=31">
+<link rel="stylesheet" href="{root}style.css?v=32">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
