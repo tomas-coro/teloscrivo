@@ -17,13 +17,14 @@ Intestazione di uno scritto (tutto su una riga ciascuno):
     sezione:  obbligatorio, una tra pensieri | poesie | citazioni | racconti | canzoni (anche due, separate da virgola: `pensieri, poesie`; la prima e' la principale)
     estratto: facoltativo (se manca: prime righe per poesie/canzoni, prima frase per il resto)
     spotify:  facoltativo, link https:// (compare il bottone "Ascolta su Spotify")
+    canzone:  facoltativo, titolo e artista del brano: credito dopo il testo (richiede spotify)
     foto-focus: facoltativo, punto da tenere nel ritaglio, es. `30% 50%` (default: centro)
     foto-zoom: facoltativo, da 1 a 3 (es. `1.5`): ritaglia piu' stretto e CENTRA il ritaglio su foto-focus (senza zoom foto-focus sposta soltanto il taglio)
     capitolo: solo per il libro (sezione: libro). Un file = un capitolo intero. Numeri da 1 senza buchi, oppure `prologo` (uno solo, viene prima di tutto)
     atto: facoltativo, solo libro: numero dell'atto (1, 2, 3...) mostrato come numero romano
 Righe che iniziano con # nell'intestazione sono commenti.
 Il corpo: righe = versi (poesie, canzoni); righe vuote = pausa/paragrafo.
-Citazione in cima: righe che iniziano con `> ` (l'ultima e' l'autore). Poesia finale dentro un testo: una riga `[poesia]` e sotto i versi.
+Citazione: righe iniziali che iniziano con `> ` (l'ultima e' l'autore); mostrata dopo il testo. Poesia finale dentro un testo: una riga `[poesia]` e sotto i versi.
 """
 import html
 import json
@@ -69,7 +70,7 @@ SECTIONS = {  # ordine = ordine nel menu; (nome lungo, nome nel menu, frase). Le
 }
 BOOK_TITLE = "La sindrome del cielo"
 # Testo breve del riquadro in home (approvato nel mockup 34, direzione B). La quarta intera sta in libro-quarta.txt, per /libro/.
-BOOK_HOME_BLURB = "Illyrium, la Culla del Cielo, non perdona chi è diverso. Aetherion è un’anomalia: una cicatrice sul petto e un potere instabile che non risponde a nessuna regola conosciuta. Un potere che non crea, ma distrugge."
+BOOK_HOME_BLURB = "Illyrium non perdona chi è diverso. Aetherion ha una cicatrice sul petto e un potere che non crea, ma distrugge."
 LINE_SECTIONS = {"poesie", "canzoni"}  # qui ogni riga e' un verso
 MONTHS_SHORT = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 MONTHS_LONG = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",
@@ -142,7 +143,7 @@ class Post:
                 raise SiteError(f"{path.name}, riga {n}: atteso 'chiave: valore', trovato '{line}'")
             k, v = line.split(":", 1)
             k = k.strip().lower()
-            if k not in ("titolo", "data", "sezione", "estratto", "spotify", "foto-focus", "foto-zoom", "capitolo", "atto"):
+            if k not in ("titolo", "data", "sezione", "estratto", "spotify", "canzone", "foto-focus", "foto-zoom", "capitolo", "atto"):
                 raise SiteError(f"{path.name}, riga {n}: chiave sconosciuta '{k}'")
             meta[k] = v.strip()
         for k in ("titolo", "data", "sezione"):
@@ -180,6 +181,9 @@ class Post:
         self.spotify = meta.get("spotify", "")
         if self.spotify and not self.spotify.startswith("https://"):
             raise SiteError(f"{path.name}: il link spotify deve iniziare con https://")
+        self.song = meta.get("canzone", "")
+        if self.song and not self.spotify:
+            raise SiteError(f"{path.name}: 'canzone' richiede il link 'spotify'")
         self.focus = meta.get("foto-focus", "50% 50%")
         if not re.fullmatch(r"\d{1,3}% \d{1,3}%", self.focus) or any(int(v) > 100 for v in re.findall(r"\d+", self.focus)):
             raise SiteError(f"{path.name}: foto-focus '{self.focus}' non valido (esempio: 30% 50%, valori da 0 a 100)")
@@ -287,13 +291,14 @@ class Post:
         if self.book:
             return self._plain_html(self.body) + (f'<div class="poema">{self._plain_html(self.poem)}</div>' if self.poem else "")
         out = ""
-        if self.quote:  # citazione in cima: tutte le righe tranne l'ultima sono la frase, l'ultima e' l'autore
-            frase, autore = (self.quote[:-1], self.quote[-1]) if len(self.quote) > 1 else (self.quote, "")
-            out += ('<blockquote class="cita"><p><span class="u">' + esc(" ".join(frase)) + "</span></p>"
-                    + (f'<cite class="u">{esc(autore)}</cite>' if autore else "") + "</blockquote>")
         out += self._lines_html(self.body) if self.cat in LINE_SECTIONS else self._prose_html(self.body)
         if self.poem:  # poesia finale: sempre a versi, separata dal testo
             out += '<div class="poema">' + self._lines_html(self.poem) + "</div>"
+        if self.quote:
+            frase, autore = (self.quote[:-1], self.quote[-1]) if len(self.quote) > 1 else (self.quote, "")
+            out += ('<aside class="origin"><small>All’origine di questo testo</small><blockquote class="cita"><span class="u">“'
+                    + "<br>".join(esc(riga) for riga in frase) + "”</span>"
+                    + (f'<cite class="u">{esc(autore)}</cite>' if autore else "") + "</blockquote></aside>")
         return out
 
 
@@ -358,7 +363,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=35">
+<link rel="stylesheet" href="{root}style.css?v=41">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -611,7 +616,9 @@ def page_reader(p, posts):
     rel = [x for x in posts if x is not p and set(x.cats) & set(p.cats)] + [x for x in posts if x is not p and not set(x.cats) & set(p.cats)]
     rel_html = rcards_html(rel[:2], root)
     find_html = social_html()
-    spotify = (f'<a class="cta" href="{esc(p.spotify)}" target="_blank" rel="noopener">Ascolta su Spotify{ICON_EXT}</a>' if p.spotify else "")
+    spotify = (f'<a class="cta" href="{esc(p.spotify)}" target="_blank" rel="noopener">Ascolta su Spotify{ICON_EXT}</a>' if p.spotify and not p.song else "")
+    title, _, artist = p.song.partition(" - ")
+    song = (f'<aside class="origin song-origin"><small>All’origine di questo testo</small><strong>“{esc(title)}”</strong><div><cite>{esc(artist)}</cite> · <a href="{esc(p.spotify)}" target="_blank" rel="noopener noreferrer">Apri su Spotify ↗</a></div></aside>' if p.song else "")
     canon = f"{BASE_URL}{p.url}"
     desc = p.flat[:155]
     ld = [{
@@ -632,7 +639,7 @@ def page_reader(p, posts):
 <header class="rbar"><div class="rbtns"><a class="rbtn rbtn-home" data-home="scritto" href="{root}" aria-label="Torna alla home">{ICON_HOME}<span>Home</span></a><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a></div></header>
 <main id="contenuto" class="rsc"><article class="rart">
   <header class="rhead"><div class="rhero"><div class="rphoto{" has-img" if p.has_photo else ""}">{photo_img(p, root, "(min-width:700px) 736px, 100vw", eager=True)}</div><h1 class="rt">{esc(p.title)}</h1></div><div class="rcard-b"><div class="metarow">{chip}{p.time_html}</div></div></header>
-  <div class="rbody">{p.body_html()}</div>
+  <div class="rbody">{p.body_html()}{song}</div>
   <footer class="rend">
     <section class="rbye"><p class="bye">Grazie per aver letto e ricorda che<br><em>la luna porta consiglio</em>{ICON_MOON}</p>
       <div class="bye-actions"><button type="button" class="sharebtn" data-share hidden>{ICON_SHARE}<span data-share-lbl>Condividi</span></button><button type="button" class="copybtn" data-copy hidden>{ICON_LINK}<span data-copy-lbl>Copia link</span></button></div></section>
