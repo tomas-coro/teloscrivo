@@ -67,6 +67,29 @@
     } catch (e) { /* senza memoria del browser il libro funziona uguale */ }
   }
 
+  // ── home: riquadro del libro. Senza memoria resta "Inizia da"; con un capitolo gia' aperto diventa
+  // "Continua da", con la barra di avanzamento e il tempo che resta. Stesse chiavi del libro sopra.
+  const bk = $('[data-book]'), bkData = $('#book-data');
+  if (bk && bkData) {
+    try {
+      const chaps = JSON.parse(bkData.textContent);
+      const durata = t => t < 60 ? t + ' min' : (Math.floor(t / 30 + 0.5) / 2).toString().replace('.', ',') + ' ore';
+      const saved = localStorage.getItem(BOOK_KEY);
+      const idx = chaps.findIndex(c => c.s === saved);
+      if (idx >= 0) {
+        const c = chaps[idx], numbered = chaps.filter(x => x.n).length;
+        const go = $('[data-bk-go]', bk);
+        go.href = c.u;
+        $('[data-bk-k]', bk).textContent = 'Continua da';
+        $('[data-bk-t]', bk).textContent = (c.n ? 'Cap. ' + c.n : 'Prologo') + '\u00a0·\u00a0' + c.t;
+        $('[data-bk-min]', bk).textContent = c.m + ' min';
+        $('[data-bk-bar]', bk).hidden = false;
+        $('[data-bk-fill]', bk).style.width = (numbered ? c.n / numbered * 100 : 0) + '%';
+        $('[data-bk-ghost]', bk).textContent = 'Restano circa ' + durata(chaps.slice(idx).reduce((a, x) => a + x.m, 0));
+      }
+    } catch (e) { /* senza memoria del browser il riquadro resta su "Inizia da" */ }
+  }
+
   // ── lettura: il testo compare riga per riga mentre scorri (e sparisce se risali) ──
   const units = $$('.u'), rend = $('.rend'), cue = $('[data-cue]');
   if (units.length) {

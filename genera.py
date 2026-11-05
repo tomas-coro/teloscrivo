@@ -66,6 +66,8 @@ SECTIONS = {  # ordine = ordine nel menu; (nome lungo, nome nel menu, frase). Le
     "libro": ("Libro", "Libro", "Un capitolo alla volta."),  # i capitoli NON entrano in home, ultimi scritti e Leggi anche: hanno pagina e lettura a parte
 }
 BOOK_TITLE = "La sindrome del cielo"
+# Testo breve del riquadro in home (approvato nel mockup 34, direzione B). La quarta intera sta in libro-quarta.txt, per /libro/.
+BOOK_HOME_BLURB = "Illyrium, la Culla del Cielo, non perdona chi è diverso. Aetherion è un’anomalia: una cicatrice sul petto e un potere instabile che non risponde a nessuna regola conosciuta. Un potere che non crea, ma distrugge."
 LINE_SECTIONS = {"poesie", "canzoni"}  # qui ogni riga e' un verso
 MONTHS_SHORT = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 MONTHS_LONG = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",
@@ -347,7 +349,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=22">
+<link rel="stylesheet" href="{root}style.css?v=24">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -369,7 +371,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=8" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=9" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -478,12 +480,23 @@ def page_home(posts, chapters=()):
                   f'<div class="desk-arrows"><button type="button" data-slide="-1" aria-label="Video precedenti">←</button><button type="button" data-slide="1" aria-label="Video successivi">→</button></div></div>'
                   f'<p>Pensieri, poesie e parole che mi porto dietro, lette a voce.</p><div class="desk-phones">{cards}</div></section>')
     book = ""
-    if chapters:  # la tessera del libro compare solo quando c'e' almeno un capitolo pubblicato
-        last = chapters[-1]
-        book = (f'<section class="desk-section book-tile" aria-labelledby="h-book"><div class="sec-h"><h2 id="h-book">{esc(BOOK_TITLE)}</h2>'
-                f'<span class="cap count">{book_count(chapters)}</span></div>'
-                f'<p>Il libro che sto scrivendo, un capitolo alla volta. Ultimo: {"prologo" if not last.chapter else f"capitolo {last.chapter}"}, {esc(last.title)}.</p>'
-                f'<a class="cta" href="{root}libro/">Apri il libro{ARROW_CTA}</a></section>')
+    if chapters:  # il riquadro del libro compare solo quando c'e' almeno un capitolo pubblicato
+        start = chapters[0]
+        label = "Prologo" if not start.chapter else f"Cap. {start.chapter}"
+        # dati per il JS: "Continua da" / progresso / "Restano circa" (senza JS resta lo stato "Inizia da")
+        bdata = json.dumps([{"s": c.slug, "u": c.url, "n": c.chapter or 0, "t": c.title, "m": c.minutes} for c in chapters], ensure_ascii=False).replace("</", "<\\/")
+        total = sum(c.minutes for c in chapters)
+        book = (f'<section class="bk" aria-labelledby="h-book" data-book><div class="bk-box">'
+                f'<p class="cap bk-kick">Il libro · <b>in corso</b></p>'
+                f'<h2 id="h-book" class="bk-ttl">{esc(BOOK_TITLE)}</h2>'
+                f'<p class="bk-quarta">{esc(BOOK_HOME_BLURB)}</p>'
+                f'<a class="bk-go" href="{root}{start.url}" data-bk-go><span class="bk-mark" aria-hidden="true"></span>'
+                f'<span class="bk-lbl"><span class="bk-k" data-bk-k>Inizia da</span> <span class="bk-t" data-bk-t>{label}&nbsp;·&nbsp;{esc(start.title)}</span></span>'
+                f'<span class="bk-min" data-bk-min>{start.minutes} min</span><span class="bk-arr" aria-hidden="true">→</span></a>'
+                f'<div class="bk-bar" data-bk-bar hidden><i data-bk-fill></i></div>'
+                f'<div class="bk-foot"><p class="bk-ghost" data-bk-ghost>{lettura_totale(total)}</p>'
+                f'<a class="bk-all" href="{root}libro/" data-bk-all{" hidden" if len(chapters) <= 5 else ""}>Tutti i capitoli <span aria-hidden="true">→</span></a></div>'
+                f'</div><script type="application/json" id="book-data">{bdata}</script></section>')
     desc = "Pensieri, poesie, citazioni e scritti nati da una canzone, da leggere scorrendo. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
     latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
@@ -620,6 +633,17 @@ def book_end_html(blog, root):
     <span class="cap">Leggi anche</span><div class="rcards">{rcards_html(blog[:2], root)}</div>
     {social_html()}
   </footer>"""
+
+
+def durata(minuti):
+    """'8 min' sotto l'ora, poi ore a mezze ore ('1,5 ore'). Stessa regola di app.js."""
+    if minuti < 60:
+        return f"{minuti} min"
+    return f"{int(minuti / 30 + 0.5) / 2:g}".replace(".", ",") + " ore"
+
+
+def lettura_totale(minuti):
+    return f"circa {durata(minuti)} di lettura"
 
 
 def book_count(chapters):
