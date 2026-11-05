@@ -77,11 +77,11 @@ MONTHS_LONG = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "lu
 BAD_DASHES = (chr(0x2014), chr(0x2013))  # trattini lunghi "da AI": vietati nei testi (chr: l'hook dei trattini riscrive i letterali)
 
 GLYPH = {
-    "pensieri": '<path d="M6.5 3h7.5l4 4v13.5h-11.5z"/><path d="M14 3v4h4"/><path d="M9.5 12h6"/><path class="ac" d="M9.5 15.5h4"/>',
-    "citazioni": '<path d="M5 18v-5.5C5 9 6.8 7 10 6.5M13.5 18v-5.5c0-3.5 1.8-5.5 5-6"/><path class="ac" d="M5 18h5v-5.5H5zM13.5 18h5v-5.5h-5z"/>',
-    "poesie": '<path d="M19.5 4.5c-6.5-.5-11 3-12 9.5L5 19.5l.8.7 3.2-1.8c6.4-1 10-5.5 10.5-12.9z"/><path class="ac" d="M8 17l7-7"/>',
+    "pensieri": '<path d="M7.5 15.5a3.8 3.8 0 0 1-.6-7.5 5.2 5.2 0 0 1 10.1-.8 4 4 0 0 1 .5 8.3z"/><circle class="ac" cx="6" cy="19.3" r="1.1"/>',
+    "citazioni": '<path d="M5 17v-4.2C5 9.5 6.5 7.7 9.3 7M5 17h4.3v-4.2H5"/><path d="M13.7 17v-4.2c0-3.3 1.5-5.1 4.3-5.8M13.7 17H18v-4.2h-4.3"/><path class="ac" d="M5 20.2h14"/>',
+    "poesie": '<path d="M15 4.5l4.5 4.5L9 19.5H4.5V15z"/><path d="M13 6.5l4.5 4.5"/><path class="ac" d="M12.5 20.5h7"/>',
     "racconti": '<path d="M3 6c3-1.2 6-.8 9 1.2 3-2 6-2.4 9-1.2v12c-3-1.2-6-.8-9 1.2-3-2-6-2.4-9-1.2z"/><path class="ac" d="M12 7.2v12"/>',
-    "libro": '<path d="M6 4h11a1 1 0 0 1 1 1v14H7a1 1 0 0 1-1-1z"/><path class="ac" d="M6 17.5h12"/>',
+    "libro": '<path d="M6 4h11a1 1 0 0 1 1 1v14H7a1 1 0 0 1-1-1z"/><path d="M6 17h12"/><path class="ac" d="M14 4v5l-1.5-1.1L11 9V4"/>',
     "canzoni": '<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5"/><path class="ac" d="M9.5 9l10-2"/>',
 }
 ARROW_CTA = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -358,7 +358,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=33">
+<link rel="stylesheet" href="{root}style.css?v=35">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -393,7 +393,7 @@ def card_html(p, root, hidden=False):
             f'<a href="{root}{p.url}" data-card><span class="desk-photo{" has-img" if p.has_photo else ""}" aria-hidden="true">{photo_img(p, root, "(min-width:900px) 380px, 90vw")}</span>'
             f'<span class="desk-info"><span class="desk-meta"><b>{esc(p.cat_label)}</b>{p.long_date()}</span>'
             f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
-            f'<span class="desk-more"><span class="t">Apri lo scritto</span><i class="arr" aria-hidden="true">↗</i></span></span></a></article>')
+            f'<span class="desk-more"><span class="t">Apri lo scritto</span><i class="arr" aria-hidden="true">{ARROW_CTA}</i></span></span></a></article>')
 
 
 # ═══ FOTO ═══

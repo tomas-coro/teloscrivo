@@ -219,9 +219,14 @@ body:has(.desk-shelf) .hero{margin-bottom:68px}
 .desk-title{display:block;font:400 clamp(1.7rem,2.4vw,2.05rem)/1.1 "Instrument Serif",Poppins,sans-serif;margin:13px 0 9px}
 .desk-excerpt{font-size:.84rem;line-height:1.6;color:var(--muted)}
 .desk-more{font-size:.76rem;margin-top:auto;padding-top:19px;display:flex;align-items:center;gap:7px}
-.desk-more .arr{display:inline-block;font-style:normal;transition:transform .25s cubic-bezier(.2,.8,.2,1),color .2s}
+.desk-more .arr{display:inline-flex;font-style:normal;transition:transform .3s cubic-bezier(.2,.8,.2,1),color .2s}
+.desk-more .arr svg{width:17px;height:17px}
 .desk-more .t{background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;padding-bottom:2px;transition:background-size .3s cubic-bezier(.2,.8,.2,1)}
-@media(hover:hover){.desk-window a:hover .desk-more .t{background-size:100% 1px}.desk-window a:hover .desk-more .arr{transform:translate(3px,-3px);color:var(--pink)}}
+/* freccia verso destra (si apre una pagina, non un sito esterno): scivola avanti al passaggio e al tocco */
+@media(hover:hover){.desk-window a:hover .desk-more .t{background-size:100% 1px}.desk-window a:hover .desk-more .arr{transform:translateX(5px);color:var(--pink)}}
+.desk-window a:active .desk-more .arr,.desk-window a:focus-visible .desk-more .arr{transform:translateX(5px);color:var(--pink)}
+.desk-window a:active .desk-more .t,.desk-window a:focus-visible .desk-more .t{background-size:100% 1px}
+@media(prefers-reduced-motion:reduce){.desk-more .arr{transition:color .2s}.desk-window a:hover .desk-more .arr,.desk-window a:active .desk-more .arr{transform:none}}
 .desk-videos{width:100vw;margin:60px 0 0 calc(50% - 50vw);padding:35px max(18px,calc((100vw - 1180px)/2));border-top:1px solid var(--line);background:#0a305b}
 .desk-videos>p{font-size:.83rem;color:var(--muted)}
 .desk-slider-top{display:flex;justify-content:space-between;align-items:center;gap:15px}
@@ -273,7 +278,7 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .catchip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px 0 12px;border:1px solid color-mix(in srgb,var(--pink) 55%,var(--line));border-radius:99px;background:color-mix(in srgb,var(--pink) 12%,transparent);color:var(--fg);font-size:.82rem;text-decoration:none;transition:background .2s,color .2s,transform .15s}
 .catchip:hover{background:var(--pink);color:var(--navy)}
 .catchip:active{transform:scale(.97)}
-.catchip svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.catchip svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .catchip .ac{stroke:var(--pink);transition:stroke .2s}
 .catchip:hover .ac{stroke:var(--navy)}
 .rphoto{aspect-ratio:16/10;border:0;border-radius:0;margin:0}
