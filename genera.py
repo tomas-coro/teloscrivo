@@ -358,7 +358,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=32">
+<link rel="stylesheet" href="{root}style.css?v=33">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -375,8 +375,8 @@ def top_html(root):
 
 def foot_html(root):
     return (f'<footer class="foot"><span class="wm2">{SITE}<span class="dot" aria-hidden="true"></span></span>'
-            f'<span>© {date.today().year} {SITE}</span>'
-            f'<a class="up" href="#inizio">Torna su{ICON_UP}</a></footer>')
+            f'<a class="up" href="#inizio">Torna su{ICON_UP}</a>'
+            f'<small class="cp">© {date.today().year}</small></footer>')
 
 
 def tail_html(root):
@@ -539,13 +539,13 @@ def page_home(posts, chapters=()):
   <section class="hero">
     <div class="hero-l">
       <h1 class="hero-h">{SITE}<span class="dot" aria-hidden="true"></span></h1>
-      <p class="hero-sub">la luna porta consiglio</p>
+      <p class="hero-sub">la luna porta consiglio{ICON_MOON}</p>
     </div>
     <article class="last">
       <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · <b class="lk-cat">{newest.cat_label}</b> · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
       <div class="lph">{last_imgs}<div class="lov">
         <p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p>
-        <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
+        <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg></button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
       </div></div>
     </article>
   </section>

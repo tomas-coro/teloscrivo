@@ -384,7 +384,11 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .rbye{padding:34px 0 6px}
 .bye{width:max-content;max-width:100%;margin:0 0 0 auto;padding-right:16px;border-right:1px solid color-mix(in srgb,var(--pink) 48%,transparent);text-align:right;white-space:nowrap;font:300 .84rem/1.8 Poppins,sans-serif;color:var(--muted)}
 .bye em{font:italic 1.1rem "Instrument Serif",serif;color:var(--seal)}
-.bye .moon{display:inline-block;width:.72em;height:.72em;margin-left:.18em;color:var(--pink);vertical-align:-.02em;transform:rotate(-12deg)}
+/* luna: stessa in hero e in fondo agli scritti, con un alone rosa che si accende una volta */
+.moon{display:inline-block;width:.72em;height:.72em;margin-left:.2em;color:var(--pink);vertical-align:-.02em;transform:rotate(-12deg);filter:drop-shadow(0 0 .35em color-mix(in srgb,var(--pink) 55%,transparent));animation:moonin 1.2s cubic-bezier(.2,.8,.2,1) .5s both}
+.hero-sub .moon{width:.62em;height:.62em;margin-left:.28em;vertical-align:.02em}
+@keyframes moonin{from{opacity:0;transform:rotate(-40deg) scale(.6);filter:drop-shadow(0 0 0 transparent)}to{opacity:1;transform:rotate(-12deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.moon{animation:none}}
 .bye-actions{display:grid;gap:12px;margin:26px auto 0;max-width:420px}
 .bye-actions .sharebtn,.copybtn{justify-content:center;width:100%;min-height:54px;font-size:1rem}
 .copybtn{display:inline-flex;align-items:center;gap:10px;padding:0 22px;border:1px solid var(--line);border-radius:99px;background:transparent;color:var(--fg);font:500 .95rem Poppins,sans-serif;cursor:pointer;transition:border-color .2s,color .2s}
