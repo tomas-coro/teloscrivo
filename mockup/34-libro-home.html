@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 34 - Sezione libro in home</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* ---- strumenti del mockup (non finiscono nel sito) ---- */
+  body{background:#0b0f1a}
+  .mkbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:#0b0f1a;border-bottom:1px solid #ffffff22}
+  .mkbar button{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#cfd8e3;cursor:pointer}
+  .mkbar button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .mkbar .sep{width:1px;background:#ffffff33;margin:4px 6px}
+  .why{max-width:60rem;margin:14px auto 0;padding:0 16px;font:400 .8rem/1.5 Poppins,sans-serif;color:#9fb0c4;text-align:center}
+  .frame{margin:14px auto 40px;transition:max-width .3s}
+  .frame.m{max-width:390px}.frame.d{max-width:1240px}
+  .scene{position:relative;overflow:hidden;background:
+    radial-gradient(70% 40% at 78% 0%,color-mix(in oklab,var(--pink) 16%,transparent),transparent 72%),
+    linear-gradient(180deg,var(--navy) 0%,color-mix(in oklab,var(--navy) 92%,var(--pink)) 100%);
+    padding:46px 20px 60px;border-radius:14px;color:var(--seal)}
+  .frame.d .scene{padding:70px 48px 80px}
+  .before{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#7e92a9;margin:0 0 14px}
+  .gap{height:54px}
+  .nexthint{margin-top:54px;font:400 clamp(2.4rem,6vw,3.5rem)/1.1 "Instrument Serif",serif;color:var(--seal);opacity:.35}
+  [hidden]{display:none!important}
+  .scene .dir{max-width:none;width:100%;margin:0}
+  .frame.d .C .foot{justify-content:space-between}
+
+  /* ---- elementi comuni ---- */
+  .kick{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0}
+  .kick b{color:var(--pink);font-weight:600}
+  .ttl{font:400 clamp(2.4rem,6vw,3.5rem)/1.05 "Instrument Serif",serif;margin:0;color:var(--seal)}
+  .cta2{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:1px solid color-mix(in srgb,var(--seal) 38%,transparent);border-radius:12px;color:var(--seal);font:600 .88rem Poppins,sans-serif;text-decoration:none;transition:background .2s,border-color .2s}
+  .cta2:hover{background:color-mix(in srgb,var(--seal) 12%,transparent);border-color:var(--seal)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap}
+  .meta{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+  /* ================= A - INDICE (frontespizio + sommario) ================= */
+  .A .wrap{display:grid;gap:30px}
+  .frame.d .A .wrap{grid-template-columns:1.25fr 1fr;gap:70px;align-items:start}
+  .A .top{border-top:1px solid var(--line);padding-top:16px;display:flex;justify-content:space-between;gap:12px;margin-bottom:22px}
+  .A .quarta{font:italic 400 1.28rem/1.5 "Instrument Serif",serif;color:color-mix(in srgb,var(--seal) 86%,transparent);margin:18px 0 26px;max-width:34rem;text-wrap:pretty}
+  .A .toc{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+  .A .toc li{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}
+  .A .toc .tn{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;color:var(--pink);min-width:3.2em}
+  .A .toc .tt{font:400 1.45rem/1.2 "Instrument Serif",serif}
+  .A .toc .tm{font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .A .toc li.new .tt::after{content:"";display:inline-block;width:.34em;height:.34em;border-radius:50%;background:var(--pink);margin-left:.5em;vertical-align:.18em}
+  .A .toc a{display:contents;color:inherit;text-decoration:none}
+  .A .toc li:hover .tt{color:var(--pink)}
+
+  .A .toc a{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;padding:14px 0}
+  .A .toc li{display:block;padding:0}
+  .A .toc li.here .tm{color:var(--pink)}
+  .A .toc li.here .tt::after{content:none}
+  .A .all{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin-top:6px;font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--seal);text-decoration:none}
+  .A .all:hover{color:var(--pink)}
+  .demo{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px auto 0;padding:0 16px}
+  .demo button{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;min-height:44px;padding:0 14px;border-radius:99px;border:1px dashed #ffffff55;background:transparent;color:#9fb0c4;cursor:pointer}
+  .demo button[aria-pressed=true]{border-style:solid;color:#fff;border-color:#fff}
+  /* ================= B - RIQUADRO NOTTE + SEGNALIBRO ================= */
+  .B .box{position:relative;border:1px solid color-mix(in srgb,var(--seal) 20%,transparent);border-radius:20px;background:color-mix(in srgb,#0E2240 88%,var(--pink) 4%);padding:26px 20px 20px;overflow:hidden}
+  .frame.d .B .box{padding:44px 54px 36px}
+  .B .box::before{content:"";position:absolute;top:-1px;right:24px;width:20px;height:40px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)}
+  .B .bhead{padding-right:44px;min-height:30px}
+  .B .ball{font:600 .64rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--seal);text-decoration:none;min-height:44px;display:inline-flex;align-items:center;white-space:nowrap}
+  .B .ball:hover{color:var(--pink)}
+  .B .ttl{margin-top:8px}
+  .B .quarta{font:300 .93rem/1.65 Poppins,sans-serif;color:color-mix(in srgb,var(--seal) 80%,transparent);margin:14px 0 22px;max-width:40rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .frame.d .B .quarta{-webkit-line-clamp:unset;display:block;font-size:1rem}
+  .B .go{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:14px;min-height:60px;padding:12px 16px 12px 14px;border-radius:14px;background:color-mix(in srgb,var(--seal) 7%,transparent);border:1px solid color-mix(in oklab,var(--pink) 30%,transparent);color:var(--seal);text-decoration:none;transition:border-color .2s}
+  .B .go:hover,.B .go.force{border-color:color-mix(in oklab,var(--pink) 60%,transparent)}
+  .B .rggb{width:12px;height:26px;background:color-mix(in oklab,var(--pink) 55%,transparent);clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%);transition:background .2s,transform .2s}
+  .B .go:hover .gb,.B .go.force .gb{background:var(--pink);transform:translateY(-2px)}
+  .B .rggl{text-wrap:balance;font:400 1.3rem/1.2 "Instrument Serif",serif;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .B .rggk{color:var(--pink)}
+  .B .rggt{color:var(--seal);font-style:normal}
+  .B .rggm{font:600 .62rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .B .rgga{color:var(--pink);font-size:1.1rem;transition:transform .2s}
+  .B .go:hover .ga,.B .go.force .ga{transform:translateX(4px)}
+  .B .bar{height:3px;border-radius:3px;background:color-mix(in srgb,var(--seal) 16%,transparent);margin:18px 2px 0;overflow:hidden}
+  .B .bar i{display:block;height:100%;background:var(--pink);border-radius:3px;transition:width .4s}
+  .B .bfoot{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}
+  .B .ghost{margin:0 2px;font:600 .62rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .frame.d .B .go{max-width:34rem}
+
+  /* ================= C - APERTURA (una frase grande) ================= */
+  .C .wrap{display:grid;gap:26px}
+  .C .big{font:400 clamp(1.9rem,7.2vw,3rem)/1.14 "Instrument Serif",serif;margin:0;text-wrap:balance;max-width:20ch}
+  .frame.d .C .big{font-size:4.1rem;max-width:22ch}
+  .C .big em{color:var(--pink);font-style:italic}
+  .C .sign{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .C .sign .ttl{font-size:1.5rem}
+  .C .sign .rule{flex:0 0 38px;height:1px;background:var(--pink)}
+  .C .foot{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding-top:26px;border-top:1px solid var(--line)}
+  .C .foot .ft{font:400 1.2rem "Instrument Serif",serif}
+  .C .foot .ft i{color:var(--muted)}
+
+  
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="mkbar" role="toolbar" aria-label="Direzioni">
+  <button data-d="A" aria-pressed="true">A · Indice</button>
+  <button data-d="B" aria-pressed="false">B · Segnalibro</button>
+  <button data-d="C" aria-pressed="false">C · Apertura</button>
+  <span class="sep"></span>
+  <button data-v="m" aria-pressed="true">Mobile</button>
+  <button data-v="d" aria-pressed="false">Desktop</button>
+</div>
+<p class="why" id="why"></p>
+<div class="demo" aria-label="Prova (solo mockup)">
+  <button data-n="2" aria-pressed="true">2 capitoli</button>
+  <button data-n="15" aria-pressed="false">15 capitoli</button>
+  <button data-r="0" aria-pressed="true">Mai letto</button>
+  <button data-r="1" aria-pressed="false">Letto fino al cap. 3</button>
+</div>
+
+<div class="frame m" id="frame">
+<div class="scene">
+  <p class="before">... la home, sopra: la finestra "Ultimo scritto"</p>
+
+  <!-- A -->
+  <section class="dir A" data-why="Editoriale tipografico: titolo e quarta a sinistra, sommario a destra. Niente bottone: ogni riga e' un link. La finestra parte da dove sei (o dall'inizio), mostra 4 righe e il resto sta dietro 'Tutti i capitoli'." aria-labelledby="hA">
+    <div class="wrap">
+      <div>
+        <div class="top"><p class="kick">Il libro · <b>in corso</b></p></div>
+        <h2 class="ttl" id="hA">La sindrome del cielo</h2>
+        <p class="quarta">Aetherion possiede solo una cicatrice sul petto e un potere che non crea, ma distrugge. Nel suo mondo, se non impari a controllare i tuoi demoni, saranno loro a divorarti.</p>
+      </div>
+      <div>
+        <ol class="toc" id="toc" aria-label="Capitoli"></ol>
+        <a class="all" id="all" href="#" hidden>Tutti i capitoli <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="dir B" hidden data-why="Riquadro tenue 'notte morbida' con segnalibro rosa. Niente bottoni: una riga cliccabile in fondo ti porta dove sei rimasto (o all'inizio) e una linea sottile mostra a che capitolo sei." aria-labelledby="hB">
+    <div class="box">
+      <div class="bhead"><p class="kick">Il libro · <b>in corso</b></p></div>
+      <h2 class="ttl" id="hB">La sindrome del cielo</h2>
+      <p class="quarta">Illyrium, la Culla del Cielo, non perdona chi è diverso. Aetherion è un'anomalia: una cicatrice sul petto e un potere instabile che non risponde a nessuna regola conosciuta. Un potere che non crea, ma distrugge.</p>
+      <a class="go" href="#" id="go"><span class="rggb" aria-hidden="true"></span><span class="rggl"><span class="rggk" id="rggk"></span> <span class="rggt" id="rggt"></span></span><span class="rggm" id="rggm"></span><span class="rgga" aria-hidden="true">→</span></a>
+      <div class="bar" id="bar"><i id="barf"></i></div>
+      <div class="bfoot"><p class="ghost" id="ghost"></p><a class="ball" id="ball" href="#" hidden>Tutti i capitoli <span aria-hidden="true">→</span></a></div>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="dir C" hidden data-why="Una frase sola, grandissima (alla copertina di un romanzo): il libro si presenta con la sua voce e non con una descrizione. Meno elementi delle altre, più impatto." aria-labelledby="hC">
+    <div class="wrap">
+      <p class="kick">Il libro · <b>capitolo dopo capitolo</b></p>
+      <p class="big" id="hC">Il dolore non è un nemico, ma <em>un maestro.</em></p>
+      <div class="sign"><span class="rule"></span><h2 class="ttl">La sindrome del cielo</h2></div>
+      <div class="btns"><a class="cta" href="#">Inizia dal prologo <span aria-hidden="true">→</span></a></div>
+      <div class="foot"><span class="meta">Prologo e 1 capitolo</span><span class="ft">Ultimo: <i>capitolo 1,</i> Reietto</span></div>
+    </div>
+  </section>
+
+  <div class="nexthint" aria-hidden="true">Gli scritti</div>
+</div>
+</div>
+
+<script>
+  // Cambio direzione e vista; ricordo la scelta (dati finti: localStorage)
+  const frame=document.getElementById('frame'),why=document.getElementById('why');
+  const panels=[...document.querySelectorAll('.dir')];
+  function showDir(d){
+    panels.forEach(p=>{const on=p.classList.contains(d);p.hidden=!on;if(on)why.textContent=p.dataset.why});
+    document.querySelectorAll('[data-d]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===d));
+    try{localStorage.setItem('m34d',d)}catch(e){}
+  }
+  function showView(v){
+    frame.className='frame '+v;
+    document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
+    try{localStorage.setItem('m34v',v)}catch(e){}
+  }
+  document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>showDir(b.dataset.d));
+  document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>showView(b.dataset.v));
+  let d='A',v='m';try{d=localStorage.getItem('m34d')||d;v=localStorage.getItem('m34v')||v}catch(e){}
+  if(/^#[ABC]d/.test(location.hash))v='d'; if(/^#[ABC]/.test(location.hash))d=location.hash[1];
+  showView(v);showDir(d);
+
+  // Sommario: finestra di 4 righe che parte da dove sei (o dall'inizio). Dati finti.
+  const TIT=["La Culla del Cielo","Reietto","Le rive di Vael","Cenere","Il patto di Korvan","La soglia","Acque basse","Voci nel bosco","Il peso del nome","Cicatrice","Sotto il ponte","L'ultima luna","Ritorno","Fuoco lento","Il cielo che cade"];
+  const MIN=[2,8,7,9,6,8,7,6,9,8,7,6,8,7,9];
+  let N=2,R=0; // R=1: ultimo aperto = capitolo 3 (indice 3)
+  function drawToc(){
+    const toc=document.getElementById('toc'),all=document.getElementById('all');
+    const lastOpened=R?3:-1, start=R?lastOpened:0, MAX=4;
+    const rows=[];
+    for(let i=start;i<N&&rows.length<MAX;i++)rows.push(i);
+    toc.innerHTML=rows.map(i=>{
+      const lab=i===0?'PROLOGO':'CAP. '+i, here=i===lastOpened, nuovo=i===N-1&&!here;
+      return `<li class="${here?'here':''}${nuovo?' new':''}"><a href="#"><span class="tn">${lab}</span><span class="tt">${TIT[i]}</span><span class="tm">${here?'Continua':MIN[i]+' min'}</span></a></li>`;
+    }).join('');
+    all.hidden=N<=5; all.firstChild.textContent='Tutti i capitoli ('+(N-1)+') ';
+    drawB();
+  }
+  // B: una riga che porta dove sei (o all'inizio) + progresso "cap. X di N"
+  function durata(t){return t<60?t+' min':(Math.round(t/30)/2).toString().replace('.',',')+' ore'}
+  function lettura(t){return 'circa '+durata(t)+' di lettura'}
+  function drawB(){
+    const idx=R?3:0, lab=idx===0?'Prologo':'Cap. '+idx;
+    document.getElementById('rggk').textContent=R?'Continua da':'Inizia da';
+    document.getElementById('rggt').textContent=lab+'\u00a0·\u00a0'+TIT[idx];
+    document.getElementById('go').classList.toggle('force',/force/.test(location.hash));
+    document.getElementById('rggm').textContent=MIN[idx]+' min';
+    const ba=document.getElementById('ball');ba.hidden=N<=5;ba.firstChild.textContent='Tutti i capitoli ';
+    const tot=N-1; // capitoli numerati (il prologo non conta)
+    document.getElementById('bar').style.display=R?'':'none';
+    document.getElementById('barf').style.width=(idx/tot*100)+'%';
+    document.getElementById('ghost').textContent=R?'Restano circa '+durata(MIN.slice(idx,N).reduce((a,b)=>a+b,0)):lettura(MIN.slice(0,N).reduce((a,b)=>a+b,0));
+  }
+  document.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{N=+b.dataset.n;document.querySelectorAll('[data-n]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawToc()});
+  document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{R=+b.dataset.r;document.querySelectorAll('[data-r]').forEach(x=>x.setAttribute('aria-pressed',x===b));drawToc()});
+  if(/n15/.test(location.hash))N=15; if(/r1/.test(location.hash))R=1;
+  document.querySelectorAll('[data-n]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.n===N));document.querySelectorAll('[data-r]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.r===R));
+  drawToc();
+</script>
+</body>
+</html>
