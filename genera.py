@@ -243,11 +243,21 @@ class Post:
 
     @property
     def minutes(self):
-        return max(1, round(len(self.full_text.split()) / 200))
+        return max(1, -(-len(self.full_text.split()) // 200))  # 200 parole al minuto, sempre per eccesso (241 parole = 2 min)
+
+    @property
+    def only_poem(self):  # "da N min a infinito" vale solo per la poesia pura, non per Poesia + altra categoria
+        return self.cats == ["poesie"]
+
+    @property
+    def minutes_short(self):  # versione corta per le card in home; stessa regola della pagina: le poesie "da N min a ∞"
+        if self.only_poem:
+            return f'da {self.minutes} min a <span class="inf" aria-hidden="true">∞</span>'
+        return f'{self.minutes} min'
 
     @property
     def time_html(self):  # data + tempo di lettura; le poesie non hanno un tempo giusto: "da N min a infinito"
-        if "poesie" in self.cats:
+        if self.only_poem:
             return (f'<span class="reading-time"><span class="cap">{self.short_date()}</span>'
                     f'<span class="tinf" aria-label="da {self.minutes} min a infinito">'
                     f'<span class="tw" aria-hidden="true">da</span> {self.minutes} min '
@@ -372,7 +382,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=42">
+<link rel="stylesheet" href="{root}style.css?v=43">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -405,7 +415,7 @@ def card_html(p, root, hidden=False):
     """Una scheda della griglia: il clic apre subito lo scritto (niente anteprima)."""
     return (f'<article class="desk-window" data-cat="{p.cat}"{" hidden" if hidden else ""}><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
             f'<a href="{root}{p.url}" data-card><span class="desk-photo{" has-img" if p.has_photo else ""}" aria-hidden="true">{photo_img(p, root, "(min-width:900px) 380px, 90vw")}</span>'
-            f'<span class="desk-info"><span class="desk-meta"><b>{esc(p.cat_label)}</b>{p.long_date()}</span>'
+            f'<span class="desk-info"><span class="desk-meta"><b>{esc(p.cat_label)}</b>{p.long_date()} · {p.minutes_short}</span>'
             f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
             f'<span class="desk-more"><span class="t">Apri lo scritto</span><i class="arr" aria-hidden="true">{ARROW_CTA}</i></span></span></a></article>')
 

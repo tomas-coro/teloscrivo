@@ -216,6 +216,7 @@ body:has(.desk-shelf) .hero{margin-bottom:68px}
 .desk-info{display:flex;flex-direction:column;flex:1;padding:20px 22px 22px}
 .desk-meta{color:var(--muted);font-size:.75rem}
 .desk-meta b{color:var(--pink);font-weight:500;margin-right:10px}
+.desk-meta .inf{color:var(--pink);font-size:1.25em;line-height:1;vertical-align:-.08em}
 .desk-title{display:block;font:400 clamp(1.7rem,2.4vw,2.05rem)/1.1 "Instrument Serif",Poppins,sans-serif;margin:13px 0 9px}
 .desk-excerpt{font-size:.84rem;line-height:1.6;color:var(--muted)}
 .desk-more{font-size:.76rem;margin-top:auto;padding-top:19px;display:flex;align-items:center;gap:7px}
