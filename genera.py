@@ -354,7 +354,21 @@ def present_cats(posts):
     return [k for k in SECTIONS if any(k in p.cats for p in posts)]
 
 
-def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=False):
+OG_HOME = "og.jpg"  # anteprima social della home, scritta da genera_og.py
+MISSING_OG = []     # scritti senza la loro immagine in assets/og/: usano quella della home e li elenco a fine lavoro
+
+
+def og_for(slug=None):
+    """Percorso (relativo alla radice) dell'immagine di anteprima: quella dello scritto, o della home."""
+    if slug:
+        rel = f"assets/og/{slug}.jpg"
+        if (ROOT / rel).is_file():
+            return rel
+        MISSING_OG.append(slug)
+    return OG_HOME
+
+
+def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=False, og_image=OG_HOME):
     ld = ""
     for obj in jsonld or []:
         ld += '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False).replace("</", "<\\/") + "</script>\n"
@@ -374,10 +388,10 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <meta property="og:locale" content="it_IT">
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
-{og_url}<meta property="og:image" content="{BASE_URL}og.png">
+{og_url}<meta property="og:image" content="{BASE_URL}{og_image}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="teloscrivo, la luna porta consiglio">
+<meta property="og:image:alt" content="{esc(title)}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
@@ -650,7 +664,7 @@ def page_reader(p, posts):
         "@context": "https://schema.org", "@type": "Article", "headline": p.title, "inLanguage": "it",
         "datePublished": p.date.isoformat(), "dateModified": p.date.isoformat(), "articleSection": p.cat_label,
         "author": {"@type": "Person", "name": SITE}, "publisher": {"@type": "Organization", "name": SITE},
-        "mainEntityOfPage": canon, "url": canon, "image": f"{BASE_URL}og.png", "description": desc,
+        "mainEntityOfPage": canon, "url": canon, "image": f"{BASE_URL}{og_for(p.slug)}", "description": desc,
     }]
     chip = "".join(
         f'<a class="catchip" href="{root}{c}/" aria-label="Tutti gli scritti: {esc(SECTIONS[c][0])}">'
@@ -673,7 +687,7 @@ def page_reader(p, posts):
   </footer>
 </article></main>
 {tail_html(root)}"""
-    return head_html(root, f"{p.title} | {SITE}", desc, canon, og_type="article", jsonld=ld) + body
+    return head_html(root, f"{p.title} | {SITE}", desc, canon, og_type="article", jsonld=ld, og_image=og_for(p.slug)) + body
 
 
 def book_head_html(root, back_href, back_label, slug=""):
@@ -794,7 +808,7 @@ def page_chapter(p, chapters, blog):
   {book_end_html(blog, root)}
 </article></main>
 {tail_html(root)}"""
-    return head_html(root, f"{p.title} | {BOOK_TITLE} | {SITE}", desc, canon, og_type="article", jsonld=ld) + body
+    return head_html(root, f"{p.title} | {BOOK_TITLE} | {SITE}", desc, canon, og_type="article", jsonld=ld, og_image=og_for(p.slug)) + body
 
 
 def page_404():
@@ -892,6 +906,8 @@ def main():
     n_html = sum(1 for w in written if w.endswith(".html"))
     print(f"OK: {len(posts)} pagine scritto, {len(live)} pagine sezione, 404, home ({n_html} pagine HTML), "
           f"sitemap.xml, robots.txt. Link interni controllati. URL base: {BASE_URL}")
+    if MISSING_OG:
+        print(f"AVVISO: {len(set(MISSING_OG))} scritti senza immagine di anteprima (usano quella della home): {', '.join(sorted(set(MISSING_OG)))}. Lancia: python3 genera_og.py", file=sys.stderr)
     if missing:
         print(f"AVVISO: {len(missing)} scritti senza foto (usano il segnaposto): {', '.join(missing)}. Mettile in {PHOTO_DIR}/<nome>.jpg", file=sys.stderr)
 
