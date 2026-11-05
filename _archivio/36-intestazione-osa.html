@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 36 - Intestazione, tre strade audaci</title>
+<style>
+  body{margin:0;background:#0b0f1a;color:#cfd8e3;font-family:Poppins,sans-serif}
+  .mkbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:#0b0f1a;border-bottom:1px solid #ffffff22}
+  .mkbar button{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#cfd8e3;cursor:pointer}
+  .mkbar button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .mkbar .sep{width:1px;background:#ffffff33;margin:4px 6px}
+  .why{max-width:60rem;margin:14px auto 0;padding:0 16px;font:400 .8rem/1.5 Poppins,sans-serif;color:#9fb0c4;text-align:center;text-wrap:pretty}
+  .stage{display:flex;justify-content:center;margin:14px 0 40px}
+  iframe{border:1px solid #ffffff22;border-radius:12px;background:#072D59;max-width:100%}
+</style>
+</head>
+<body>
+<div class="mkbar" role="toolbar" aria-label="Direzioni">
+  <button data-d="A" aria-pressed="true">A · Luna</button>
+  <button data-d="B" aria-pressed="false">B · Una frase</button>
+  <button data-d="C" aria-pressed="false">C · Sommario</button>
+  <span class="sep"></span>
+  <button data-v="m" aria-pressed="false">Mobile</button>
+  <button data-v="d" aria-pressed="true">Desktop</button>
+</div>
+<p class="why" id="why"></p>
+<div class="stage"><iframe id="f" title="Anteprima"></iframe></div>
+
+<script>
+const ARR = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* ---------- A · LUNA: la mezzaluna del logo e' il protagonista ---------- */
+const A = {
+  why: 'La mezzaluna rosa del logo diventa l\'immagine: enorme, sopra il wordmark. Il wordmark è gigante in basso, l\'ultimo scritto è una riga sola con il suo "Leggi". Niente card: il sito sa chi è da subito.',
+  html: `<section class="hA">
+    <svg class="moon" viewBox="0 0 400 400" aria-hidden="true"><defs><mask id="mk"><rect width="400" height="400" fill="#fff"/><circle cx="262" cy="168" r="158" fill="#000"/></mask></defs><circle cx="190" cy="206" r="176" fill="#FD6E88" mask="url(#mk)"/></svg>
+    <div class="hA-in">
+      <h1 class="hA-h">teloscrivo<span class="dot" aria-hidden="true"></span></h1>
+      <p class="hA-sub">la luna porta consiglio</p>
+      <a class="hA-last" href="#"><span class="hA-k">Ultimo scritto</span><span class="hA-t">Nella nostra testa</span><span class="hA-go">Leggi ${ARR}</span></a>
+    </div>
+  </section>`,
+  css: `
+  .hA{position:relative;min-height:640px;overflow:hidden;display:flex;align-items:flex-end}
+  .moon{position:absolute;right:-2%;top:-2%;width:min(80vw,500px);height:auto;pointer-events:none}
+  .hA-in{position:relative;width:100%;padding:0 0 8px}
+  .hA-h{font:400 clamp(4rem,19vw,9.8rem)/.92 "Instrument Serif",serif;margin:0;display:flex;align-items:baseline;gap:.05em}
+  .hA-h .dot{width:.1em;height:.1em;flex:none}
+  .hA-sub{font:italic 400 clamp(1.5rem,6vw,2.4rem)/1.15 "Instrument Serif",serif;margin:.7rem 0 0;color:color-mix(in srgb,var(--seal) 88%,transparent)}
+  .hA-last{display:grid;grid-template-columns:auto 1fr auto;gap:6px 18px;align-items:baseline;margin-top:34px;padding:18px 0 4px;border-top:1px solid var(--line);color:var(--seal);text-decoration:none}
+  .hA-k{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--pink)}
+  .hA-t{font:400 1.5rem/1.1 "Instrument Serif",serif}
+  .hA-go{display:inline-flex;align-items:center;gap:8px;font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase}
+  .hA-go svg{width:16px;height:16px;color:var(--pink);transition:transform .2s}
+  .hA-last:hover .hA-t{color:var(--pink)}.hA-last:hover svg{transform:translateX(5px)}
+  .hA-last:focus-visible{outline:2px solid var(--pink);outline-offset:4px}
+  @media (max-width:639px){.hA{min-height:640px}.moon{right:-12%;top:-2%;width:84vw}.hA-last{grid-template-columns:1fr auto}.hA-k{grid-column:1/-1}}
+  @media (min-width:900px){.hA{min-height:760px}.moon{right:0;top:-2%;width:520px}.hA-t{font-size:2rem}}
+  `
+};
+
+/* ---------- B · UNA FRASE: l'ultimo scritto come copertina ---------- */
+const B = {
+  why: 'La home si apre con una frase dell\'ultimo scritto, enorme, come la copertina di una rivista. Il wordmark diventa la testata, piccola. Una parola in rosa e le virgolette rosa sono l\'unico dettaglio acceso. Cambia con gli scritti.',
+  html: `<section class="hB">
+    <header class="hB-top"><span class="hB-w">teloscrivo<span class="dot" aria-hidden="true"></span></span><span class="hB-s">la luna porta consiglio</span></header>
+    <div class="hB-main">
+      <span class="hB-q" aria-hidden="true">“</span>
+      <p class="hB-big">Il limite più grande che esista è nella nostra <em>testa.</em></p>
+      <div class="hB-foot">
+        <p class="hB-meta"><b>Nella nostra testa</b><span>Pensiero · Poesia · 4 novembre</span></p>
+        <div class="hB-act"><div class="hB-dots" aria-label="Ultimi scritti"><i class="on"></i><i></i><i></i></div><a class="cta" href="#">Leggi${ARR}</a></div>
+      </div>
+    </div>
+  </section>`,
+  css: `
+  .hB{min-height:640px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+  .hB-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .hB-w{display:inline-flex;align-items:baseline;gap:.05em;font:400 1.9rem/1 "Instrument Serif",serif}
+  .hB-w .dot{width:.12em;height:.12em}
+  .hB-s{font:italic 400 1.2rem/1 "Instrument Serif",serif;color:var(--muted)}
+  .hB-main{position:relative;padding-top:8px}
+  .hB-q{position:absolute;left:-.02em;top:-.42em;font:400 clamp(6rem,24vw,13rem)/1 "Instrument Serif",serif;color:var(--pink);opacity:.9;pointer-events:none}
+  .hB-big{position:relative;margin:0;padding-top:clamp(2rem,7vw,3.6rem);font:400 clamp(2.5rem,10.4vw,6.4rem)/1.02 "Instrument Serif",serif;letter-spacing:-.012em;text-wrap:balance;max-width:17ch}
+  .hB-big em{color:var(--pink);font-style:italic}
+  .hB-foot{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-top:34px;padding-top:20px;border-top:1px solid var(--line)}
+  .hB-meta{margin:0;display:grid;gap:4px}
+  .hB-meta b{font:400 1.45rem/1.1 "Instrument Serif",serif}
+  .hB-meta span{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .hB-act{display:flex;align-items:center;gap:18px}
+  .hB-dots{display:flex;gap:8px}.hB-dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.hB-dots i.on{background:var(--pink);transform:scale(1.35)}
+  @media (max-width:639px){.hB{min-height:520px}}
+  @media (min-width:900px){.hB{min-height:680px}.hB-big{max-width:17ch}}
+  `
+};
+
+/* ---------- C · SOMMARIO: indice tipografico, nessuna card ---------- */
+const row = (n, t, c, nuovo) => `<li><a href="#"><span class="hC-n">${n}</span><span class="hC-t">${t}${nuovo ? '<i class="hC-new" aria-label="nuovo"></i>' : ''}</span><span class="hC-c">${c}</span><span class="hC-a" aria-hidden="true">${ARR}</span></a></li>`;
+const C = {
+  why: 'Il wordmark occupa tutta la larghezza, come la testata di un quaderno. Sotto, gli ultimi scritti sono un sommario: titoli grandi, una riga ciascuno, tutta la riga cliccabile. Zero finestre: la lista è l\'intestazione.',
+  html: `<section class="hC">
+    <h1 class="hC-h">teloscrivo<span class="dot" aria-hidden="true"></span></h1>
+    <p class="hC-sub">la luna porta consiglio</p>
+    <p class="hC-lab">Gli ultimi scritti</p>
+    <ol class="hC-list">
+      ${row('01','Nella nostra testa','Pensiero · Poesia',true)}
+      ${row('02','Limite/Specchio','Pensiero · daCitazione')}
+      ${row('03','La vita con te','Poesia')}
+    </ol>
+  </section>`,
+  css: `
+  .hC{min-height:640px;display:flex;flex-direction:column}
+  .hC-h{font:400 clamp(3.6rem,19.5vw,11.6rem)/.9 "Instrument Serif",serif;margin:0;display:flex;align-items:baseline;gap:.04em;letter-spacing:-.015em}
+  .hC-h .dot{width:.1em;height:.1em;flex:none}
+  .hC-sub{font:italic 400 clamp(1.4rem,5.6vw,2.2rem)/1.15 "Instrument Serif",serif;margin:.6rem 0 0;color:color-mix(in srgb,var(--seal) 88%,transparent)}
+  .hC-lab{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:auto 0 12px;padding-top:36px}
+  .hC-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--seal)}
+  .hC-list a{display:grid;grid-template-columns:2.4em 1fr auto;grid-template-areas:"n t a" ". c a";gap:2px 14px;align-items:baseline;padding:16px 0;border-bottom:1px solid var(--line);color:var(--seal);text-decoration:none;transition:padding .25s}
+  .hC-n{grid-area:n;font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.14em;color:var(--pink)}
+  .hC-t{grid-area:t;font:400 clamp(1.9rem,8vw,3.4rem)/1.04 "Instrument Serif",serif;text-wrap:balance}
+  .hC-new{display:inline-block;width:.2em;height:.2em;border-radius:50%;background:var(--pink);margin-left:.35em;vertical-align:.34em}
+  .hC-c{grid-area:c;font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .hC-a{grid-area:a;align-self:center;color:var(--pink)}.hC-a svg{width:22px;height:22px;transition:transform .25s}
+  .hC-list a:hover .hC-t{color:var(--pink)}.hC-list a:hover .hC-a svg{transform:translateX(6px)}
+  .hC-list a:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+  @media (max-width:639px){.hC{min-height:500px}}
+  @media (min-width:900px){
+    .hC{min-height:640px}
+    .hC-list a{grid-template-columns:3.2em 1fr 14rem auto;grid-template-areas:"n t c a";align-items:center;padding:20px 0}
+    .hC-list a:hover{padding-left:14px}
+    .hC-t{font-size:3.7rem}
+  }
+  `
+};
+
+const D = { A, B, C };
+const f = document.getElementById('f'), whyEl = document.getElementById('why');
+let d = 'A', v = 'd';
+try { d = localStorage.getItem('m36d') || d; v = localStorage.getItem('m36v') || v } catch (e) {}
+if (/^#[ABC]/.test(location.hash)) d = location.hash[1];
+if (/^#[ABC]m/.test(location.hash)) v = 'm';
+function draw() {
+  const x = D[d];
+  f.style.width = v === 'm' ? '390px' : '1240px';
+  f.srcdoc = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <base href="${location.href.replace(/mockup\/[^/]*$/, '')}">
+    <link rel="stylesheet" href="style.css"><style>.wrapin{max-width:1180px}${x.css}</style></head>
+    <body id="inizio"><div class="sky" aria-hidden="true"></div>
+    <header class="tbar"><a class="brand" href="#"><img src="assets/logo/monogramma-navy.svg" alt="" width="34" height="34"></a></header>
+    <main class="page"><div class="wrapin">${x.html}</div></main></body></html>`;
+  f.onload = () => { try { f.style.height = f.contentDocument.documentElement.scrollHeight + 'px' } catch (e) {} };
+  whyEl.textContent = x.why;
+  document.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', b.dataset.d === d));
+  document.querySelectorAll('[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+  try { localStorage.setItem('m36d', d); localStorage.setItem('m36v', v) } catch (e) {}
+}
+document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { d = b.dataset.d; draw() });
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { v = b.dataset.v; draw() });
+draw();
+</script>
+</body>
+</html>

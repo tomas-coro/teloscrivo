@@ -242,7 +242,9 @@
     };
     pg.innerHTML = LATEST.map((p, i) => `<button type="button" data-i="${i}" aria-label="Scritto ${i + 1}: ${esc(p.t)}" aria-pressed="false"></button>`).join('');
     function meta(p, i) {
-      lk.textContent = (i === 0 ? 'Ultimo scritto' : 'Prima ancora') + ' · ' + p.k + ' · ' + p.d;
+      // la categoria resta come si scrive (daCitazione), non tutta maiuscola: va in un <b> a parte
+      const cat = document.createElement('b'); cat.className = 'lk-cat'; cat.textContent = p.k;
+      lk.replaceChildren((i === 0 ? 'Ultimo scritto' : 'Prima ancora') + ' · ', cat, ' · ' + p.d);
       cta.href = p.u;
       pg.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
     }

@@ -105,13 +105,14 @@ body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-ca
 .gh{visibility:hidden}
 @keyframes blink{50%{opacity:0}}
 .last{padding:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 18px 40px -22px color-mix(in srgb,var(--navy) 55%,transparent)}
-.wbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;height:40px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--soft)}
+.wbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;height:34px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--soft)}
 .wd{display:flex;gap:6px}.wd i{width:10px;height:10px;border-radius:50%;background:var(--line)}.wd i:first-child{background:var(--pink)}
 .lk{display:flex;align-items:center;gap:10px;margin:0;justify-content:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wbody{padding:24px 24px 6px}
-.lt{font-family:"Instrument Serif",Poppins,sans-serif;font-weight:400;font-size:2.5rem;line-height:1.05;margin:0 0 14px;text-wrap:balance}
-.lx{font-weight:300;font-size:1.12rem;line-height:1.75;margin:0 0 20px;min-height:5.3em}
-.lf{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 14px 12px 18px;border-top:1px solid var(--line);background:var(--soft)}
+.wbody{padding:16px 20px 2px}
+.lt{font-family:"Instrument Serif",Poppins,sans-serif;font-weight:400;font-size:2rem;line-height:1.05;margin:0 0 8px;text-wrap:balance}
+.lx{font-weight:300;font-size:1rem;line-height:1.6;margin:0 0 12px;min-height:4.8em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.lk-cat{text-transform:none;letter-spacing:.04em;font:500 .8rem Poppins,sans-serif;color:var(--fg)}
+.lf{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 10px 6px 16px;border-top:1px solid var(--line);background:var(--soft)}
 .last-controls{display:flex;align-items:center;gap:8px}
 .pause{width:32px;min-height:44px;padding:0;border:0;background:none;color:var(--fg);font:500 1rem Poppins,sans-serif;cursor:pointer}
 .pause:hover{color:var(--pink)}
@@ -441,7 +442,18 @@ body.book{--navy:#0E2240;--bg:#0E2240;--fg:#C9D6E4;--pink:#F08AA0;
 .bk-all{display:inline-flex;align-items:center;gap:6px;min-height:44px;font:600 .64rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--seal);text-decoration:none;white-space:nowrap}
 .bk-all:hover{color:var(--pink)}
 .bk [hidden]{display:none!important}
-@media (min-width:900px){.bk-box{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:64px;align-items:center;padding:44px 54px 36px}.bk-quarta{display:block;font-size:1rem;margin-bottom:0}}
+.bk-toc{display:none}
+@media (min-width:900px){.bk-box{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:64px;align-items:center;padding:44px 54px 36px}.bk-quarta{display:block;font-size:1rem;margin-bottom:0}
+  .bk-go{min-height:76px;padding:14px 20px 14px 18px;gap:16px}.bk-mark{width:14px;height:32px}.bk-lbl{font-size:1.4rem}.bk-min{font-size:.68rem}
+  .bk-foot{margin-top:12px}.bk-ghost{font-size:.68rem}
+  .bk-toc{display:block;list-style:none;margin:22px 0 0;padding:0;border-top:1px solid var(--line)}
+  .bk-toc a{display:grid;grid-template-columns:2.6em 1fr auto;gap:12px;align-items:baseline;padding:13px 2px;border-bottom:1px solid var(--line);color:var(--seal);text-decoration:none}
+  .bk-n{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;color:var(--pink)}
+  .bk-ct{font:400 1.3rem/1.2 "Instrument Serif",serif;min-width:0}
+  .bk-cm{font:600 .62rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .bk-toc a:hover .bk-ct{color:var(--pink)}
+  .bk-toc a:focus-visible{outline:2px solid var(--pink);outline-offset:2px;border-radius:6px}
+}
 @media (prefers-reduced-motion:reduce){.bk *{transition:none!important}}
 
 /* navigazione tra le scene: due celle uguali (precedente / prossima); se ce n'e' una sola occupa tutta la riga */

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 37 - Intestazione compatta</title>
+<style>
+  body{margin:0;background:#0b0f1a;color:#cfd8e3;font-family:Poppins,sans-serif}
+  .mkbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:#0b0f1a;border-bottom:1px solid #ffffff22}
+  .mkbar button{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#cfd8e3;cursor:pointer}
+  .mkbar button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .mkbar .sep{width:1px;background:#ffffff33;margin:4px 6px}
+  .why{max-width:60rem;margin:14px auto 0;padding:0 16px;font:400 .8rem/1.5 Poppins,sans-serif;color:#9fb0c4;text-align:center}
+  .stage{display:flex;justify-content:center;margin:14px 0 40px}
+  iframe{border:1px solid #ffffff22;border-radius:12px;background:#072D59;max-width:100%}
+</style>
+</head>
+<body>
+<div class="mkbar" role="toolbar" aria-label="Direzioni">
+  <button data-d="A" aria-pressed="true">A · Ritocchi</button>
+  <button data-d="B" aria-pressed="false">B · Ritocchi + base</button>
+  <button data-d="C" aria-pressed="false">C · Card in una riga</button>
+  <button data-d="0" aria-pressed="false">Com'è ora</button>
+  <span class="sep"></span>
+  <button data-v="m" aria-pressed="false">Mobile</button>
+  <button data-v="d" aria-pressed="true">Desktop</button>
+</div>
+<p class="why" id="why"></p>
+<div class="stage"><iframe id="f" title="Anteprima"></iframe></div>
+
+<script>
+  // Classi vere del sito (style.css). Le varianti cambiano SOLO la card e l'allineamento: la pagina non si allunga.
+  const lab = '<span>Ultimo scritto</span> · <b class="mk-cat">daCitazione</b> · <span>4 nov</span>';
+  const card = `<article class="last">
+    <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk">${lab}</p><span aria-hidden="true"></span></div>
+    <div class="wbody"><p class="lt">Nella nostra testa</p><p class="lx">Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.</p></div>
+    <div class="lf"><div class="last-controls"><div class="pg"><button aria-pressed="true"></button><button aria-pressed="false"></button><button aria-pressed="false"></button></div></div><a class="cta" href="#">Leggi<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </article>`;
+  const word = `<h1 class="hero-h">teloscrivo<span class="dot" aria-hidden="true"></span></h1><p class="hero-sub">la luna porta consiglio</p>`;
+  // Etichetta: la categoria resta come si scrive (daCitazione), non tutta maiuscola
+  const fixLabel = `.mk-cat{text-transform:none;letter-spacing:.04em;font:500 .8rem Poppins,sans-serif;color:var(--fg)}`;
+  // A: card piu' bassa (testo piu' stretto, barra piu' bassa) + etichetta giusta
+  const cssA = `${fixLabel}
+    .wbar{height:34px}
+    .wbody{padding:16px 20px 2px}
+    .lt{font-size:2rem;margin:0 0 8px}
+    .lx{font-size:1rem;line-height:1.6;min-height:0;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .lf{padding:6px 10px 6px 16px}`;
+  // B: A + base del sottotitolo allineata alla base della card (solo desktop)
+  const cssB = cssA + `
+    @media (min-width:640px){.hero{align-items:end}.hero-l{padding-bottom:6px}.hero-sub{margin-bottom:0}}`;
+  // C: la barra in alto sparisce nel corpo: pallini e etichetta sulla stessa riga del testo, "Leggi" a fianco dei pallini, niente fascia grigia in fondo
+  const cssC = `${fixLabel}
+    .wbar{height:32px;border-bottom:0;background:none;padding-top:6px}
+    .wbody{padding:2px 20px 0}
+    .lt{font-size:2rem;margin:0 0 8px}
+    .lx{font-size:1rem;line-height:1.6;min-height:0;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .lf{border-top:0;background:none;padding:2px 14px 14px 20px}
+    .cta{min-height:44px}
+    @media (min-width:640px){.hero{align-items:end}.hero-l{padding-bottom:6px}.hero-sub{margin-bottom:0}}`;
+  const css = {0: fixLabel.replace(/.*/,''), A: cssA, B: cssB, C: cssC};
+  const why = {
+    0:'Com\'è ora (il riferimento). Notare l\'etichetta della categoria, tutta maiuscola: "DACITAZIONE".',
+    A:'Solo ritocchi: card più bassa (titolo 2rem, testo su 3 righe, barre più sottili) e categoria scritta giusta: "daCitazione".',
+    B:'Come A, in più su desktop la base del sottotitolo si allinea alla base della card (i due blocchi poggiano sulla stessa linea).',
+    C:'La più compatta: niente fascia grigia in fondo, pallini + "Leggi" sulla stessa riga del testo, barra in alto senza bordo. Allineata alla base come B.'
+  };
+  const f = document.getElementById('f'), whyEl = document.getElementById('why');
+  let d = 'A', v = 'd';
+  try { d = localStorage.getItem('m37d') || d; v = localStorage.getItem('m37v') || v } catch (e) {}
+  if (/^#[0ABC]/.test(location.hash)) d = location.hash[1];
+  if (/^#[0ABC]m/.test(location.hash)) v = 'm';
+  function draw() {
+    f.style.width = v === 'm' ? '390px' : '1240px';
+    f.srcdoc = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+      <base href="${location.href.replace(/mockup\/[^/]*$/, '')}">
+      <link rel="stylesheet" href="style.css"><style>${d === '0' ? '' : css[d]}${d === '0' ? '.hero{align-items:center}' : ''}</style></head>
+      <body id="inizio"><div class="sky" aria-hidden="true"></div>
+      <header class="tbar"><a class="brand" href="#"><img src="assets/logo/monogramma-navy.svg" alt="" width="34" height="34"></a></header>
+      <main class="page"><div class="wrapin"><section class="hero"><div class="hero-l">${word}</div>${card}</section></div></main></body></html>`;
+    f.onload = () => { try {
+      const doc = f.contentDocument;
+      f.style.height = doc.documentElement.scrollHeight + 'px';
+      const h = Math.round(doc.querySelector('.last').getBoundingClientRect().height);
+      whyEl.textContent = why[d] + ' · Altezza card: ' + h + 'px';
+    } catch (e) {} };
+    whyEl.textContent = why[d];
+    document.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', b.dataset.d === d));
+    document.querySelectorAll('[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+    try { localStorage.setItem('m37d', d); localStorage.setItem('m37v', v) } catch (e) {}
+  }
+  document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { d = b.dataset.d; draw() });
+  document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { v = b.dataset.v; draw() });
+  draw();
+</script>
+</body>
+</html>

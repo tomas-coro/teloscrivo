@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 35 - Intestazione della home</title>
+<style>
+  body{margin:0;background:#0b0f1a;color:#cfd8e3;font-family:Poppins,sans-serif}
+  .mkbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:#0b0f1a;border-bottom:1px solid #ffffff22}
+  .mkbar button{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#cfd8e3;cursor:pointer}
+  .mkbar button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .mkbar .sep{width:1px;background:#ffffff33;margin:4px 6px}
+  .why{max-width:60rem;margin:14px auto 0;padding:0 16px;font:400 .8rem/1.5 Poppins,sans-serif;color:#9fb0c4;text-align:center}
+  .stage{display:flex;justify-content:center;margin:14px 0 40px}
+  iframe{border:1px solid #ffffff22;border-radius:12px;background:#072D59;max-width:100%}
+</style>
+</head>
+<body>
+<div class="mkbar" role="toolbar" aria-label="Direzioni">
+  <button data-d="A" aria-pressed="true">A · Pulita</button>
+  <button data-d="B" aria-pressed="false">B · Con le porte</button>
+  <button data-d="C" aria-pressed="false">C · Una riga di voce</button>
+  <span class="sep"></span>
+  <button data-v="m" aria-pressed="false">Mobile</button>
+  <button data-v="d" aria-pressed="true">Desktop</button>
+</div>
+<p class="why" id="why"></p>
+<div class="stage"><iframe id="f" title="Anteprima"></iframe></div>
+
+<script>
+  // Pezzi comuni (le classi sono quelle vere del sito: style.css)
+  const card = `<article class="last">
+    <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span>Ultimo scritto · Pensiero · Poesia · 4 nov</span></p><span aria-hidden="true"></span></div>
+    <div class="wbody"><p class="lt">Nella nostra testa</p><p class="lx">Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.</p></div>
+    <div class="lf"><div class="last-controls"><div class="pg"></div></div><a class="cta" href="#">Leggi<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </article>`;
+  const word = `<h1 class="hero-h">teloscrivo<span class="dot" aria-hidden="true"></span></h1><p class="hero-sub">la luna porta consiglio</p>`;
+  const extra = {
+    // A: solo wordmark e sottotitolo (la riga "Ultimo scritto il..." e' tolta: la card a destra dice gia' tutto)
+    A: '',
+    // B: le sezioni come porte d'ingresso, sotto il sottotitolo
+    B: `<nav class="mk-doors" aria-label="Sezioni"><a href="#">Pensiero</a><a href="#">Poesia</a><a href="#">daCitazione</a><a href="#">Il libro</a></nav>`,
+    // C: una frase che dice cosa e' il sito, in Poppins leggero
+    C: `<p class="mk-voice">Pensieri, poesie e parole di altri, da leggere scorrendo. E un libro che scrivo un capitolo alla volta.</p>`
+  };
+  const why = {
+    A:'Togliere la riga piccola e basta: wordmark e sottotitolo restano soli, centrati in verticale rispetto alla card. La piu\' silenziosa.',
+    B:'Sotto il sottotitolo compaiono le 4 sezioni come pillole: riempi lo spazio con qualcosa di utile e dai subito una porta per entrare (il libro e\' una di queste).',
+    C:'Una frase sola sotto il sottotitolo che dice cosa trovi qui, come una quarta di copertina in piccolo. Piu\' calda, niente pulsanti.'
+  };
+  const css = `
+    .hero{align-items:center}
+    .mk-doors{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0}
+    .mk-doors a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:99px;color:var(--seal);text-decoration:none;font:500 .86rem Poppins,sans-serif;transition:border-color .2s,background .2s}
+    .mk-doors a:hover{border-color:var(--pink);background:var(--soft)}
+    .mk-doors a:last-child{border-color:color-mix(in oklab,var(--pink) 45%,transparent)}
+    .mk-voice{margin:24px 0 0;max-width:26rem;font:300 1rem/1.65 Poppins,sans-serif;color:color-mix(in srgb,var(--seal) 82%,transparent);text-wrap:pretty}
+  `;
+  const f = document.getElementById('f'), whyEl = document.getElementById('why');
+  let d = 'A', v = 'd';
+  try { d = localStorage.getItem('m35d') || d; v = localStorage.getItem('m35v') || v } catch (e) {}
+  if (/^#[ABC]/.test(location.hash)) d = location.hash[1];
+  if (/^#[ABC]m/.test(location.hash)) v = 'm';
+  function draw() {
+    f.style.width = v === 'm' ? '390px' : '1240px';
+    f.srcdoc = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+      <base href="${location.href.replace(/mockup\/[^/]*$/, '')}">
+      <link rel="stylesheet" href="style.css"><style>${css}</style></head>
+      <body id="inizio"><div class="sky" aria-hidden="true"></div>
+      <header class="tbar"><a class="brand" href="#"><img src="assets/logo/monogramma-navy.svg" alt="" width="34" height="34"></a></header>
+      <main class="page"><div class="wrapin"><section class="hero"><div class="hero-l">${word}${extra[d]}</div>${card}</section></div></main></body></html>`;
+    f.onload = () => { try { f.style.height = (f.contentDocument.documentElement.scrollHeight) + 'px' } catch (e) {} };
+    whyEl.textContent = why[d];
+    document.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', b.dataset.d === d));
+    document.querySelectorAll('[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+    try { localStorage.setItem('m35d', d); localStorage.setItem('m35v', v) } catch (e) {}
+  }
+  document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { d = b.dataset.d; draw() });
+  document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { v = b.dataset.v; draw() });
+  draw();
+</script>
+</body>
+</html>
