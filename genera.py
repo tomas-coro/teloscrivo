@@ -225,6 +225,15 @@ class Post:
         return " · ".join(SECTIONS[c][0] for c in self.cats)
 
     @property
+    def bar_label(self):
+        # barra della card in home: "Pensiero e Poesia", ma "Poesia · daCanzone" (le daX sono un tipo, non una seconda categoria)
+        out = ""
+        for c in self.cats:
+            name = SECTIONS[c][0]
+            out += name if not out else (" · " if name.startswith("da") else " e ") + name
+        return out
+
+    @property
     def full_text(self):  # tutto quello che si legge: serve al tempo di lettura
         return "\n\n".join(x for x in ("\n".join(self.quote), self.body, self.poem) if x.strip())
 
@@ -385,7 +394,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=9" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=10" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -490,7 +499,7 @@ def photo_img(p, root, sizes, eager=False):
 def page_home(posts, chapters=()):
     root = ""
     newest = posts[0]
-    latest = [{"t": p.title, "k": p.cat_label, "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
+    latest = [{"t": p.title, "k": p.bar_label, "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
     first = latest[0]
     # una foto per ognuno dei 5 scritti recenti (se manca, resta lo sfondo sfumato); la prima e' subito visibile
     last_imgs = "".join(
@@ -547,7 +556,7 @@ def page_home(posts, chapters=()):
       <p class="hero-sub">la luna porta consiglio{ICON_MOON}</p>
     </div>
     <article class="last">
-      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · <b class="lk-cat">{newest.cat_label}</b> · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
+      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk><b class="lk-cat">{newest.bar_label}</b> · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
       <div class="lph">{last_imgs}<div class="lov">
         <p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p>
         <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg></button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>

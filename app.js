@@ -259,9 +259,10 @@
     };
     pg.innerHTML = LATEST.map((p, i) => `<button type="button" data-i="${i}" aria-label="Scritto ${i + 1}: ${esc(p.t)}" aria-pressed="false"></button>`).join('');
     function meta(p, i) {
+      // la barra descrive lo scritto che si legge (categoria + data), non la sua posizione nell'elenco
       // la categoria resta come si scrive (daCitazione), non tutta maiuscola: va in un <b> a parte
       const cat = document.createElement('b'); cat.className = 'lk-cat'; cat.textContent = p.k;
-      lk.replaceChildren((i === 0 ? 'Ultimo scritto' : 'Prima ancora') + ' · ', cat, ' · ' + p.d);
+      lk.replaceChildren(cat, ' · ' + p.d);
       cta.href = p.u;
       $$('.lph-img').forEach(im => im.classList.toggle('on', +im.dataset.i === i));  // la foto dello scritto che sta scrivendo
       pg.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
