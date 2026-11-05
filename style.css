@@ -441,7 +441,7 @@ body.book{--navy:#0E2240;--bg:#0E2240;--fg:#C9D6E4;--pink:#F08AA0;
 .bk-all{display:inline-flex;align-items:center;gap:6px;min-height:44px;font:600 .64rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--seal);text-decoration:none;white-space:nowrap}
 .bk-all:hover{color:var(--pink)}
 .bk [hidden]{display:none!important}
-@media (min-width:900px){.bk-box{padding:44px 54px 36px}.bk-quarta{display:block;font-size:1rem}.bk-go{max-width:34rem}}
+@media (min-width:900px){.bk-box{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:64px;align-items:center;padding:44px 54px 36px}.bk-quarta{display:block;font-size:1rem;margin-bottom:0}}
 @media (prefers-reduced-motion:reduce){.bk *{transition:none!important}}
 
 /* navigazione tra le scene: due celle uguali (precedente / prossima); se ce n'e' una sola occupa tutta la riga */

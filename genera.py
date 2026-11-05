@@ -349,7 +349,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=24">
+<link rel="stylesheet" href="{root}style.css?v=25">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -487,16 +487,16 @@ def page_home(posts, chapters=()):
         bdata = json.dumps([{"s": c.slug, "u": c.url, "n": c.chapter or 0, "t": c.title, "m": c.minutes} for c in chapters], ensure_ascii=False).replace("</", "<\\/")
         total = sum(c.minutes for c in chapters)
         book = (f'<section class="bk" aria-labelledby="h-book" data-book><div class="bk-box">'
-                f'<p class="cap bk-kick">Il libro · <b>in corso</b></p>'
+                f'<div class="bk-l"><p class="cap bk-kick">Il libro · <b>in corso</b></p>'
                 f'<h2 id="h-book" class="bk-ttl">{esc(BOOK_TITLE)}</h2>'
-                f'<p class="bk-quarta">{esc(BOOK_HOME_BLURB)}</p>'
+                f'<p class="bk-quarta">{esc(BOOK_HOME_BLURB)}</p></div><div class="bk-r">'
                 f'<a class="bk-go" href="{root}{start.url}" data-bk-go><span class="bk-mark" aria-hidden="true"></span>'
                 f'<span class="bk-lbl"><span class="bk-k" data-bk-k>Inizia da</span> <span class="bk-t" data-bk-t>{label}&nbsp;·&nbsp;{esc(start.title)}</span></span>'
                 f'<span class="bk-min" data-bk-min>{start.minutes} min</span><span class="bk-arr" aria-hidden="true">→</span></a>'
                 f'<div class="bk-bar" data-bk-bar hidden><i data-bk-fill></i></div>'
                 f'<div class="bk-foot"><p class="bk-ghost" data-bk-ghost>{lettura_totale(total)}</p>'
                 f'<a class="bk-all" href="{root}libro/" data-bk-all{" hidden" if len(chapters) <= 5 else ""}>Tutti i capitoli <span aria-hidden="true">→</span></a></div>'
-                f'</div><script type="application/json" id="book-data">{bdata}</script></section>')
+                f'</div></div><script type="application/json" id="book-data">{bdata}</script></section>')
     desc = "Pensieri, poesie, citazioni e scritti nati da una canzone, da leggere scorrendo. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
     latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
