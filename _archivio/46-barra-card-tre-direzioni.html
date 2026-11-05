@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 46 - barra della finestra, tre direzioni</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* solo struttura del mockup: i colori e i font sono quelli veri del sito */
+  body{padding:24px 16px 60px}
+  .ctl{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:center;margin:0 auto 24px;max-width:900px}
+  .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .grp>span{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+  .ctl button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--fg);font:500 .85rem Poppins,sans-serif;cursor:pointer}
+  .ctl button[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:var(--navy)}
+  .frame{margin:0 auto;width:min(100%,390px);transition:width .3s}
+  .frame.desk{width:min(100%,760px)}
+  .note{max-width:520px;margin:18px auto 0;text-align:center;color:var(--muted);font:300 .95rem/1.5 Poppins,sans-serif;text-wrap:pretty}
+  .note b{color:var(--fg);font-weight:500}
+
+  /* FIX mobile: la foto non ha piu' altezza fissa, e' il testo che decide. Il testo sta nel flusso
+     (non in assoluto) con un tetto di foto sopra, cosi' niente esce piu' dalla card. */
+  .lph{aspect-ratio:auto;min-height:340px;display:flex;flex-direction:column;justify-content:flex-end}
+  .frame.desk .lph{aspect-ratio:16/10;min-height:0}
+  .lov{position:relative;padding-top:120px}
+  .frame.desk .lov{padding-top:0}
+
+  /* la barra: 3 colonne (pallini | titolo | data), come la finestra del libro */
+  .wbar{display:grid;grid-template-columns:auto 1fr auto;gap:12px}
+  .wbar .ttl,.wbar .dt{margin:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:500 .8rem Poppins,sans-serif;letter-spacing:.03em;color:var(--fg);text-transform:none}
+  .wbar .dt{color:var(--muted);font-weight:400}
+
+  /* ── A · Titolo di finestra: categoria al centro come il titolo di una finestra vera, data a destra ── */
+  .a .ttl{text-align:center}
+
+  /* ── B · Scheda: categoria dentro una linguetta che "esce" dalla barra, come una tab ── */
+  /* B2: tab vera. Angoli esterni raccordati (trucco delle tab di Chrome), filo rosa in alto come scheda attiva,
+     puntino rosa davanti, e la DATA dentro la tab dopo un filetto: categoria e data sono un blocco solo. */
+  /* B3: la barra NON ha piu' un suo sfondo pieno: sta sopra la foto, con la stessa velatura blu scuro (#071c3b)
+     che c'e' gia' sotto al testo. La tab e' di quel blu ma trasparente, quindi prende il colore di ogni foto. */
+  .b{--tab:#071c3b99}
+  .b .last{position:relative}
+  .b .wbar{position:absolute;top:0;left:0;right:0;z-index:4;height:40px;background:linear-gradient(#071c3bd9,#071c3b00);align-items:end;padding-top:8px;border-bottom:0}
+  .b .wd{align-self:end;margin-bottom:15px}
+  .b .ttl{position:relative;z-index:1;justify-self:start;max-width:100%;height:32px;padding:0 16px 0 14px;display:flex;align-items:center;gap:10px;background:linear-gradient(color-mix(in srgb,var(--seal) 22%,transparent),color-mix(in srgb,var(--seal) 0%,transparent));border-radius:12px 12px 0 0;box-shadow:inset 0 2px 0 var(--pink)}
+  .b .ttl .c{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .b .ttl .c::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pink);margin-right:9px;vertical-align:1px}
+  .b .ttl .tdt{display:inline;color:var(--muted);font-weight:400;padding-left:10px;border-left:1px solid var(--line);flex:none}
+  .b .dt{display:none}
+  .tdt{display:none}
+
+  /* ── C · Nome file: categoria scritta come un file ("Poesia · daCanzone.txt"), come il-libro.txt del sito ── */
+  .c .ttl{text-align:center}
+  .c .ttl::after{content:".txt";color:var(--pink);font-weight:500}
+</style>
+</head>
+<body>
+<div class="ctl">
+  <div class="grp" id="gd"><span>Direzione</span>
+    <button type="button" data-d="a" aria-pressed="true">A · Titolo finestra</button>
+    <button type="button" data-d="b">B · Scheda</button>
+    <button type="button" data-d="c">C · Nome file</button>
+  </div>
+  <div class="grp" id="gv"><span>Vista</span>
+    <button type="button" data-v="m" aria-pressed="true">Mobile</button>
+    <button type="button" data-v="d" aria-pressed="false">Desktop</button>
+  </div>
+  <div class="grp" id="gs"><span>Scritto</span>
+    <button type="button" data-s="0" aria-pressed="true">Che se sparisci</button>
+    <button type="button" data-s="1" aria-pressed="false">Nella nostra testa</button>
+    <button type="button" data-s="2" aria-pressed="false">Limite/Specchio</button>
+  </div>
+</div>
+
+<div class="frame a" id="frame">
+  <article class="last">
+    <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="ttl" id="ttl"></p><p class="dt" id="dt"></p></div>
+    <div class="lph">
+      <img class="lph-img on" id="img" src="../assets/foto/che-se-sparisci-696.webp" alt="" width="696" height="435">
+      <div class="lov">
+        <p class="lt" id="t"></p><p class="lx" id="x"></p>
+        <div class="lf"><div class="last-controls"></div><a class="cta" href="#">Leggi<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+      </div>
+    </div>
+  </article>
+</div>
+<p class="note" id="note"></p>
+
+<script>
+  // dati veri della home; le categorie seguono la regola nuova (" e " tra categorie, " · " davanti a daX)
+  const D = [
+    {t:"Che se sparisci", k:"Poesia · daCanzone", d:"5 nov", x:"Stai assieme a me,<br>Che se sparisci<br>Mi perdo dentro me stesso,", i:"che-se-sparisci-696.webp"},
+    {t:"Nella nostra testa", k:"Pensiero e Poesia", d:"4 nov", x:"Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.", i:"nella-nostra-testa-720.webp"},
+    {t:"Limite/Specchio", k:"Pensiero · daCitazione", d:"4 nov", x:"Guardarsi allo specchio può portarci a dubitare di quello che vediamo.", i:"limite-specchio-736.webp"}
+  ];
+  const NOTE = {
+    a:"<b>A · Titolo di finestra.</b> La barra resta com'è, ma ora ha tre parti chiare: pallini a sinistra, categoria al centro come il titolo di una finestra vera, data a destra in grigio. Nessun puntino da interpretare.",
+    b:"<b>B3 · Scheda sulla foto.</b> La barra non ha più uno sfondo suo: sta sopra la foto, con la stessa velatura blu scuro che c'è già sotto al testo. La tab è un velo chiaro che sfuma verso il basso dentro la foto: niente bordo sotto, quindi si fonde con ogni foto. Categoria e data stanno insieme dentro la tab.",
+    c:"<b>C · Nome file.</b> La categoria è scritta come un file, con <b>.txt</b> in rosa. È lo stesso gioco di <b>il-libro.txt</b> nella finestra del libro: il sito parla una lingua sola."
+  };
+  const $ = s => document.querySelector(s), f = $('#frame');
+  let cur = 0, dir = 'a';
+  function render(){
+    const p = D[cur];
+    $('#t').textContent = p.t; $('#x').innerHTML = p.x;
+    $('#img').src = '../assets/foto/' + p.i;
+    $('#ttl').innerHTML = '<span class="c">' + p.k + '</span><span class="tdt">' + p.d + '</span>'; $('#dt').textContent = p.d;
+    f.className = 'frame ' + dir + (f.classList.contains('desk') ? ' desk' : '');
+    $('#note').innerHTML = NOTE[dir];
+  }
+  function bind(sel, attr, fn){
+    document.querySelectorAll(sel + ' button').forEach(b => b.onclick = () => {
+      document.querySelectorAll(sel + ' button').forEach(x => x.setAttribute('aria-pressed', x === b));
+      fn(b.dataset[attr]);
+    });
+  }
+  bind('#gd','d', v => { dir = v; render(); });
+  bind('#gs','s', v => { cur = +v; render(); });
+  bind('#gv','v', v => { f.classList.toggle('desk', v === 'd'); render(); });
+  render();
+</script>
+</body>
+</html>
