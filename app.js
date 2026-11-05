@@ -53,6 +53,20 @@
   $$('[data-copy]').forEach(b => { b.hidden = false; b.addEventListener('click', copyLink); });
   $$('[data-share]').forEach(b => { b.hidden = false; b.addEventListener('click', share); }); // nascosti nell'HTML: senza JS non servono
 
+  // ── libro: ricorda l'ultimo capitolo aperto; sull'indice "Inizia" diventa "Continua" ──
+  // (localStorage puo' non esserci: privato/bloccato. In quel caso resta "Inizia", niente errori)
+  const BOOK_KEY = 'teloscrivo-libro';
+  const chapterSlug = document.body.dataset.slug;
+  if (document.body.classList.contains('book')) {
+    try {
+      if (chapterSlug) localStorage.setItem(BOOK_KEY, chapterSlug);
+      const start = $('[data-book-start]');
+      const saved = localStorage.getItem(BOOK_KEY);
+      const link = saved && $(`.chaps a[href$="scritti/${CSS.escape(saved)}/"]`);
+      if (start && link) { start.href = link.href; start.firstChild.textContent = 'Continua'; }
+    } catch (e) { /* senza memoria del browser il libro funziona uguale */ }
+  }
+
   // ── lettura: il testo compare riga per riga mentre scorri (e sparisce se risali) ──
   const units = $$('.u'), rend = $('.rend'), cue = $('[data-cue]');
   if (units.length) {

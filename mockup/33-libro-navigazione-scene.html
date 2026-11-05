@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 33 - Libro, navigazione tra scene e capitoli</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* ── selettori del mockup (non fanno parte del sito) ── */
+  .mkbar{position:sticky;top:0;z-index:50;background:#0b0f1a;border-bottom:1px solid #ffffff22;padding:8px 10px;display:grid;gap:6px}
+  .mkbar .row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+  .mkbar button{font:600 .7rem "Roboto Condensed",sans-serif;letter-spacing:.1em;text-transform:uppercase;min-height:44px;padding:0 14px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#fff;cursor:pointer}
+  .mkbar button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .mkbar .row.sm button{min-height:36px;font-size:.64rem;padding:0 11px;border-color:#ffffff2a;color:#cfd8e6}
+  .mkbar .row.sm button[aria-pressed=true]{background:#ffffff;border-color:#fff;color:#072D59}
+  .mkbar small{display:block;text-align:center;font:400 .66rem Poppins,sans-serif;color:#8497AD}
+
+  /* ── lettura "notte morbida" (come il sito reale) ── */
+  .bk{--bgp:#0E2240;--ink:#C9D6E4;--soft:#8497AD;--acc:#F08AA0;--line:#ffffff24;background:var(--bgp);color:var(--ink);padding-bottom:60px;min-height:100vh}
+  .bk .ph{height:30vh;max-height:230px;background:center/cover no-repeat url(../assets/foto/1-1-reietto-800.webp);position:relative}
+  .bk .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,var(--bgp) 100%)}
+  .bk .col{max-width:34rem;margin:0 auto;padding:0 22px}
+  .bk .kick{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:20px 0 8px}
+  .bk .kick b{color:var(--acc);font-weight:600}
+  .bk h1{font:400 2.6rem/1.04 "Instrument Serif",serif;margin:0 0 8px}
+  .bk .meta{font:italic 400 1.1rem "Instrument Serif",serif;color:var(--soft);margin:0 0 30px}
+  .bk .t{font:300 1.12rem/1.9 Poppins,sans-serif}
+  .bk .t p{margin:0 0 1.3em;text-wrap:pretty}
+  .bk a{color:inherit;text-decoration:none}
+  .bk svg{flex:none}
+  .bk .bye{margin:34px 0 0;text-align:right;font:300 .9rem/1.6 Poppins,sans-serif;color:var(--soft);padding-right:14px;border-right:1px solid color-mix(in srgb,var(--acc) 50%,transparent)}
+  .bk .bye em{font:italic 400 1.35rem "Instrument Serif",serif;color:var(--ink)}
+  .lab{max-width:34rem;margin:30px auto 0;padding:0 22px;font:400 .8rem/1.6 Poppins,sans-serif;color:var(--soft)}
+  .lab b{color:var(--ink);font-weight:500}
+
+  /* ═════ A - PERCORSO: barra delle scene in testa, un bottone grande "avanti", pillole per il resto ═════ */
+  .trk{display:flex;gap:6px;margin:2px 0 -8px}
+  .sg{flex:1;height:44px;position:relative;display:block}
+  .sg::before{content:"";position:absolute;left:0;right:0;top:20px;height:4px;border-radius:4px;background:color-mix(in srgb,var(--ink) 13%,transparent)}
+  .sg.past::before{background:color-mix(in srgb,var(--ink) 50%,transparent)}
+  .sg.ready::before{background:color-mix(in srgb,var(--ink) 28%,transparent)}
+  .sg.cur::before{background:var(--acc)}
+  .sg.todo::before{background:none;border-top:2px dotted color-mix(in srgb,var(--ink) 28%,transparent);height:0;top:21px;border-radius:0}
+  .endA .big{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:84px;padding:16px 20px;border:1px solid var(--acc);border-radius:18px;background:color-mix(in srgb,var(--acc) 9%,transparent);transition:background .2s}
+  .endA .big:hover{background:color-mix(in srgb,var(--acc) 17%,transparent)}
+  .endA .big small{display:block;font:600 .64rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:4px}
+  .endA .big span{font:400 1.5rem/1.1 "Instrument Serif",serif;color:var(--ink)}
+  .endA .big svg{color:var(--acc)}
+  .endA .soonline{margin:0;padding:6px 2px;font:italic 400 1.2rem "Instrument Serif",serif;color:var(--soft)}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .pill{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:99px;font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);transition:border-color .2s}
+  .pill:hover{border-color:var(--acc)}
+  .pill svg{color:var(--acc)}
+
+  /* ═════ B - CASSETTO: chip "Scena 3" in testa apre l'elenco; in fondo solo due frecce di testo ═════ */
+  .metaB{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 28px}
+  .chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:99px;background:transparent;color:var(--ink);font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:border-color .2s}
+  .chip:hover{border-color:var(--acc)}
+  .chip svg{color:var(--acc)}
+  .metaB span{font:italic 400 1.1rem "Instrument Serif",serif;color:var(--soft)}
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px;border-top:1px solid var(--line);padding-top:6px}
+  .duo>*{display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:84px}
+  .duo .r{text-align:right;align-items:flex-end}
+  .duo small{font:600 .64rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);display:flex;align-items:center;gap:6px}
+  .duo small svg{color:var(--acc)}
+  .duo b{font:400 1.35rem/1.1 "Instrument Serif",serif;text-wrap:balance}
+  .duo .soon b{color:var(--soft);font-style:italic}
+  .duo a:hover b{color:var(--acc)}
+  .allbtn{display:flex;width:100%;justify-content:center;margin-top:8px}
+  .ov{position:fixed;inset:0;background:#000a;opacity:0;pointer-events:none;transition:opacity .25s;z-index:60}
+  .ov.open{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:34rem;max-height:80vh;overflow:auto;overscroll-behavior:contain;background:#12294C;border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:8px 22px 30px;transform:translateY(105%);transition:transform .28s ease;z-index:70;color:var(--ink)}
+  .sheet.open{transform:none}
+  .sh-top{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#12294C;padding:8px 0;z-index:1}
+  .sh-top b{font:400 1.7rem "Instrument Serif",serif}
+  .sh-x{min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:99px;background:transparent;color:var(--ink);font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+  .sheet ol{list-style:none;margin:0 0 6px;padding:0}
+  .sheet li>*{display:flex;align-items:center;gap:14px;min-height:48px;padding:6px 4px;border-bottom:1px solid #ffffff12}
+  .sheet li i{font:italic 400 1.1rem "Instrument Serif",serif;color:var(--soft);width:1.4rem;text-align:right}
+  .sheet li .tt{font:400 1.3rem "Instrument Serif",serif;flex:1}
+  .sheet li .here{font:600 .6rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+  .sheet li .off{color:var(--soft)}
+  .sheet li .off .tt{font-style:italic}
+  .sheet li.cur>*{color:var(--ink)}
+  .sheet .chrow{display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:6px 4px;border-bottom:1px solid #ffffff12;font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+  .sheet .chrow em{font:italic 400 1.05rem "Instrument Serif",serif;text-transform:none;letter-spacing:0}
+  .sheet .chrow svg{color:var(--acc)}
+  .sheet .chcur{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:16px 0 4px}
+  body.lock{overflow:hidden}
+
+  /* ═════ C - PAGINA DI LIBRO: solo testo, niente scatole, niente "di N" ═════ */
+  .endC{text-align:center;padding-top:10px}
+  .endC .orn{font:400 1.4rem "Instrument Serif",serif;letter-spacing:.6em;color:var(--soft);margin:0 0 8px;padding-left:.6em}
+  .endC .fin{font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 22px}
+  .endC .go{display:inline-flex;flex-direction:column;align-items:center;gap:2px;min-height:44px;padding:6px 12px}
+  .endC .go small{font:600 .64rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+  .endC .go b{font:400 2.1rem/1.1 "Instrument Serif",serif;display:flex;align-items:center;gap:10px;transition:color .2s}
+  .endC .go b svg{color:var(--acc)}
+  .endC .go:hover b{color:var(--acc)}
+  .endC .soonC{margin:0;font:italic 400 1.3rem "Instrument Serif",serif;color:var(--soft)}
+  .endC .low{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 26px;margin-top:26px}
+  .endC .low a{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:400 1.15rem "Instrument Serif",serif;color:var(--soft);transition:color .2s}
+  .endC .low a:hover{color:var(--ink)}
+  .endC .low svg{color:var(--acc)}
+  .endC + .bye{text-align:center;border-right:0;padding-right:0}
+
+  @media (max-width:480px){.bk h1{font-size:2.3rem}.duo b{font-size:1.2rem}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body style="background:#0E2240">
+<div class="mkbar" role="group" aria-label="Controlli del mockup">
+  <div class="row" id="dirs">
+    <button data-d="A" aria-pressed="true">A Percorso</button>
+    <button data-d="B" aria-pressed="false">B Cassetto</button>
+    <button data-d="C" aria-pressed="false">C Pagina di libro</button>
+  </div>
+  <div class="row sm" id="sts"></div>
+  <small>I link dentro la pagina funzionano: cliccali per camminare tra scene e capitoli.</small>
+</div>
+
+<div class="bk" id="bk">
+  <div class="ph"></div>
+  <div class="col">
+    <div id="head"></div>
+    <div class="t">
+      <p>Da bambino credevo che il futuro fosse un pozzo senza fondo in cui poter pescare giorni. Ero ancora ignaro di ciò che il mondo attorno a me rappresentasse veramente. Crescendo ho imparato a contare i sassi che gettavo dentro e a sentirne l’eco che si faceva ogni volta più vicino.</p>
+      <p>Il palcoscenico di quella illusione era la capitale del nostro Regno, Illyrium, una città ricca e prospera dove risiedevano la gran maggioranza delle persone di rilievo della società.</p>
+    </div>
+    <div id="end"></div>
+    <p class="bye" id="bye">Grazie per aver letto e ricorda che<br><em>la luna porta consiglio</em></p>
+  </div>
+  <p class="lab" id="lab"></p>
+</div>
+
+<div class="ov" id="ov"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Scene del capitolo" aria-hidden="true"></div>
+
+<script>
+/* Dati finti: capitolo 1 con 5 scene tutte scritte, capitolo 2 con 3 scene di cui solo la prima scritta */
+var CH={
+  1:{act:"I",tot:5,w:5,t:["Reietto","Le mura","Il pozzo","L'eco","Ombra tollerata"]},
+  2:{act:"I",tot:3,w:1,t:["La capitale"]}
+};
+var STATES=[
+  {c:1,s:1,n:"Cap. 1 · scena 1 (inizio libro)"},
+  {c:1,s:3,n:"Cap. 1 · scena 3 (in mezzo)"},
+  {c:1,s:5,n:"Cap. 1 · scena 5 (fine capitolo)"},
+  {c:2,s:1,n:"Cap. 2 · scena 1 (si torna indietro?)"}
+];
+var st={c:1,s:3},dir="A";
+var ic={
+  r:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  l:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  u:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>',
+  d:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
+};
+function has(c,s){return !!CH[c]&&s<=CH[c].w}
+function T(c,s){return CH[c].t[s-1]}
+function go(c,s,html,cls){return '<a class="'+(cls||'')+'" href="#" data-go="'+c+'.'+s+'">'+html+'</a>'}
+function X(){
+  var c=st.c,s=st.s,C=CH[c];
+  return {c:c,s:s,C:C,title:T(c,s),
+    nextS:s<C.tot?{c:c,s:s+1}:null, nextOk:s<C.tot&&has(c,s+1),
+    prevS:s>1?{c:c,s:s-1}:null,
+    nextC:(s===C.tot&&CH[c+1]&&has(c+1,1))?{c:c+1,s:1}:null,
+    prevC:(s===1&&c>1)?{c:c-1,s:1}:null};
+}
+function date(){return "5 nov · 4 min"}
+function kick(x){return '<p class="kick">Atto '+(x.C.act)+' <b>·</b> Capitolo '+x.c+'</p>'}
+
+/* ───── A ───── */
+function headA(x){
+  var seg="";
+  for(var i=1;i<=x.C.tot;i++){
+    var k=i<x.s?"past":i===x.s?"cur":has(x.c,i)?"ready":"todo";
+    var lab="Scena "+i+(has(x.c,i)?": "+T(x.c,i):" (in arrivo)");
+    seg+=(has(x.c,i)&&i!==x.s)?go(x.c,i,"","sg "+k).replace('href="#"','href="#" aria-label="'+lab+'"'):'<span class="sg '+k+'" aria-label="'+lab+'"></span>';
+  }
+  return kick(x)+'<h1>'+x.title+'</h1><div class="trk" role="group" aria-label="Scene del capitolo">'+seg+'</div><p class="meta">Scena '+x.s+' di '+x.C.tot+' · '+date()+'</p>';
+}
+function endA(x){
+  var main="";
+  if(x.nextOk) main=go(x.nextS.c,x.nextS.s,'<div><small>Scena successiva</small><span>'+T(x.nextS.c,x.nextS.s)+'</span></div>'+ic.r,"big");
+  else if(x.nextC) main=go(x.nextC.c,1,'<div><small>Fine del capitolo '+x.c+' · Capitolo successivo</small><span>'+T(x.nextC.c,1)+'</span></div>'+ic.r,"big");
+  else main='<p class="soonline">La scena '+(x.s+1)+' arriva presto.</p>';
+  var p="";
+  if(x.prevS) p+=go(x.prevS.c,x.prevS.s,ic.l+'Scena '+x.prevS.s,"pill");
+  if(x.prevC) p+=go(x.prevC.c,1,ic.l+'Capitolo '+x.prevC.c+' dall\'inizio',"pill");
+  if(x.s>2) p+=go(x.c,1,ic.u+'Inizio capitolo',"pill");
+  p+='<a class="pill" href="#" data-go="idx">Indice</a>';
+  return '<div class="endA" id="endbox">'+main+'<div class="pills">'+p+'</div></div>';
+}
+
+/* ───── B ───── */
+function headB(x){
+  return kick(x)+'<h1>'+x.title+'</h1><div class="metaB"><button type="button" class="chip" data-open aria-haspopup="dialog">Scena '+x.s+' di '+x.C.tot+ic.d+'</button><span>'+date()+'</span></div>';
+}
+function endB(x){
+  var L="",R="";
+  if(x.prevS) L=go(x.prevS.c,x.prevS.s,'<small>'+ic.l+'Scena '+x.prevS.s+'</small><b>'+T(x.prevS.c,x.prevS.s)+'</b>');
+  else if(x.prevC) L=go(x.prevC.c,1,'<small>'+ic.l+'Capitolo '+x.prevC.c+' dall\'inizio</small><b>'+T(x.prevC.c,1)+'</b>');
+  else L='<span></span>';
+  if(x.nextOk) R=go(x.nextS.c,x.nextS.s,'<small>Scena '+x.nextS.s+ic.r+'</small><b>'+T(x.nextS.c,x.nextS.s)+'</b>',"r");
+  else if(x.nextC) R=go(x.nextC.c,1,'<small>Capitolo '+x.nextC.c+ic.r+'</small><b>'+T(x.nextC.c,1)+'</b>',"r");
+  else R='<span class="r soon"><small>Scena '+(x.s+1)+'</small><b>in arrivo</b></span>';
+  return '<div id="endbox"><nav class="duo" aria-label="Scene">'+L+R+'</nav><button type="button" class="chip allbtn" data-open>Tutte le scene del capitolo '+x.c+ic.d+'</button></div>';
+}
+function sheetB(x){
+  var h='<div class="sh-top"><b>Capitolo '+x.c+'</b><button type="button" class="sh-x" data-close>Chiudi</button></div><ol>';
+  for(var i=1;i<=x.C.tot;i++){
+    var ok=has(x.c,i),cur=i===x.s;
+    var inner='<i>'+i+'</i><span class="tt">'+(ok?T(x.c,i):'In arrivo')+'</span>'+(cur?'<span class="here">Qui</span>':'');
+    h+='<li class="'+(cur?'cur':'')+'">'+(ok&&!cur?go(x.c,i,inner):'<span class="'+(ok?'':'off')+'">'+inner+'</span>')+'</li>';
+  }
+  h+='</ol>';
+  for(var k in CH){ k=+k; if(k===x.c) continue;
+    if(has(k,1)) h+=go(k,1,'<span>Capitolo '+k+' · dall\'inizio <em>'+T(k,1)+'</em></span>'+ic.r,"chrow");
+  }
+  return h;
+}
+
+/* ───── C ───── */
+function headC(x){
+  return kick(x)+'<h1>'+x.title+'</h1><p class="meta">Scena '+x.s+' · '+date()+'</p>';
+}
+function endC(x){
+  var done=x.s===x.C.tot?"Fine del capitolo "+x.c:"Fine della scena "+x.s;
+  var main="";
+  if(x.nextOk) main=go(x.nextS.c,x.nextS.s,'<small>Continua</small><b>'+T(x.nextS.c,x.nextS.s)+ic.r+'</b>',"go");
+  else if(x.nextC) main=go(x.nextC.c,1,'<small>Capitolo '+x.nextC.c+'</small><b>'+T(x.nextC.c,1)+ic.r+'</b>',"go");
+  else main='<p class="soonC">La prossima scena è in arrivo.</p>';
+  var low="";
+  if(x.prevS) low+=go(x.prevS.c,x.prevS.s,ic.l+T(x.prevS.c,x.prevS.s));
+  if(x.prevC) low+=go(x.prevC.c,1,ic.l+'Capitolo '+x.prevC.c+', dall\'inizio');
+  if(x.s>2||(x.s>1&&x.s===x.C.tot)) low+=go(x.c,1,ic.u+'Rileggi il capitolo');
+  return '<div class="endC" id="endbox"><p class="orn" aria-hidden="true">· · ·</p><p class="fin">'+done+'</p>'+main+(low?'<div class="low">'+low+'</div>':'')+'</div>';
+}
+
+var LABS={
+ A:"<b>A - Percorso.</b> Una barra a segmenti in testa mostra tutto il capitolo (le scene future sono tratteggiate, così \"in arrivo\" non ha più bisogno di una scatola). In fondo un solo bottone grande per andare avanti, poi pillole per il resto. Da capitolo 2 scena 1 la pillola riporta a capitolo 1 dalla scena 1, non dall'ultima. <b>Limite:</b> con più di 8-10 scene i segmenti diventano troppo stretti.",
+ B:"<b>B - Cassetto.</b> Il chip \"Scena 3 di 5\" in testa (e il bottone in fondo) apre un elenco con tutte le scene del capitolo, quelle future in grigio. In fondo restano solo due frecce di testo, senza scatole. Regge anche 30 scene. Il capitolo precedente porta sempre alla sua scena 1. <b>Costo:</b> un tocco in più per saltare lontano.",
+ C:"<b>C - Pagina di libro.</b> Niente scatole e niente \"di N\" (il totale può cambiare mentre scrivi): fine scena, un titolo grande per continuare, sotto due link piccoli. Se la scena dopo non c'è: una riga \"in arrivo\". Il più pulito e il più simile a un libro. <b>Limite:</b> nessuna panoramica del capitolo, orientarsi con tante scene è più difficile."
+};
+
+function render(){
+  var x=X(),bk=document.getElementById("bk");
+  var f={A:[headA,endA],B:[headB,endB],C:[headC,endC]}[dir];
+  document.getElementById("head").innerHTML=f[0](x);
+  document.getElementById("end").innerHTML=f[1](x);
+  document.getElementById("sheet").innerHTML=dir==="B"?sheetB(x):"";
+  document.getElementById("lab").innerHTML=LABS[dir];
+  document.querySelectorAll("#dirs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.d===dir)});
+  document.querySelectorAll("#sts button").forEach(function(b,i){b.setAttribute("aria-pressed",STATES[i].c===st.c&&STATES[i].s===st.s)});
+  try{history.replaceState(null,"","#"+dir)}catch(e){}
+}
+
+/* cassetto: sfondo bloccato mentre e' aperto, focus gestito */
+var lastFocus=null;
+function openSheet(){
+  lastFocus=document.activeElement;
+  document.getElementById("ov").classList.add("open");
+  var sh=document.getElementById("sheet");sh.classList.add("open");sh.setAttribute("aria-hidden","false");
+  document.body.classList.add("lock");
+  var cb=sh.querySelector("[data-close]");if(cb)cb.focus();
+}
+function closeSheet(){
+  document.getElementById("ov").classList.remove("open");
+  var sh=document.getElementById("sheet");sh.classList.remove("open");sh.setAttribute("aria-hidden","true");
+  document.body.classList.remove("lock");
+  if(lastFocus&&lastFocus.focus)lastFocus.focus();
+}
+
+/* selettori del mockup */
+var sts=document.getElementById("sts");
+STATES.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.n;b.onclick=function(){st={c:s.c,s:s.s};render();window.scrollTo(0,0)};sts.appendChild(b)});
+var jump=document.createElement("button");jump.textContent="↓ fine pagina";jump.onclick=function(){var e=document.getElementById("endbox");if(e)e.scrollIntoView({block:"center"})};sts.appendChild(jump);
+document.querySelectorAll("#dirs button").forEach(function(b){b.onclick=function(){closeSheet();dir=b.dataset.d;render()}});
+
+document.addEventListener("click",function(e){
+  var g=e.target.closest("[data-go]");
+  if(g){e.preventDefault();
+    if(g.dataset.go==="idx")return;
+    var p=g.dataset.go.split(".");st={c:+p[0],s:+p[1]};
+    var wasOpen=document.getElementById("sheet").classList.contains("open");
+    if(wasOpen){document.getElementById("ov").classList.remove("open");document.getElementById("sheet").classList.remove("open");document.body.classList.remove("lock")}
+    lastFocus=null;render();window.scrollTo(0,0);return}
+  if(e.target.closest("[data-open]")){e.preventDefault();openSheet();return}
+  if(e.target.closest("[data-close]")||e.target.id==="ov"){closeSheet()}
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
+
+var m=location.hash.match(/^#([ABC])([1-4])?$/);
+if(m){dir=m[1];if(m[2]){var q=STATES[+m[2]-1];st={c:q.c,s:q.s}}}
+render();
+</script>
+</body>
+</html>

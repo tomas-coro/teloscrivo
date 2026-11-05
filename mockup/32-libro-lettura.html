@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 32 - La sindrome del cielo, lettura</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* selettore delle 3 direzioni (solo per il mockup) */
+  .pick{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;padding:10px;background:#0b0f1a;border-bottom:1px solid #ffffff22}
+  .pick button{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:9px 14px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#fff;cursor:pointer}
+  .pick button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .stage{min-height:100vh;transition:background .3s,color .3s}
+
+  /* struttura comune: libro = testata piu' bassa, colonna stretta, tutto visibile */
+  .bk{--bgp:#000;--ink:#fff;--soft:#999;--acc:#FD6E88;background:var(--bgp);color:var(--ink);padding-bottom:70px}
+  .bk .ph{height:34vh;max-height:260px;background:center/cover no-repeat url(../assets/foto/nella-nostra-testa-720.webp);position:relative}
+  .bk .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,var(--bgp) 100%)}
+  .bk .col{max-width:34rem;margin:0 auto;padding:0 22px}
+  .bk .kick{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:22px 0 8px}
+  .bk .kick b{color:var(--acc);font-weight:600}
+  .bk h1{font:400 2.6rem/1.04 "Instrument Serif",serif;margin:0 0 6px}
+  .bk .meta{font:italic 400 1.1rem "Instrument Serif",serif;color:var(--soft);margin:0 0 34px}
+  .bk .t p{margin:0 0 1.35em;text-wrap:pretty}
+  .bk .nav{display:flex;justify-content:space-between;gap:12px;margin-top:44px;padding-top:22px;border-top:1px solid color-mix(in srgb,var(--ink) 16%,transparent)}
+  .bk .nav a{font:600 .7rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);text-decoration:none;padding:12px 16px;border:1px solid color-mix(in srgb,var(--ink) 22%,transparent);border-radius:99px}
+  .bk .dots{display:flex;gap:6px;justify-content:center;margin-top:26px}
+  .bk .dots i{width:7px;height:7px;border-radius:50%;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+  .bk .dots i:first-child{background:var(--acc)}
+  .lab{max-width:34rem;margin:0 auto;padding:18px 22px 0;font:400 .8rem Poppins,sans-serif;opacity:.7}
+
+  /* A - NOTTE MORBIDA: navy del sito, ma abbassato e caldo; sans leggero */
+  .A{--bgp:#0E2240;--ink:#C9D6E4;--soft:#8497AD;--acc:#F08AA0}
+  .A .t{font:300 1.22rem/1.95 Poppins,sans-serif}
+
+  /* B - CARTA: crema calda, serif grande, inchiostro blu scuro */
+  .B{--bgp:#F4EEE2;--ink:#2B3140;--soft:#7D7466;--acc:#C8506A}
+  .B .t{font:400 1.5rem/1.6 "Instrument Serif",serif}
+  .B h1{font-size:2.9rem}
+
+  /* C - SEPPIA SCURA: marrone-grigio caldo, per la sera, sans normale */
+  .C{--bgp:#1D1A17;--ink:#D8CDBB;--soft:#8F8576;--acc:#E0896B}
+  .C .t{font:300 1.2rem/1.9 Poppins,sans-serif;letter-spacing:.005em}
+  .C .ph{filter:sepia(.55) saturate(.8) brightness(.8)}
+</style>
+</head>
+<body style="background:#000">
+<div class="pick" role="group" aria-label="Direzione">
+  <button data-v="A" aria-pressed="true">A Notte morbida</button>
+  <button data-v="B" aria-pressed="false">B Carta</button>
+  <button data-v="C" aria-pressed="false">C Seppia scura</button>
+</div>
+
+<div class="stage">
+  <div class="bk A" id="bk">
+    <div class="ph"></div>
+    <div class="col">
+      <p class="kick">La sindrome del cielo <b>·</b> Capitolo 1</p>
+      <h1>Nella nostra testa</h1>
+      <p class="meta">4 nov · 3 min</p>
+      <div class="t">
+        <p>Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.</p>
+        <p>Ogni volta ci sbattiamo la testa senza nemmeno accorgercene, siamo sempre distratti, pronti a dare la colpa a qualcuno o a qualcosa, la prima che ci capita tra le mani… quando invece dovremmo solo imparare a guardarci dentro. A conoscerci. A volerci bene.</p>
+        <p>La vita è frenetica e se non ci diamo il tempo di respirare, di apprezzare ciò che veramente abbiamo. Finiamo per sbracciarci ma rimanere fermi a galleggiare nella nostra frustrazione. Il mare è calmo, non ci sono correnti contrarie al nostro senso di marcia, non ci sono onde a deviare il nostro cammino, il sole splende alto ma noi abbiamo la testa sott’acqua.</p>
+      </div>
+      <div class="nav"><a href="#" onclick="return false">← Indice</a><a href="#" onclick="return false">Capitolo 2 →</a></div>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <p class="lab" id="lab"></p>
+  </div>
+</div>
+
+<script>
+  var labels={
+    A:"A - Notte morbida: resta il blu del sito ma piu' scuro e caldo, testo grigio-azzurro (non bianco), sans leggero, interlinea ampia.",
+    B:"B - Carta: sfondo crema, inchiostro blu scuro, serif grande come un libro vero. Il piu' comodo per leggere a lungo, ma rompe il tema scuro del sito.",
+    C:"C - Seppia scura: marrone caldo, foto virata seppia, testo color avorio. Piu' intimo e stanco-occhi-friendly di sera."
+  };
+  var bk=document.getElementById("bk"),lab=document.getElementById("lab");
+  function set(v){bk.className="bk "+v;lab.textContent=labels[v];
+    document.querySelectorAll(".pick button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===v)});
+    document.body.style.background=getComputedStyle(bk).getPropertyValue("--bgp")}
+  document.querySelectorAll(".pick button").forEach(function(b){b.onclick=function(){set(b.dataset.v)}});
+  set(/^#[ABC]$/.test(location.hash)?location.hash.slice(1):"A");
+</script>
+</body>
+</html>

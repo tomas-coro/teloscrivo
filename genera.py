@@ -18,6 +18,8 @@ Intestazione di uno scritto (tutto su una riga ciascuno):
     estratto: facoltativo (se manca: prime righe per poesie/canzoni, prima frase per il resto)
     spotify:  facoltativo, link https:// (compare il bottone "Ascolta su Spotify")
     foto-focus: facoltativo, punto da tenere nel ritaglio, es. `30% 50%` (default: centro)
+    capitolo: solo per il libro (sezione: libro). Un file = un capitolo intero. Numeri da 1 senza buchi, oppure `prologo` (uno solo, viene prima di tutto)
+    atto: facoltativo, solo libro: numero dell'atto (1, 2, 3...) mostrato come numero romano
 Righe che iniziano con # nell'intestazione sono commenti.
 Il corpo: righe = versi (poesie, canzoni); righe vuote = pausa/paragrafo.
 Citazione in cima: righe che iniziano con `> ` (l'ultima e' l'autore). Poesia finale dentro un testo: una riga `[poesia]` e sotto i versi.
@@ -61,7 +63,9 @@ SECTIONS = {  # ordine = ordine nel menu; (nome lungo, nome nel menu, frase). Le
     "citazioni": ("daCitazione", "daCitazione", "Parole di altri che mi sono rimaste addosso."),
     "racconti": ("Racconto breve", "Racconto", "Storie brevi, da leggere in un respiro."),
     "canzoni": ("daCanzone", "daCanzone", "Quello che ho scritto cantando sottovoce."),
+    "libro": ("Libro", "Libro", "Un capitolo alla volta."),  # i capitoli NON entrano in home, ultimi scritti e Leggi anche: hanno pagina e lettura a parte
 }
+BOOK_TITLE = "La sindrome del cielo"
 LINE_SECTIONS = {"poesie", "canzoni"}  # qui ogni riga e' un verso
 MONTHS_SHORT = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 MONTHS_LONG = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto",
@@ -73,6 +77,7 @@ GLYPH = {
     "citazioni": '<path d="M5 18v-5.5C5 9 6.8 7 10 6.5M13.5 18v-5.5c0-3.5 1.8-5.5 5-6"/><path class="ac" d="M5 18h5v-5.5H5zM13.5 18h5v-5.5h-5z"/>',
     "poesie": '<path d="M19.5 4.5c-6.5-.5-11 3-12 9.5L5 19.5l.8.7 3.2-1.8c6.4-1 10-5.5 10.5-12.9z"/><path class="ac" d="M8 17l7-7"/>',
     "racconti": '<path d="M3 6c3-1.2 6-.8 9 1.2 3-2 6-2.4 9-1.2v12c-3-1.2-6-.8-9 1.2-3-2-6-2.4-9-1.2z"/><path class="ac" d="M12 7.2v12"/>',
+    "libro": '<path d="M6 4h11a1 1 0 0 1 1 1v14H7a1 1 0 0 1-1-1z"/><path class="ac" d="M6 17.5h12"/>',
     "canzoni": '<circle cx="7" cy="17.5" r="2.5"/><circle cx="17" cy="15.5" r="2.5"/><path d="M9.5 17.5V6l10-2v11.5"/><path class="ac" d="M9.5 9l10-2"/>',
 }
 ARROW_CTA = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -93,6 +98,14 @@ ICON_EXT = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14L14 6M7 6h
 
 class SiteError(Exception):
     """Errore nei contenuti: si ferma tutto con un messaggio chiaro, niente correzioni silenziose."""
+
+
+def roman(n):
+    out = ""
+    for v, s in ((10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")):
+        while n >= v:
+            out, n = out + s, n - v
+    return out
 
 
 def esc(s):
@@ -125,7 +138,7 @@ class Post:
                 raise SiteError(f"{path.name}, riga {n}: atteso 'chiave: valore', trovato '{line}'")
             k, v = line.split(":", 1)
             k = k.strip().lower()
-            if k not in ("titolo", "data", "sezione", "estratto", "spotify", "foto-focus"):
+            if k not in ("titolo", "data", "sezione", "estratto", "spotify", "foto-focus", "capitolo", "atto"):
                 raise SiteError(f"{path.name}, riga {n}: chiave sconosciuta '{k}'")
             meta[k] = v.strip()
         for k in ("titolo", "data", "sezione"):
@@ -143,6 +156,23 @@ class Post:
         if not self.cats or len(set(self.cats)) != len(self.cats):
             raise SiteError(f"{path.name}: 'sezione' vuota o con una sezione ripetuta")
         self.cat = self.cats[0]  # la principale: colore, icona, prima voce in elenco
+        self.book = "libro" in self.cats
+        self.chapter = self.act = None  # chapter 0 = prologo
+        if self.book:
+            if self.cats != ["libro"]:
+                raise SiteError(f"{path.name}: un capitolo del libro ha solo 'sezione: libro' (niente altre sezioni)")
+            cap = meta.get("capitolo", "").lower()
+            if cap != "prologo" and not re.fullmatch(r"[1-9]\d{0,2}", cap):
+                raise SiteError(f"{path.name}: manca 'capitolo: N' (un numero intero da 1 in su, oppure 'prologo') nell'intestazione")
+            self.chapter = 0 if cap == "prologo" else int(cap)  # 0 = prologo: ordina prima del capitolo 1
+            if "atto" in meta:
+                if not re.fullmatch(r"[1-9]\d?", meta["atto"]):
+                    raise SiteError(f"{path.name}: 'atto' deve essere un numero intero da 1 in su")
+                self.act = int(meta["atto"])
+        else:
+            for key in ("capitolo", "atto"):
+                if key in meta:
+                    raise SiteError(f"{path.name}: '{key}' si usa solo con 'sezione: libro'")
         self.spotify = meta.get("spotify", "")
         if self.spotify and not self.spotify.startswith("https://"):
             raise SiteError(f"{path.name}: il link spotify deve iniziare con https://")
@@ -235,8 +265,16 @@ class Post:
             for p in paras
         )
 
+    @staticmethod
+    def _plain_html(text):
+        """Capitoli: paragrafi semplici, tutto visibile subito (niente effetto "compare scorrendo")."""
+        paras = [p for p in re.split(r"\n\s*\n", text) if p.strip()]
+        return "".join("<p>" + "<br>".join(esc(l.strip()) for l in p.strip().split("\n") if l.strip()) + "</p>" for p in paras)
+
     def body_html(self):
         """Il testo e' tutto nell'HTML. Ogni riga/frase e' un <span class=u>: il JS la fa comparire scorrendo."""
+        if self.book:
+            return self._plain_html(self.body) + (f'<div class="poema">{self._plain_html(self.poem)}</div>' if self.poem else "")
         out = ""
         if self.quote:  # citazione in cima: tutte le righe tranne l'ultima sono la frase, l'ultima e' l'autore
             frase, autore = (self.quote[:-1], self.quote[-1]) if len(self.quote) > 1 else (self.quote, "")
@@ -254,6 +292,24 @@ def load_posts():
         raise SiteError("nessun file in scritti/*.md")
     posts = [Post(f) for f in files]
     posts.sort(key=lambda p: (p.date, p.title), reverse=True)  # dal piu' recente
+    book = [p for p in posts if p.book]
+    nums = sorted(p.chapter for p in book if p.chapter)  # il prologo (0) ha le sue regole: uno solo, e niente 'atto'
+    dup = sorted({n for n in nums if nums.count(n) > 1})
+    if dup:
+        raise SiteError(f"libro: capitolo ripetuto: {', '.join(map(str, dup))}")
+    if nums != list(range(1, len(nums) + 1)):
+        raise SiteError(f"libro: i capitoli devono andare da 1 senza buchi, trovati: {', '.join(map(str, nums))}")
+    if sum(1 for p in book if not p.chapter) > 1:
+        raise SiteError("libro: c'e' piu' di un prologo")
+    for p in book:
+        if not p.chapter and p.act is not None:
+            raise SiteError(f"{p.slug}.md: il prologo non ha 'atto'")
+    last_act = 0  # gli atti non tornano indietro (un capitolo senza 'atto:' eredita quello prima)
+    for p in sorted(book, key=lambda p: p.chapter):
+        if p.act is not None:
+            if p.act < last_act:
+                raise SiteError(f"{p.slug}.md: l'atto {p.act} torna indietro rispetto al capitolo precedente (atto {last_act})")
+            last_act = p.act
     return posts
 
 
@@ -291,7 +347,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=12">
+<link rel="stylesheet" href="{root}style.css?v=22">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -313,7 +369,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=7" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=8" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -409,7 +465,7 @@ def photo_img(p, root, sizes, eager=False):
 
 
 # ═══ PAGINE ═══
-def page_home(posts):
+def page_home(posts, chapters=()):
     root = ""
     newest = posts[0]
     latest = [{"t": p.title, "k": p.cat_label, "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
@@ -421,6 +477,13 @@ def page_home(posts):
         tiktok = (f'<section class="desk-videos" aria-labelledby="h-tk"><div class="desk-slider-top"><h2 id="h-tk">Le parole, in video</h2>'
                   f'<div class="desk-arrows"><button type="button" data-slide="-1" aria-label="Video precedenti">←</button><button type="button" data-slide="1" aria-label="Video successivi">→</button></div></div>'
                   f'<p>Pensieri, poesie e parole che mi porto dietro, lette a voce.</p><div class="desk-phones">{cards}</div></section>')
+    book = ""
+    if chapters:  # la tessera del libro compare solo quando c'e' almeno un capitolo pubblicato
+        last = chapters[-1]
+        book = (f'<section class="desk-section book-tile" aria-labelledby="h-book"><div class="sec-h"><h2 id="h-book">{esc(BOOK_TITLE)}</h2>'
+                f'<span class="cap count">{book_count(chapters)}</span></div>'
+                f'<p>Il libro che sto scrivendo, un capitolo alla volta. Ultimo: {"prologo" if not last.chapter else f"capitolo {last.chapter}"}, {esc(last.title)}.</p>'
+                f'<a class="cta" href="{root}libro/">Apri il libro{ARROW_CTA}</a></section>')
     desc = "Pensieri, poesie, citazioni e scritti nati da una canzone, da leggere scorrendo. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
     latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
@@ -446,6 +509,7 @@ def page_home(posts):
       <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
     </article>
   </section>
+  {book}
   <section class="desk-section" aria-labelledby="h-all"><div class="sec-h"><h2 id="h-all">Gli scritti</h2><span class="cap count">{plural(len(posts), "scritto", "scritti")}</span></div><p>Una finestra per ogni scritto: aprila per leggere.</p>
     <div class="desk-shelf">{windows}</div>
   </section>
@@ -479,23 +543,33 @@ def page_section(k, posts):
     return head_html(root, f"{name} | {SITE}", desc, canon, jsonld=ld) + body
 
 
-def page_reader(p, posts):
-    root = "../../"
-    name = SECTIONS[p.cat][0]
-    rel = [x for x in posts if x is not p and set(x.cats) & set(p.cats)] + [x for x in posts if x is not p and not set(x.cats) & set(p.cats)]
-    rel_html = "".join(
-        f'<a class="rcard" data-cat="{x.cat}" href="{root}{x.url}"><span class="desk-photo{" has-img" if x.has_photo else ""}" aria-hidden="true">{photo_img(x, root, "(min-width:640px) 340px, 120px")}</span>'
-        f'<span class="rcb"><span class="rcm"><b>{esc(x.cat_label)}</b>{x.short_date()}</span>'
-        f'<span class="rct">{esc(x.title)}</span><span class="rcx">{esc(x.excerpt).replace(chr(10), " ")}</span>'
-        f'<span class="rcgo">Leggi{ARROW_CTA}</span></span></a>'
-        for x in rel[:2]
-    )
+def social_html():
+    """"scrivoanchesu" + profili social: lo stesso fondo per scritti e scene del libro."""
     soc = "".join(
         f'<a class="soc-a" href="{esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="{SOCIAL_ICONS[k][0]}: {esc(label)}">'
         f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span>{esc(label)}</span></a>'
         for k, (url, label) in SOCIAL.items() if url
     )
     find_html = f'<div class="rsign"><span class="wm2 wm-find">scrivoanchesu<span class="dot" aria-hidden="true"></span></span><div class="soc">{soc}</div></div>' if soc else ""
+    return find_html
+
+
+def rcards_html(items, root):
+    """Le card di 'Leggi anche' (le stesse in fondo a ogni scritto e in fondo al libro)."""
+    return "".join(
+        f'<a class="rcard" data-cat="{x.cat}" href="{root}{x.url}"><span class="desk-photo{" has-img" if x.has_photo else ""}" aria-hidden="true">{photo_img(x, root, "(min-width:640px) 340px, 120px")}</span>'
+        f'<span class="rcb"><span class="rcm"><b>{esc(x.cat_label)}</b>{x.short_date()}</span>'
+        f'<span class="rct">{esc(x.title)}</span><span class="rcx">{esc(x.excerpt).replace(chr(10), " ")}</span>'
+        f'<span class="rcgo">Leggi{ARROW_CTA}</span></span></a>'
+        for x in items)
+
+
+def page_reader(p, posts):
+    root = "../../"
+    name = SECTIONS[p.cat][0]
+    rel = [x for x in posts if x is not p and set(x.cats) & set(p.cats)] + [x for x in posts if x is not p and not set(x.cats) & set(p.cats)]
+    rel_html = rcards_html(rel[:2], root)
+    find_html = social_html()
     spotify = (f'<a class="cta" href="{esc(p.spotify)}" target="_blank" rel="noopener">Ascolta su Spotify{ICON_EXT}</a>' if p.spotify else "")
     canon = f"{BASE_URL}{p.url}"
     desc = p.flat[:155]
@@ -527,6 +601,116 @@ def page_reader(p, posts):
 </article></main>
 {tail_html(root)}"""
     return head_html(root, f"{p.title} | {SITE}", desc, canon, og_type="article", jsonld=ld) + body
+
+
+def book_head_html(root, back_href, back_label, slug=""):
+    data = f' data-slug="{slug}"' if slug else ""
+    return f"""<body class="reader swipe book" id="inizio" data-cat="libro"{data}>
+<a class="skip" href="#contenuto">Vai al testo</a>
+<div class="sky" aria-hidden="true"></div>
+<header class="rbar"><div class="rbtns"><a class="rbtn rbtn-home" data-home="scritto" href="{root}" aria-label="Torna alla home">{ICON_HOME}<span>Home</span></a><a class="rbtn" data-rback href="{back_href}">{ICON_BACK}{back_label}</a></div></header>
+"""
+
+
+def book_end_html(blog, root):
+    """Chiusura del libro (frase, condividi, Leggi anche, social): identica a quella degli altri scritti, in fondo all'indice e a ogni capitolo."""
+    return f"""<footer class="rend">
+    <section class="rbye"><p class="bye">Grazie per aver letto e ricorda che<br><em>la luna porta consiglio</em>{ICON_MOON}</p>
+      <div class="bye-actions"><button type="button" class="sharebtn" data-share hidden>{ICON_SHARE}<span data-share-lbl>Condividi</span></button><button type="button" class="copybtn" data-copy hidden>{ICON_LINK}<span data-copy-lbl>Copia link</span></button></div></section>
+    <span class="cap">Leggi anche</span><div class="rcards">{rcards_html(blog[:2], root)}</div>
+    {social_html()}
+  </footer>"""
+
+
+def book_count(chapters):
+    """'Prologo e 2 capitoli', '3 capitoli' o 'Prologo' (il prologo non e' un capitolo numerato)."""
+    n = sum(1 for c in chapters if c.chapter)
+    has_pro = any(not c.chapter for c in chapters)
+    if not n:
+        return "Prologo"
+    return ("Prologo e " if has_pro else "") + plural(n, "capitolo", "capitoli")
+
+
+def book_quarta():
+    """Quarta di copertina (libro-quarta.txt): una riga = un paragrafo; la prima e' lo slogan, l'ultima la chiusa."""
+    f = ROOT / "libro-quarta.txt"
+    if not f.is_file():
+        return ""
+    lines = [l.strip() for l in f.read_text(encoding="utf-8").split("\n") if l.strip()]
+    out = []
+    for i, l in enumerate(lines):
+        cls = " class=\"q-lead\"" if i == 0 and len(lines) > 2 else " class=\"q-last\"" if i == len(lines) - 1 and len(lines) > 2 else ""
+        out.append(f"<p{cls}>{esc(l)}</p>")
+    return f'<div class="quarta">{"".join(out)}</div>'
+
+
+def chapter_kicker(p):
+    if not p.chapter:
+        return "Prologo"
+    act = f"Atto {roman(p.act)} <b>·</b> " if p.act else ""
+    return f"{act}Capitolo {p.chapter}"
+
+
+def page_book(chapters, blog):
+    """Indice del libro: un capitolo per riga (raggruppati per atto), 'Inizia' (il JS lo trasforma in 'Continua' dall'ultimo letto)."""
+    root = "../"
+    canon = f"{BASE_URL}libro/"
+    desc = f"{BOOK_TITLE}: il libro, un capitolo alla volta. {book_count(chapters)} da leggere."
+    ld = [{"@context": "https://schema.org", "@type": "Book", "name": BOOK_TITLE, "inLanguage": "it", "url": canon,
+           "author": {"@type": "Person", "name": SITE}, "description": desc}]
+    groups, last_act, items = "", None, []
+
+    def close():
+        return f'<ol class="chaps">{"".join(items)}</ol>' if items else ""
+    for c in chapters:
+        if c.act and c.act != last_act:  # nuovo atto: chiude l'elenco aperto e apre il titolo dell'atto
+            groups += close()
+            items = []
+            groups += f'<h2 class="chact">Atto {roman(c.act)}</h2>'
+            last_act = c.act
+        items.append(
+            f'<li><a href="{root}{c.url}"><span class="cn">{c.chapter or "P"}</span><span class="cph{" has-img" if c.has_photo else ""}" aria-hidden="true">{photo_img(c, root, "72px")}</span>'
+            f'<span class="cb"><span class="ct">{esc(c.title)}</span><span class="cm">{c.minutes} min</span></span></a></li>')
+    groups += close()
+    body = book_head_html(root, root, "Indietro") + f"""<main id="contenuto" class="page"><div class="wrapin">
+  <header class="phead"><span class="cap">Libro</span><h1>{esc(BOOK_TITLE)}</h1>{book_quarta()}
+    <p><a class="cta" data-book-start href="{root}{chapters[0].url}">Inizia{ARROW_CTA}</a></p></header>
+  {groups}
+  <div class="book-end">{book_end_html(blog, root)}</div>
+</div></main>
+{tail_html(root)}"""
+    return head_html(root, f"{BOOK_TITLE} | {SITE}", desc, canon, jsonld=ld) + body
+
+
+def page_chapter(p, chapters, blog):
+    """Capitolo: lettura tenue, tutto visibile, solo precedente/successivo (niente 'Leggi anche').
+    Il precedente/successivo e' sempre un capitolo intero: si riparte dal suo inizio."""
+    root = "../../"
+    i = chapters.index(p)
+    prev_c = chapters[i - 1] if i > 0 else None
+    next_c = chapters[i + 1] if i + 1 < len(chapters) else None  # se non c'e' non si mostra nulla: niente promesse di "in arrivo"
+
+    canon = f"{BASE_URL}{p.url}"
+    desc = p.flat[:155]
+    ld = [{
+        "@context": "https://schema.org", "@type": "Chapter", "name": p.title, "position": i + 1, "inLanguage": "it",
+        "datePublished": p.date.isoformat(), "isPartOf": {"@type": "Book", "name": BOOK_TITLE},
+        "author": {"@type": "Person", "name": SITE}, "mainEntityOfPage": canon, "url": canon, "description": desc,
+    }]
+
+    def cell(label, c, cls, arrow):
+        return f'<a class="{cls}" href="{root}{c.url}"><small>{label}</small><span>{esc(c.title)}</span>{arrow}</a>'
+    prev_a = cell("Prologo" if prev_c and not prev_c.chapter else "Capitolo precedente", prev_c, "pv", ICON_BACK) if prev_c else ""
+    next_a = cell("Capitolo successivo", next_c, "nx", ARROW_CTA) if next_c else ""
+    body = book_head_html(root, f"{root}libro/", "Indice", p.slug) + f"""<main id="contenuto" class="rsc"><article class="rart">
+  <header class="rhead"><div class="rhero"><div class="rphoto{" has-img" if p.has_photo else ""}">{photo_img(p, root, "(min-width:700px) 736px, 100vw", eager=True)}</div></div>
+    <div class="rcard-b"><p class="kick">{chapter_kicker(p)}</p><h1 class="rt">{esc(p.title)}</h1><p class="bmeta">{p.short_date()} · {p.minutes} min</p></div></header>
+  <div class="rbody">{p.body_html()}</div>
+  <nav class="bnav" aria-label="Capitoli">{prev_a}{next_a}</nav>
+  {book_end_html(blog, root)}
+</article></main>
+{tail_html(root)}"""
+    return head_html(root, f"{p.title} | {BOOK_TITLE} | {SITE}", desc, canon, og_type="article", jsonld=ld) + body
 
 
 def page_404():
@@ -587,6 +771,10 @@ def check_links():
 
 def main():
     posts = load_posts()
+    blog = [p for p in posts if not p.book]  # il libro non si mescola agli altri scritti
+    chapters = sorted((p for p in posts if p.book), key=lambda p: p.chapter)  # in ordine di lettura
+    if not blog:
+        raise SiteError("serve almeno uno scritto fuori dal libro (la home mostra l'ultimo)")
     slugs = {p.slug for p in posts}
     # niente pagine orfane: se un file .md e' stato tolto, sparisce anche la sua pagina generata
     for d in (ROOT / "scritti").iterdir():
@@ -596,7 +784,7 @@ def main():
     missing = bake_photos(posts)
     if missing and REQUIRE_PHOTOS:
         raise SiteError("scritti senza foto (in foto/<nome>.jpg): " + ", ".join(missing))
-    write("index.html", page_home(posts))
+    write("index.html", page_home(blog, chapters))
     live = present_cats(posts)
     for k in SECTIONS:  # una sezione senza scritti non ha pagina: se ce n'era una vecchia, sparisce solo il suo index.html generato
         stale = ROOT / k / "index.html"
@@ -604,9 +792,9 @@ def main():
             stale.unlink()
             print(f"  rimossa pagina di sezione vuota: {k}/index.html")
     for k in live:
-        write(f"{k}/index.html", page_section(k, posts))
+        write(f"{k}/index.html", page_book(chapters, blog) if k == "libro" else page_section(k, blog))
     for p in posts:
-        write(f"scritti/{p.slug}/index.html", page_reader(p, posts))
+        write(f"scritti/{p.slug}/index.html", page_chapter(p, chapters, blog) if p.book else page_reader(p, blog))
     write("testi/index.html", f'''<!DOCTYPE html><html lang="it"><head><meta charset="utf-8">
 <meta http-equiv="refresh" content="0;url={BASE_PATH}pensieri/">
 <link rel="canonical" href="{BASE_URL}pensieri/"><title>Pensiero | {SITE}</title>

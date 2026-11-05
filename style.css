@@ -386,3 +386,60 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .rsign{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:12px;margin-top:46px;padding-top:26px;border-top:1px solid var(--line)}
 .rsign .wm-find{font-size:1.3rem;white-space:nowrap}
 .rsign .soc-a{min-height:44px;font-size:.85rem;padding:0 16px 0 12px;white-space:nowrap}
+
+/* ── LIBRO: lettura tenue (direzione A "notte morbida", mockup 32). Tutto qui sotto vale solo con body.book ── */
+body.book{--navy:#0E2240;--bg:#0E2240;--fg:#C9D6E4;--pink:#F08AA0;
+  --muted:color-mix(in srgb,var(--fg) 62%,var(--bg));--line:color-mix(in srgb,var(--fg) 18%,transparent);--soft:color-mix(in srgb,var(--fg) 8%,transparent);
+  background:#0E2240}
+.book .sky{background:#0E2240}
+.book .sky::after{opacity:.03}
+.book .rphoto{aspect-ratio:16/6;max-height:260px;-webkit-mask-image:linear-gradient(180deg,#000 40%,transparent 100%);mask-image:linear-gradient(180deg,#000 40%,transparent 100%)}
+.book .rcard-b{padding:6px 22px 0}
+.book .kick{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:10px 0 8px}
+.book .kick b{color:var(--pink);font-weight:600}
+.book .rt{font-size:clamp(2.2rem,10vw,2.6rem);margin:0 0 6px}
+.book .bmeta{font:italic 400 1.1rem "Instrument Serif",serif;color:var(--muted);margin:0 0 30px}
+.book .rbody{font-size:1.22rem;line-height:1.95;padding:0 0 30px}
+.book .rbody p{margin:0 0 1.35em;text-wrap:pretty}
+.book .poema{margin:1.6em 0 0;padding-left:18px;border-left:2px solid var(--line);font-style:italic}
+.book .rend{opacity:1!important;transform:none!important}  /* il JS di lettura non gira qui: il fondo e' sempre visibile */
+/* indice del libro */
+.chaps{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.chact{font:400 2rem/1 "Instrument Serif",serif;margin:44px 0 12px;color:var(--pink)}
+.chaps a{display:flex;align-items:center;gap:14px;padding:14px 4px;min-height:72px;border-bottom:1px solid var(--line);color:var(--fg);text-decoration:none;transition:background .2s}
+.chaps a:hover{background:var(--soft)}
+.chaps .cn{flex:0 0 3.4ch;font:400 1.7rem/1 "Instrument Serif",serif;color:var(--pink);text-align:right}
+.chaps .cph{flex:0 0 72px;aspect-ratio:16/10;border-radius:8px;overflow:hidden;position:relative;background:linear-gradient(155deg,#5d7488,#1d3558)}
+.chaps .cph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.chaps .cb{display:flex;flex-direction:column;gap:2px;min-width:0}
+.chaps .ct{font:400 1.45rem/1.1 "Instrument Serif",serif;text-wrap:balance}
+.chaps .cm{font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.book-tile .cta{margin-top:6px}
+@media (min-width:900px){.book .rbody{max-width:36rem;margin:0 auto}.book .rcard-b{padding:6px 36px 0}.book .rt{font-size:3rem}}
+.book-tile{margin-bottom:64px}
+
+/* navigazione tra le scene: due celle uguali (precedente / prossima); se ce n'e' una sola occupa tutta la riga */
+.book .bnav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 0}
+.book .bnav:empty{display:none}
+.book .bnav>:only-child{grid-column:1/-1}
+.book .bnav a{position:relative;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:76px;padding:14px 46px 14px 18px;border:1px solid var(--line);border-radius:16px;color:var(--fg);text-decoration:none;transition:border-color .2s,background .2s}
+.book .bnav a:hover{border-color:var(--pink);background:var(--soft)}
+.book .bnav .pv{padding:14px 18px 14px 46px}
+.book .bnav small{font:600 .64rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.book .bnav a>span{font:400 1.35rem/1.1 "Instrument Serif",serif;text-wrap:balance}
+.book .bnav svg{position:absolute;top:50%;width:18px;height:18px;margin-top:-9px;color:var(--pink)}
+.book .bnav .nx svg{right:16px}
+.book .bnav .pv svg{left:16px}
+.book .rbye{padding-top:22px}
+@media (max-width:480px){.book .bnav{grid-template-columns:1fr}}
+
+/* ── LIBRO: quarta di copertina sull'indice (slogan, corpo, chiusa) ── */
+.book .quarta{max-width:34rem;margin:22px 0 24px}
+.book .quarta p{max-width:none;margin:0 0 1em;font:300 1.02rem/1.8 Poppins,sans-serif;color:var(--fg);text-wrap:pretty}
+.book .quarta .q-lead{font:400 1.7rem/1.15 "Instrument Serif",serif;color:var(--fg);margin-bottom:.8em}
+.book .quarta .q-last{font:italic 400 1.35rem/1.3 "Instrument Serif",serif;color:var(--pink);margin-top:1.3em}
+
+/* indice del libro: la chiusura sta nella colonna stretta, come in fondo alle poesie (niente secondo piede) */
+.book .book-end{max-width:36rem;margin:56px auto 0}  /* stessa colonna del fondo degli altri scritti */
+@media (min-width:700px){.book .book-end{max-width:46rem}}
+.book .phead p:has(.cta){margin-bottom:24px}
