@@ -272,6 +272,7 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 /* chip categoria dentro lo scritto: apre tutti i testi di quella categoria */
 .metarow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 10px}
 .metarow .cap{margin:0;color:var(--muted)}
+.reading-time{display:inline-flex;align-items:center;gap:14px;white-space:nowrap}
 .tinf{font:italic 400 1.3rem "Instrument Serif",serif;color:var(--fg);white-space:nowrap}
 .tinf .tw{color:var(--muted)}
 .tinf .inf{font-style:normal;font-size:1.36em;line-height:1;color:var(--pink);vertical-align:-.1em}

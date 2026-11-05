@@ -239,10 +239,10 @@ class Post:
     @property
     def time_html(self):  # data + tempo di lettura; le poesie non hanno un tempo giusto: "da N min a infinito"
         if "poesie" in self.cats:
-            return (f'<span class="cap">{self.short_date()}</span>'
+            return (f'<span class="reading-time"><span class="cap">{self.short_date()}</span>'
                     f'<span class="tinf" aria-label="da {self.minutes} min a infinito">'
                     f'<span class="tw" aria-hidden="true">da</span> {self.minutes} min '
-                    f'<span class="tw" aria-hidden="true">a</span> <span class="inf" aria-hidden="true">\u221e</span></span>')
+                    f'<span class="tw" aria-hidden="true">a</span> <span class="inf" aria-hidden="true">\u221e</span></span></span>')
         return f'<span class="cap">{self.short_date()} · {self.minutes} min</span>'
 
     @property
@@ -363,7 +363,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=41">
+<link rel="stylesheet" href="{root}style.css?v=42">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
