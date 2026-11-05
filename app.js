@@ -250,8 +250,11 @@
     };
     let tok = 0, auto = !reduced, current = 0;
     if (!reduced && LATEST.length > 1) pause.hidden = false;
+    // icone SVG (non emoji): su iOS "▶" diventa un'emoji colorata e stona con la pausa
+    const ICO_PAUSE = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>';
+    const ICO_PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>';
     const syncPause = () => {
-      pause.textContent = auto ? '❚❚' : '▶';
+      pause.innerHTML = auto ? ICO_PAUSE : ICO_PLAY;
       pause.setAttribute('aria-label', auto ? 'Metti in pausa gli ultimi scritti' : 'Riprendi gli ultimi scritti');
     };
     pg.innerHTML = LATEST.map((p, i) => `<button type="button" data-i="${i}" aria-label="Scritto ${i + 1}: ${esc(p.t)}" aria-pressed="false"></button>`).join('');
