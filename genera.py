@@ -246,8 +246,8 @@ class Post:
         return max(1, -(-len(self.full_text.split()) // 200))  # 200 parole al minuto, sempre per eccesso (241 parole = 2 min)
 
     @property
-    def only_poem(self):  # "da N min a infinito" vale solo per la poesia pura, non per Poesia + altra categoria
-        return self.cats == ["poesie"]
+    def only_poem(self):  # "da N min a infinito": il testo e' solo una poesia. daCanzone/daCitazione non cambiano la natura, Pensiero si'
+        return "poesie" in self.cats and set(self.cats) <= {"poesie", "canzoni", "citazioni"}
 
     @property
     def minutes_short(self):  # versione corta per le card in home; stessa regola della pagina: le poesie "da N min a ∞"
