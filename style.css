@@ -105,14 +105,25 @@ body[data-cat="pensieri"]{--sx:12%}body[data-cat="poesie"]{--sx:31%}body[data-ca
 .gh{visibility:hidden}
 @keyframes blink{50%{opacity:0}}
 .last{padding:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 18px 40px -22px color-mix(in srgb,var(--navy) 55%,transparent)}
-.wbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;height:34px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--soft)}
+.wbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;height:40px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--soft)}
 .wd{display:flex;gap:6px}.wd i{width:10px;height:10px;border-radius:50%;background:var(--line)}.wd i:first-child{background:var(--pink)}
 .lk{display:flex;align-items:center;gap:10px;margin:0;justify-content:center;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wbody{padding:16px 20px 2px}
-.lt{font-family:"Instrument Serif",Poppins,sans-serif;font-weight:400;font-size:2rem;line-height:1.05;margin:0 0 8px;text-wrap:balance}
-.lx{font-weight:300;font-size:1rem;line-height:1.6;margin:0 0 12px;min-height:4.8em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.lt{font-family:"Instrument Serif",Poppins,sans-serif;font-weight:400;font-size:2.5rem;line-height:1.05;margin:0 0 14px;text-wrap:balance}
+/* card "Ultimo scritto": foto a tutta card, titolo e frase che si scrivono sopra, controlli in basso */
+.lph{position:relative;aspect-ratio:4/5;overflow:hidden;background:linear-gradient(155deg,#8da6b4,#38577e 51%,#17294b)}
+@media (min-width:640px){.lph{aspect-ratio:16/10}}
+.lph-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s}
+.lph-img.on{opacity:1}
+.lph::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,#071c3bf5 0%,#071c3bcc 34%,#071c3b55 62%,transparent 82%)}
+.lov{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 22px 12px}
+.lov .lt{font-size:clamp(1.9rem,6vw,2.6rem);margin:0 0 10px;text-shadow:0 2px 18px #071c3b}
+.lx{font-weight:300;font-size:1.05rem;line-height:1.6;margin:0 0 8px;text-shadow:0 1px 12px #071c3b}
+.lov .lf{border:0;background:none;padding:0;margin:0}
+.lov .pg button::before{background:color-mix(in srgb,var(--seal) 45%,transparent)}
+.lov .pg button[aria-pressed="true"]::before{background:var(--pink)}
+@media (prefers-reduced-motion:reduce){.lph-img{transition:none}}
 .lk-cat{text-transform:none;letter-spacing:.04em;font:500 .8rem Poppins,sans-serif;color:var(--fg)}
-.lf{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 10px 6px 16px;border-top:1px solid var(--line);background:var(--soft)}
+.lf{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 14px 12px 18px;border-top:1px solid var(--line);background:var(--soft)}
 .last-controls{display:flex;align-items:center;gap:8px}
 .pause{width:32px;min-height:44px;padding:0;border:0;background:none;color:var(--fg);font:500 1rem Poppins,sans-serif;cursor:pointer}
 .pause:hover{color:var(--pink)}
@@ -418,7 +429,12 @@ body.book{--navy:#0E2240;--bg:#0E2240;--fg:#C9D6E4;--pink:#F08AA0;
 @media (min-width:900px){.book .rbody{max-width:36rem;margin:0 auto}.book .rcard-b{padding:6px 36px 0}.book .rt{font-size:3rem}}
 
 /* ---- home: riquadro del libro (mockup 34, direzione B: notte morbida + segnalibro) ---- */
-.bk{margin-bottom:64px}
+.bk{margin-bottom:0}
+.bkwin{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#123862;margin:0 0 20px}
+.bkwin .bk-box{border:0;border-radius:0}
+.more-row{display:flex;justify-content:center;margin:30px 0 0}
+.more-btn{min-height:48px;padding:0 28px;border:1px solid color-mix(in srgb,var(--pink) 55%,transparent);border-radius:12px;background:none;color:var(--fg);font:600 .78rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .2s,border-color .2s}
+.more-btn:hover{background:var(--soft);border-color:var(--pink)}
 .bk-box{position:relative;overflow:hidden;border:1px solid color-mix(in srgb,var(--seal) 20%,transparent);border-radius:20px;background:color-mix(in srgb,#0E2240 88%,var(--pink) 4%);padding:26px 20px 20px}
 .bk-box::before{content:"";position:absolute;top:-1px;right:24px;width:20px;height:40px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)}
 .bk-kick{margin:0;padding-right:44px;min-height:30px}

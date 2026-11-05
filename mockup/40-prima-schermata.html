@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 40 - Prima schermata</title>
+<style>
+  body{margin:0;background:#0b0f1a;color:#cfd8e3;font-family:Poppins,sans-serif}
+  .mkbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:#0b0f1a;border-bottom:1px solid #ffffff22}
+  .mkbar button{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#cfd8e3;cursor:pointer}
+  .mkbar button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .mkbar .sep{width:1px;background:#ffffff33;margin:4px 6px}
+  .why{max-width:60rem;margin:14px auto 0;padding:0 16px;font:400 .8rem/1.5 Poppins,sans-serif;color:#9fb0c4;text-align:center}
+  .stage{display:flex;justify-content:center;margin:14px 0 40px}
+  iframe{border:1px solid #ffffff22;border-radius:12px;background:#072D59;max-width:100%}
+</style>
+</head>
+<body>
+<div class="mkbar" role="toolbar" aria-label="Direzioni">
+  <button data-d="A" aria-pressed="true">A · Foto grande</button>
+  <button data-d="B" aria-pressed="false">B · Tre foto sotto</button>
+  <button data-d="C" aria-pressed="false">C · Card con foto</button>
+  <button data-d="0" aria-pressed="false">Com'è ora</button>
+  <span class="sep"></span>
+  <button data-v="m" aria-pressed="false">Mobile</button>
+  <button data-v="d" aria-pressed="true">Desktop</button>
+</div>
+<p class="why" id="why"></p>
+<div class="stage"><iframe id="f" title="Anteprima"></iframe></div>
+
+<script>
+const MAIN = "<main id=\"contenuto\" class=\"page\"><div class=\"wrapin\">\n  <section class=\"hero\">\n    <div class=\"hero-l\">\n      <h1 class=\"hero-h\">teloscrivo<span class=\"dot\" aria-hidden=\"true\"><\/span><\/h1>\n      <p class=\"hero-sub\">la luna porta consiglio<\/p>\n    <\/div>\n    <article class=\"last\">\n      <div class=\"wbar\"><span class=\"wd\" aria-hidden=\"true\"><i><\/i><i><\/i><i><\/i><\/span><p class=\"cap lk\"><span data-lk>Ultimo scritto · <b class=\"lk-cat\">Pensiero · Poesia<\/b> · 4 nov<\/span><\/p><span aria-hidden=\"true\"><\/span><\/div>\n      <div class=\"wbody\"><p class=\"lt\" data-lt>Nella nostra testa<\/p><p class=\"lx\" data-lx>Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.<\/p><\/div>\n      <div class=\"lf\"><div class=\"last-controls\"><div class=\"pg\" data-pg role=\"group\" aria-label=\"Ultimi scritti\"><\/div><button class=\"pause\" data-pause type=\"button\" aria-label=\"Metti in pausa gli ultimi scritti\" hidden>❚❚<\/button><\/div><a class=\"cta\" data-cta href=\"scritti/nella-nostra-testa/\">Leggi<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M4 10h11M11 5l5 5-5 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg><\/a><\/div>\n    <\/article>\n  <\/section>\n  <section class=\"desk-section\" aria-labelledby=\"h-all\"><div class=\"sec-h\"><h2 id=\"h-all\">Gli scritti<\/h2><span class=\"cap count\">3 scritti<\/span><\/div><p>Una finestra per ogni scritto: aprila per leggere.<\/p>\n    <div class=\"bkwin\"><div class=\"desk-bar\"><i><\/i><i><\/i><i><\/i><span>il-libro.txt<\/span><\/div><section class=\"bk\" aria-labelledby=\"h-book\" data-book><div class=\"bk-box\"><div class=\"bk-l\"><p class=\"cap bk-kick\">Il libro · <b>in corso<\/b><\/p><h2 id=\"h-book\" class=\"bk-ttl\">La sindrome del cielo<\/h2><p class=\"bk-quarta\">Illyrium, la Culla del Cielo, non perdona chi è diverso. Aetherion è un’anomalia: una cicatrice sul petto e un potere instabile che non risponde a nessuna regola conosciuta. Un potere che non crea, ma distrugge.<\/p><\/div><div class=\"bk-r\"><a class=\"bk-go\" href=\"scritti/prologo/\" data-bk-go><span class=\"bk-mark\" aria-hidden=\"true\"><\/span><span class=\"bk-lbl\"><span class=\"bk-k\" data-bk-k>Inizia da<\/span> <span class=\"bk-t\" data-bk-t>Prologo&nbsp;·&nbsp;La Culla del Cielo<\/span><\/span><span class=\"bk-min\" data-bk-min>2 min<\/span><span class=\"bk-arr\" aria-hidden=\"true\">→<\/span><\/a><div class=\"bk-bar\" data-bk-bar hidden><i data-bk-fill><\/i><\/div><div class=\"bk-foot\"><p class=\"bk-ghost\" data-bk-ghost>circa 11 min di lettura<\/p><a class=\"bk-all\" href=\"libro/\" data-bk-all hidden>Tutti i capitoli <span aria-hidden=\"true\">→<\/span><\/a><\/div><ol class=\"bk-toc\" aria-label=\"Ultimi capitoli\"><li><a href=\"scritti/prologo/\"><span class=\"bk-n\">P<\/span><span class=\"bk-ct\">La Culla del Cielo<\/span><span class=\"bk-cm\">2 min<\/span><\/a><\/li><li><a href=\"scritti/reietto/\"><span class=\"bk-n\">1<\/span><span class=\"bk-ct\">Reietto<\/span><span class=\"bk-cm\">9 min<\/span><\/a><\/li><\/ol><\/div><\/div><\/section><\/div>\n    <div class=\"desk-shelf\" data-shelf><article class=\"desk-window\" data-cat=\"pensieri\"><div class=\"desk-bar\"><i><\/i><i><\/i><i><\/i><span>nella-nostra-testa.txt<\/span><\/div><a href=\"scritti/nella-nostra-testa/\" data-card><span class=\"desk-photo has-img\" aria-hidden=\"true\"><img src=\"assets/foto/nella-nostra-testa-720.webp\" srcset=\"assets/foto/nella-nostra-testa-720.webp 720w\" sizes=\"(min-width:900px) 380px, 90vw\" alt=\"\" width=\"720\" height=\"450\" loading=\"lazy\" decoding=\"async\" style=\"object-position:50% 50%\"><\/span><span class=\"desk-info\"><span class=\"desk-meta\"><b>Pensiero · Poesia<\/b>4 novembre<\/span><span class=\"desk-title\">Nella nostra testa<\/span><span class=\"desk-excerpt\">Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.<\/span><span class=\"desk-more\"><span class=\"t\">Apri lo scritto<\/span><i class=\"arr\" aria-hidden=\"true\">↗<\/i><\/span><\/span><\/a><\/article><article class=\"desk-window\" data-cat=\"pensieri\"><div class=\"desk-bar\"><i><\/i><i><\/i><i><\/i><span>limite-specchio.txt<\/span><\/div><a href=\"scritti/limite-specchio/\" data-card><span class=\"desk-photo has-img\" aria-hidden=\"true\"><img src=\"assets/foto/limite-specchio-736.webp\" srcset=\"assets/foto/limite-specchio-736.webp 736w\" sizes=\"(min-width:900px) 380px, 90vw\" alt=\"\" width=\"736\" height=\"460\" loading=\"lazy\" decoding=\"async\" style=\"object-position:50% 50%\"><\/span><span class=\"desk-info\"><span class=\"desk-meta\"><b>Pensiero · daCitazione<\/b>4 novembre<\/span><span class=\"desk-title\">Limite/Specchio<\/span><span class=\"desk-excerpt\">Guardarsi allo specchio può portarci a dubitare di quello che vediamo.<\/span><span class=\"desk-more\"><span class=\"t\">Apri lo scritto<\/span><i class=\"arr\" aria-hidden=\"true\">↗<\/i><\/span><\/span><\/a><\/article><article class=\"desk-window\" data-cat=\"poesie\"><div class=\"desk-bar\"><i><\/i><i><\/i><i><\/i><span>la-vita-con-te.txt<\/span><\/div><a href=\"scritti/la-vita-con-te/\" data-card><span class=\"desk-photo has-img\" aria-hidden=\"true\"><img src=\"assets/foto/la-vita-con-te-441.webp\" srcset=\"assets/foto/la-vita-con-te-441.webp 441w\" sizes=\"(min-width:900px) 380px, 90vw\" alt=\"\" width=\"441\" height=\"276\" loading=\"lazy\" decoding=\"async\" style=\"object-position:30% 66%\"><\/span><span class=\"desk-info\"><span class=\"desk-meta\"><b>Poesia<\/b>4 novembre<\/span><span class=\"desk-title\">La vita con te<\/span><span class=\"desk-excerpt\">Quanta vita che voglio Vivere con te, condividere Lacrime e sorrisi, litigate<\/span><span class=\"desk-more\"><span class=\"t\">Apri lo scritto<\/span><i class=\"arr\" aria-hidden=\"true\">↗<\/i><\/span><\/span><\/a><\/article><\/div>\n    \n  <\/section>\n  \n  <footer class=\"foot\"><span class=\"wm2\">teloscrivo<span class=\"dot\" aria-hidden=\"true\"><\/span><\/span><span>© 2026 teloscrivo<\/span><a class=\"up\" href=\"#inizio\">Torna su<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M10 16V4M5 9l5-5 5 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg><\/a><\/footer>\n<\/div><\/main>";
+
+const common = `
+    .mk-ov{position:absolute;left:24px;right:24px;bottom:20px;z-index:2;display:flex;flex-direction:column;gap:8px}
+    .mk-ov .cap{color:var(--pink)}
+    .mk-t{font:400 clamp(2rem,4.2vw,2.9rem)/1.02 "Instrument Serif",Poppins,sans-serif;margin:0;text-wrap:balance}
+    .mk-x{font:300 .95rem/1.55 Poppins,sans-serif;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:color-mix(in srgb,var(--fg) 88%,transparent)}
+    .mk-ct .cap{color:var(--muted)}`;
+const css = {
+  0: '',
+  // A: l'ultimo scritto e' una grande foto con il titolo sopra, a destra del wordmark
+  A: `
+    .hero{align-items:center}
+    .mk-a{display:block;position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#123862;color:inherit;text-decoration:none;box-shadow:0 18px 40px -22px color-mix(in srgb,var(--navy) 55%,transparent);transition:transform .25s,border-color .25s}
+    .mk-a:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--pink) 55%,var(--line))}
+    .mk-a .desk-bar{position:relative;z-index:2}
+    .mk-ph{position:relative;aspect-ratio:16/10;overflow:hidden}
+    .mk-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .mk-ph::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,#071c3bf2 0%,#071c3baa 38%,transparent 72%)}
+    .mk-ov{position:absolute;left:24px;right:24px;bottom:20px;z-index:2;display:flex;flex-direction:column;gap:8px}
+    .mk-ov .cap{color:var(--pink)}
+    .mk-t{font:400 clamp(2rem,4.2vw,2.9rem)/1.02 "Instrument Serif",Poppins,sans-serif;margin:0}
+    .mk-x{font:300 .95rem/1.55 Poppins,sans-serif;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:color-mix(in srgb,var(--fg) 88%,transparent)}
+    .mk-go{display:inline-flex;align-items:center;gap:8px;margin-top:4px;font:600 .74rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase}`,
+  // B: wordmark centrato, sotto tre foto (le piu' recenti)
+  B: `
+    .hero{display:block;text-align:center}
+    .hero-h{justify-content:center}.hero-sub{margin-bottom:0}
+    .mk-row{display:grid;grid-template-columns:1fr;gap:16px;margin-top:40px;text-align:left}
+    @media(min-width:760px){.mk-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}}
+    .mk-tile{position:relative;display:block;border:1px solid var(--line);border-radius:15px;overflow:hidden;aspect-ratio:4/3;color:inherit;text-decoration:none;background:#123862;transition:transform .25s,border-color .25s}
+    .mk-tile:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--pink) 55%,var(--line))}
+    .mk-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .mk-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,#071c3bf0 0%,#071c3b88 40%,transparent 70%)}
+    .mk-tile .mk-ov{left:18px;right:18px;bottom:16px}
+    .mk-tile .mk-t{font-size:1.9rem}`,
+  // C: card testuale piu' bassa, con una foto a fianco
+  C: `
+    .hero{align-items:center}
+    .mk-c{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(10px);box-shadow:0 18px 40px -22px color-mix(in srgb,var(--navy) 55%,transparent)}
+    .mk-c .desk-bar{min-height:36px}
+    .mk-cb{display:grid;grid-template-columns:1fr}
+    @media(min-width:760px){.mk-cb{grid-template-columns:1.25fr .75fr}}
+    .mk-ct{padding:20px 22px 18px;display:flex;flex-direction:column;gap:10px}
+    .mk-ct .mk-t{font-size:2.2rem}
+    .mk-ct .mk-x{font-size:1rem;-webkit-line-clamp:3}
+    .mk-cp{position:relative;min-height:150px}
+    .mk-cp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+    .mk-cta{align-self:flex-start;margin-top:6px}`
+};
+const why = {
+  0:'Com\'è ora, per confronto.',
+  A:'L\'ultimo scritto diventa una grande foto con titolo, frase e "Leggi" sopra. È la prima cosa che vedi: un\'immagine, non un riquadro di testo.',
+  B:'Il wordmark sta da solo al centro e sotto ci sono le tre foto più recenti, con il titolo sopra. La prima schermata è già una vetrina.',
+  C:'Resta una card di testo ma più bassa (niente vuoto), con la foto dello scritto a fianco. Cambia poco, più sicura.'
+};
+const f = document.getElementById('f'), whyEl = document.getElementById('why');
+let d = 'A', v = 'd';
+try { d = localStorage.getItem('m40d') || d; v = localStorage.getItem('m40v') || v } catch (e) {}
+if (/^#[0ABC]/.test(location.hash)) d = location.hash[1];
+if (/^#[0ABC]m/.test(location.hash)) v = 'm';
+function draw() {
+  f.style.width = v === 'm' ? '390px' : '1240px';
+  const place = `<script>
+    const d = '${d}', hero = document.querySelector('.hero'), last = hero.querySelector('.last');
+    const w = [...document.querySelectorAll('.desk-window')].slice(0, 3).map(x => ({
+      img: x.querySelector('.desk-photo img')?.src || '', t: x.querySelector('.desk-title').textContent, x: x.querySelector('.desk-excerpt').textContent,
+      k: x.querySelector('.desk-meta b').textContent, m: x.querySelector('.desk-meta').textContent.replace(x.querySelector('.desk-meta b').textContent, '').trim(), u: x.querySelector('a').getAttribute('href')
+    }));
+    const E = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const arrow = '<svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const a = w[0];
+    if (d === 'A') { last.outerHTML = '<a class="mk-a" href="#"><div class="desk-bar"><i></i><i></i><i></i><span>ultimo scritto</span></div><div class="mk-ph"><img src="' + a.img + '" alt=""><div class="mk-ov"><span class="cap">' + E(a.k) + ' · ' + E(a.m) + '</span><p class="mk-t">' + E(a.t) + '</p><p class="mk-x">' + E(a.x) + '</p><span class="mk-go">Leggi ' + arrow + '</span></div></div></a>'; }
+    if (d === 'B') { last.remove(); const r = document.createElement('div'); r.className = 'mk-row'; r.innerHTML = w.map(p => '<a class="mk-tile" href="#"><img src="' + p.img + '" alt="" loading="eager"><div class="mk-ov"><span class="cap" style="color:var(--pink)">' + E(p.k) + '</span><p class="mk-t">' + E(p.t) + '</p></div></a>').join(''); hero.append(r); }
+    if (d === 'C') { last.outerHTML = '<article class="mk-c"><div class="desk-bar"><i></i><i></i><i></i><span>ultimo scritto</span></div><div class="mk-cb"><div class="mk-ct"><span class="cap">' + E(a.k) + ' · ' + E(a.m) + '</span><p class="mk-t">' + E(a.t) + '</p><p class="mk-x">' + E(a.x) + '</p><a class="cta mk-cta" href="#">Leggi' + arrow + '</a></div><div class="mk-cp"><img src="' + a.img + '" alt=""></div></div></article>'; }
+  <\/script>`;
+  f.srcdoc = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <base href="${location.href.replace(/mockup\/[^/]*$/, '')}">
+    <link rel="stylesheet" href="style.css"><style>${common}${css[d]}</style></head>
+    <body id="inizio"><div class="sky" aria-hidden="true"></div>
+    <header class="tbar"><a class="brand" href="#"><img src="assets/logo/monogramma-navy.svg" alt="" width="34" height="34"></a></header>
+    ${MAIN}${place}</body></html>`;
+  f.onload = () => { try { f.style.height = f.contentDocument.documentElement.scrollHeight + 'px' } catch (e) {} };
+  whyEl.textContent = why[d];
+  document.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', b.dataset.d === d));
+  document.querySelectorAll('[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+  try { localStorage.setItem('m40d', d); localStorage.setItem('m40v', v) } catch (e) {}
+}
+document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { d = b.dataset.d; draw() });
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { v = b.dataset.v; draw() });
+draw();
+</script>
+</body>
+</html>

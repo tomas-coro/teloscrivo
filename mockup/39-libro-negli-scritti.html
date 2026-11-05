@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 39 - Il libro negli scritti</title>
+<style>
+  body{margin:0;background:#0b0f1a;color:#cfd8e3;font-family:Poppins,sans-serif}
+  .mkbar{position:sticky;top:0;z-index:20;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:#0b0f1a;border-bottom:1px solid #ffffff22}
+  .mkbar button{font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid #ffffff44;background:transparent;color:#cfd8e3;cursor:pointer}
+  .mkbar button[aria-pressed=true]{background:#FD6E88;border-color:#FD6E88;color:#072D59}
+  .mkbar .sep{width:1px;background:#ffffff33;margin:4px 6px}
+  .why{max-width:60rem;margin:14px auto 0;padding:0 16px;font:400 .8rem/1.5 Poppins,sans-serif;color:#9fb0c4;text-align:center}
+  .stage{display:flex;justify-content:center;margin:14px 0 40px}
+  iframe{border:1px solid #ffffff22;border-radius:12px;background:#072D59;max-width:100%}
+</style>
+</head>
+<body>
+<div class="mkbar" role="toolbar" aria-label="Direzioni">
+  <button data-d="A" aria-pressed="true">A · Libro in testa</button>
+  <button data-d="B" aria-pressed="false">B · Libro come finestra</button>
+  <button data-d="C" aria-pressed="false">C · Libro in fondo</button>
+  <button data-d="0" aria-pressed="false">Com'è ora</button>
+  <span class="sep"></span>
+  <button data-v="m" aria-pressed="false">Mobile</button>
+  <button data-v="d" aria-pressed="true">Desktop</button>
+</div>
+<p class="why" id="why"></p>
+<div class="stage"><iframe id="f" title="Anteprima"></iframe></div>
+
+<script>
+const MAIN = "<main id=\"contenuto\" class=\"page\"><div class=\"wrapin\">\n  <section class=\"hero\">\n    <div class=\"hero-l\">\n      <h1 class=\"hero-h\">teloscrivo<span class=\"dot\" aria-hidden=\"true\"><\/span><\/h1>\n      <p class=\"hero-sub\">la luna porta consiglio<\/p>\n    <\/div>\n    <article class=\"last\">\n      <div class=\"wbar\"><span class=\"wd\" aria-hidden=\"true\"><i><\/i><i><\/i><i><\/i><\/span><p class=\"cap lk\"><span data-lk>Ultimo scritto · <b class=\"lk-cat\">Pensiero · Poesia<\/b> · 4 nov<\/span><\/p><span aria-hidden=\"true\"><\/span><\/div>\n      <div class=\"wbody\"><p class=\"lt\" data-lt>Nella nostra testa<\/p><p class=\"lx\" data-lx>Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.<\/p><\/div>\n      <div class=\"lf\"><div class=\"last-controls\"><div class=\"pg\" data-pg role=\"group\" aria-label=\"Ultimi scritti\"><\/div><button class=\"pause\" data-pause type=\"button\" aria-label=\"Metti in pausa gli ultimi scritti\" hidden>❚❚<\/button><\/div><a class=\"cta\" data-cta href=\"scritti/nella-nostra-testa/\">Leggi<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M4 10h11M11 5l5 5-5 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg><\/a><\/div>\n    <\/article>\n  <\/section>\n  <section class=\"bk\" aria-labelledby=\"h-book\" data-book><div class=\"bk-box\"><div class=\"bk-l\"><p class=\"cap bk-kick\">Il libro · <b>in corso<\/b><\/p><h2 id=\"h-book\" class=\"bk-ttl\">La sindrome del cielo<\/h2><p class=\"bk-quarta\">Illyrium, la Culla del Cielo, non perdona chi è diverso. Aetherion è un’anomalia: una cicatrice sul petto e un potere instabile che non risponde a nessuna regola conosciuta. Un potere che non crea, ma distrugge.<\/p><\/div><div class=\"bk-r\"><a class=\"bk-go\" href=\"scritti/prologo/\" data-bk-go><span class=\"bk-mark\" aria-hidden=\"true\"><\/span><span class=\"bk-lbl\"><span class=\"bk-k\" data-bk-k>Inizia da<\/span> <span class=\"bk-t\" data-bk-t>Prologo&nbsp;·&nbsp;La Culla del Cielo<\/span><\/span><span class=\"bk-min\" data-bk-min>2 min<\/span><span class=\"bk-arr\" aria-hidden=\"true\">→<\/span><\/a><div class=\"bk-bar\" data-bk-bar hidden><i data-bk-fill><\/i><\/div><div class=\"bk-foot\"><p class=\"bk-ghost\" data-bk-ghost>circa 11 min di lettura<\/p><a class=\"bk-all\" href=\"libro/\" data-bk-all hidden>Tutti i capitoli <span aria-hidden=\"true\">→<\/span><\/a><\/div><ol class=\"bk-toc\" aria-label=\"Ultimi capitoli\"><li><a href=\"scritti/prologo/\"><span class=\"bk-n\">P<\/span><span class=\"bk-ct\">La Culla del Cielo<\/span><span class=\"bk-cm\">2 min<\/span><\/a><\/li><li><a href=\"scritti/reietto/\"><span class=\"bk-n\">1<\/span><span class=\"bk-ct\">Reietto<\/span><span class=\"bk-cm\">9 min<\/span><\/a><\/li><\/ol><\/div><\/div><\/section>\n  <section class=\"desk-section\" aria-labelledby=\"h-all\"><div class=\"sec-h\"><h2 id=\"h-all\">Gli scritti<\/h2><span class=\"cap count\">3 scritti<\/span><\/div><p>Una finestra per ogni scritto: aprila per leggere.<\/p>\n    <div class=\"desk-shelf\"><article class=\"desk-window\" data-cat=\"pensieri\"><div class=\"desk-bar\"><i><\/i><i><\/i><i><\/i><span>nella-nostra-testa.txt<\/span><\/div><a href=\"scritti/nella-nostra-testa/\" data-card><span class=\"desk-photo has-img\" aria-hidden=\"true\"><img src=\"assets/foto/nella-nostra-testa-720.webp\" srcset=\"assets/foto/nella-nostra-testa-720.webp 720w\" sizes=\"(min-width:900px) 380px, 90vw\" alt=\"\" width=\"720\" height=\"450\" loading=\"lazy\" decoding=\"async\" style=\"object-position:50% 50%\"><\/span><span class=\"desk-info\"><span class=\"desk-meta\"><b>Pensiero · Poesia<\/b>4 novembre<\/span><span class=\"desk-title\">Nella nostra testa<\/span><span class=\"desk-excerpt\">Il limite più grande che esista è nella nostra testa, ce lo auto-imponiamo e non è nulla di più vicino a quello che siamo realmente.<\/span><span class=\"desk-more\"><span class=\"t\">Apri lo scritto<\/span><i class=\"arr\" aria-hidden=\"true\">↗<\/i><\/span><\/span><\/a><\/article><article class=\"desk-window\" data-cat=\"pensieri\"><div class=\"desk-bar\"><i><\/i><i><\/i><i><\/i><span>limite-specchio.txt<\/span><\/div><a href=\"scritti/limite-specchio/\" data-card><span class=\"desk-photo has-img\" aria-hidden=\"true\"><img src=\"assets/foto/limite-specchio-736.webp\" srcset=\"assets/foto/limite-specchio-736.webp 736w\" sizes=\"(min-width:900px) 380px, 90vw\" alt=\"\" width=\"736\" height=\"460\" loading=\"lazy\" decoding=\"async\" style=\"object-position:50% 50%\"><\/span><span class=\"desk-info\"><span class=\"desk-meta\"><b>Pensiero · daCitazione<\/b>4 novembre<\/span><span class=\"desk-title\">Limite/Specchio<\/span><span class=\"desk-excerpt\">Guardarsi allo specchio può portarci a dubitare di quello che vediamo.<\/span><span class=\"desk-more\"><span class=\"t\">Apri lo scritto<\/span><i class=\"arr\" aria-hidden=\"true\">↗<\/i><\/span><\/span><\/a><\/article><article class=\"desk-window\" data-cat=\"poesie\"><div class=\"desk-bar\"><i><\/i><i><\/i><i><\/i><span>la-vita-con-te.txt<\/span><\/div><a href=\"scritti/la-vita-con-te/\" data-card><span class=\"desk-photo has-img\" aria-hidden=\"true\"><img src=\"assets/foto/la-vita-con-te-662.webp\" srcset=\"assets/foto/la-vita-con-te-662.webp 662w\" sizes=\"(min-width:900px) 380px, 90vw\" alt=\"\" width=\"662\" height=\"414\" loading=\"lazy\" decoding=\"async\" style=\"object-position:50% 50%\"><\/span><span class=\"desk-info\"><span class=\"desk-meta\"><b>Poesia<\/b>4 novembre<\/span><span class=\"desk-title\">La vita con te<\/span><span class=\"desk-excerpt\">Quanta vita che voglio Vivere con te, condividere Lacrime e sorrisi, litigate<\/span><span class=\"desk-more\"><span class=\"t\">Apri lo scritto<\/span><i class=\"arr\" aria-hidden=\"true\">↗<\/i><\/span><\/span><\/a><\/article><\/div>\n  <\/section>\n  \n  <footer class=\"foot\"><span class=\"wm2\">teloscrivo<span class=\"dot\" aria-hidden=\"true\"><\/span><\/span><span>© 2026 teloscrivo<\/span><a class=\"up\" href=\"#inizio\">Torna su<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M10 16V4M5 9l5-5 5 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><\/svg><\/a><\/footer>\n<\/div><\/main>";
+
+// Card "Ultimo scritto" in hero: torna COME PRIMA del commit (spaziosa), al suo posto.
+const roomy = `
+  .wbar{height:40px}
+  .wbody{padding:24px 24px 6px}
+  .lt{font-size:2.5rem;margin:0 0 14px}
+  .lx{font-size:1.12rem;line-height:1.75;margin:0 0 20px;min-height:5.3em;display:block;overflow:visible}
+  .lf{padding:12px 14px 12px 18px}
+  .lk-cat{text-transform:none;letter-spacing:.04em;font:500 .8rem Poppins,sans-serif;color:var(--fg)}`;
+const css = {
+  0: roomy,
+  // A: il libro apre la sezione "Gli scritti": fascia larga con la barra della finestra, poi le tre finestre
+  A: roomy + `
+    .mk-bkwin{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#123862;margin:0 0 20px}
+    .mk-bkwin .bk{margin:0}.mk-bkwin .bk-box{border:0;border-radius:0}`,
+  // B: il libro e' una finestra come le altre (stessa forma), la prima della griglia
+  B: roomy + `
+    .mk-book .desk-photo{display:grid;place-items:center;background:linear-gradient(160deg,#1c2a4d,#0e1d3d 60%,#2a2350)}
+    .mk-book .desk-photo::before{display:none}
+    .mk-book .mk-mark{position:absolute;top:0;right:22px;width:26px;height:46px;background:var(--pink);clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%)}
+    .mk-book .mk-bt{font:400 clamp(1.9rem,3.2vw,2.5rem)/1.05 "Instrument Serif",Poppins,sans-serif;text-align:center;padding:0 18px;color:var(--fg)}
+    .mk-book .desk-meta b{color:var(--pink)}`,
+  // C: il libro chiude la sezione, dopo le finestre: "e poi, un libro"
+  C: roomy + `
+    .mk-after{margin:38px 0 0}.mk-after .bk{margin:0}`
+};
+const why = {
+  0:'Com\'è ora: card spaziosa in hero, libro sopra "Gli scritti" (riferimento).',
+  A:'Il libro entra nella sezione "Gli scritti" come prima fascia larga, dentro una finestra con i tre pallini. Poi le tre finestre degli scritti.',
+  B:'Il libro diventa una finestra come le altre: stessa forma, stessa barra "il-libro.txt", segnalibro rosa al posto della foto. Prima della griglia.',
+  C:'Prima le finestre degli scritti, poi il libro a chiudere la sezione. Il resto della pagina scende di meno prima del primo scritto.'
+};
+const f = document.getElementById('f'), whyEl = document.getElementById('why');
+let d = 'A', v = 'd';
+try { d = localStorage.getItem('m39d') || d; v = localStorage.getItem('m39v') || v } catch (e) {}
+if (/^#[0ABC]/.test(location.hash)) d = location.hash[1];
+if (/^#[0ABC]m/.test(location.hash)) v = 'm';
+function draw() {
+  f.style.width = v === 'm' ? '390px' : '1240px';
+  const place = `<script>
+    const d = '${d}', bk = document.querySelector('.bk'), sec = document.querySelector('.desk-section'), shelf = sec.querySelector('.desk-shelf');
+    const intro = sec.querySelector('.sec-h + p');
+    document.querySelector('.last .pause')?.remove();
+    if (d === 'A') { const w = document.createElement('div'); w.className = 'mk-bkwin'; w.innerHTML = '<div class="desk-bar"><i></i><i></i><i></i><span>il-libro.txt</span></div>'; w.append(bk); sec.insertBefore(w, shelf); }
+    if (d === 'B') {
+      const t = bk.querySelector('.bk-ttl').textContent, q = bk.querySelector('.bk-quarta').textContent, s = bk.querySelector('.bk-t').textContent;
+      const a = document.createElement('article'); a.className = 'desk-window mk-book';
+      a.innerHTML = '<div class="desk-bar"><i></i><i></i><i></i><span>il-libro.txt</span></div><a href="#"><span class="desk-photo" aria-hidden="true"><span class="mk-mark"></span><span class="mk-bt"></span></span><span class="desk-info"><span class="desk-meta"><b>Il libro · in corso</b></span><span class="desk-title"></span><span class="desk-excerpt"></span><span class="desk-more"><span class="t"></span><i class="arr" aria-hidden="true">→</i></span></span></a>';
+      a.querySelector('.mk-bt').textContent = t; a.querySelector('.desk-title').textContent = 'Inizia a leggere'; a.querySelector('.desk-excerpt').textContent = q; a.querySelector('.desk-more .t').textContent = 'Inizia da ' + s;
+      bk.remove(); shelf.prepend(a);
+    }
+    if (d === 'C') { const w = document.createElement('div'); w.className = 'mk-after'; w.append(bk); shelf.after(w); }
+  <\/script>`;
+  f.srcdoc = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <base href="${location.href.replace(/mockup\/[^/]*$/, '')}">
+    <link rel="stylesheet" href="style.css"><style>${css[d]}</style></head>
+    <body id="inizio"><div class="sky" aria-hidden="true"></div>
+    <header class="tbar"><a class="brand" href="#"><img src="assets/logo/monogramma-navy.svg" alt="" width="34" height="34"></a></header>
+    ${MAIN}${place}</body></html>`;
+  f.onload = () => { try { f.style.height = f.contentDocument.documentElement.scrollHeight + 'px' } catch (e) {} };
+  whyEl.textContent = why[d];
+  document.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', b.dataset.d === d));
+  document.querySelectorAll('[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+  try { localStorage.setItem('m39d', d); localStorage.setItem('m39v', v) } catch (e) {}
+}
+document.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { d = b.dataset.d; draw() });
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { v = b.dataset.v; draw() });
+draw();
+</script>
+</body>
+</html>

@@ -221,6 +221,20 @@
     }
   }
 
+  // ── home: "Carica altri" mostra le finestre nascoste 9 alla volta (senza JS restano tutte visibili: vedi <noscript> in pagina) ──
+  (function () {
+    const shelf = $('[data-shelf]'), row = $('[data-more-row]'), btn = $('[data-more]');
+    if (!shelf || !row || !btn) return;
+    const left = () => $$('.desk-window[hidden]', shelf);
+    row.hidden = !left().length;
+    btn.addEventListener('click', () => {
+      const next = left().slice(0, 9);
+      next.forEach(w => { w.hidden = false; });
+      if (next[0]) next[0].querySelector('a')?.focus({ preventScroll: true });  // la tastiera riparte dalla prima finestra nuova
+      row.hidden = !left().length;
+    });
+  })();
+
   // ── home: il blocco che si scrive da solo, dal piu' recente ──
   const latestEl = $('#latest');
   if (latestEl) {
@@ -246,6 +260,7 @@
       const cat = document.createElement('b'); cat.className = 'lk-cat'; cat.textContent = p.k;
       lk.replaceChildren((i === 0 ? 'Ultimo scritto' : 'Prima ancora') + ' · ', cat, ' · ' + p.d);
       cta.href = p.u;
+      $$('.lph-img').forEach(im => im.classList.toggle('on', +im.dataset.i === i));  // la foto dello scritto che sta scrivendo
       pg.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
     }
     function play(i) {

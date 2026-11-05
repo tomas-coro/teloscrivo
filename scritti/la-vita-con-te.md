@@ -2,6 +2,8 @@
 titolo: La vita con te
 data: 2026-11-04
 sezione: poesie
+foto-focus: 30% 66%
+foto-zoom: 1.5
 ---
 
 Quanta vita che voglio

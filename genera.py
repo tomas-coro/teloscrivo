@@ -18,6 +18,7 @@ Intestazione di uno scritto (tutto su una riga ciascuno):
     estratto: facoltativo (se manca: prime righe per poesie/canzoni, prima frase per il resto)
     spotify:  facoltativo, link https:// (compare il bottone "Ascolta su Spotify")
     foto-focus: facoltativo, punto da tenere nel ritaglio, es. `30% 50%` (default: centro)
+    foto-zoom: facoltativo, da 1 a 3 (es. `1.5`): ritaglia piu' stretto e CENTRA il ritaglio su foto-focus (senza zoom foto-focus sposta soltanto il taglio)
     capitolo: solo per il libro (sezione: libro). Un file = un capitolo intero. Numeri da 1 senza buchi, oppure `prologo` (uno solo, viene prima di tutto)
     atto: facoltativo, solo libro: numero dell'atto (1, 2, 3...) mostrato come numero romano
 Righe che iniziano con # nell'intestazione sono commenti.
@@ -50,6 +51,7 @@ PHOTO_DIR = "foto"
 PHOTO_OUT = "assets/foto"
 PHOTO_SIZES = (800, 1600)  # larghezze in uscita, sempre 16:10 (mai ingrandite: se la foto e' piu' stretta, si scrive la sua misura)
 PHOTO_MIN_WIDTH = 700
+HOME_PAGE = 9  # scritti mostrati in home prima di "Carica altri" (e a ogni clic)
 REQUIRE_PHOTOS = False
 # Filtro duotono: ombre = Navy, luci = Seal Blue; prima della tinta si aumenta un po' il contrasto (stessa resa del mockup 27)
 DUO_DARK, DUO_LIGHT = (0x07, 0x2D, 0x59), (0xDB, 0xF2, 0xFC)
@@ -140,7 +142,7 @@ class Post:
                 raise SiteError(f"{path.name}, riga {n}: atteso 'chiave: valore', trovato '{line}'")
             k, v = line.split(":", 1)
             k = k.strip().lower()
-            if k not in ("titolo", "data", "sezione", "estratto", "spotify", "foto-focus", "capitolo", "atto"):
+            if k not in ("titolo", "data", "sezione", "estratto", "spotify", "foto-focus", "foto-zoom", "capitolo", "atto"):
                 raise SiteError(f"{path.name}, riga {n}: chiave sconosciuta '{k}'")
             meta[k] = v.strip()
         for k in ("titolo", "data", "sezione"):
@@ -181,6 +183,12 @@ class Post:
         self.focus = meta.get("foto-focus", "50% 50%")
         if not re.fullmatch(r"\d{1,3}% \d{1,3}%", self.focus) or any(int(v) > 100 for v in re.findall(r"\d+", self.focus)):
             raise SiteError(f"{path.name}: foto-focus '{self.focus}' non valido (esempio: 30% 50%, valori da 0 a 100)")
+        try:
+            self.zoom = float(meta.get("foto-zoom", "1"))
+        except ValueError:
+            raise SiteError(f"{path.name}: foto-zoom '{meta['foto-zoom']}' non e' un numero (esempio: 1.5)")
+        if not 1 <= self.zoom <= 3:
+            raise SiteError(f"{path.name}: foto-zoom {self.zoom} fuori scala (da 1 a 3)")
         self.has_photo = False  # lo decide bake_photos()
         self.photo_sizes = []
         raw = m.group(2).strip("\n")
@@ -349,7 +357,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=29">
+<link rel="stylesheet" href="{root}style.css?v=31">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -378,9 +386,9 @@ def icon(k):
     return f'<span class="ic ic-{k}"><svg viewBox="0 0 24 24" aria-hidden="true">{GLYPH[k]}</svg></span>'
 
 
-def card_html(p, root):
+def card_html(p, root, hidden=False):
     """Una scheda della griglia: il clic apre subito lo scritto (niente anteprima)."""
-    return (f'<article class="desk-window" data-cat="{p.cat}"><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
+    return (f'<article class="desk-window" data-cat="{p.cat}"{" hidden" if hidden else ""}><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
             f'<a href="{root}{p.url}" data-card><span class="desk-photo{" has-img" if p.has_photo else ""}" aria-hidden="true">{photo_img(p, root, "(min-width:900px) 380px, 90vw")}</span>'
             f'<span class="desk-info"><span class="desk-meta"><b>{esc(p.cat_label)}</b>{p.long_date()}</span>'
             f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
@@ -396,16 +404,22 @@ def duotone(img):
     return ImageOps.colorize(gray, black=DUO_DARK, white=DUO_LIGHT)
 
 
-def crop_16_10(img, focus):
-    """Taglia al rapporto 16:10 tenendo vicino il punto focale ('x% y%')."""
+def crop_16_10(img, focus, zoom=1.0):
+    """Taglia al rapporto 16:10 tenendo vicino il punto focale ('x% y%').
+    Con zoom > 1 il ritaglio si stringe e il punto focale ne diventa il CENTRO (in % dell'intera foto)."""
     fx, fy = (int(v) / 100 for v in re.findall(r"\d+", focus))
     w, h = img.size
     if w / h > 1.6:  # troppo larga: si taglia ai lati
         cw, ch = round(h * 1.6), h
     else:  # troppo alta: si taglia sopra e sotto
         cw, ch = w, round(w / 1.6)
-    left = min(max(round((w - cw) * fx), 0), w - cw)
-    top = min(max(round((h - ch) * fy), 0), h - ch)
+    if zoom > 1:
+        cw, ch = round(cw / zoom), round(ch / zoom)
+        left = min(max(round(w * fx - cw / 2), 0), w - cw)
+        top = min(max(round(h * fy - ch / 2), 0), h - ch)
+    else:
+        left = min(max(round((w - cw) * fx), 0), w - cw)
+        top = min(max(round((h - ch) * fy), 0), h - ch)
     return img.crop((left, top, left + cw, top + ch))
 
 
@@ -446,7 +460,7 @@ def bake_photos(posts):
             raise SiteError(f"{PHOTO_DIR}/{src.name}: e' verticale ({w}x{h}). Le foto devono essere orizzontali.")
         if w < PHOTO_MIN_WIDTH:
             raise SiteError(f"{PHOTO_DIR}/{src.name}: troppo piccola ({w}px di larghezza, minimo {PHOTO_MIN_WIDTH}).")
-        cropped = duotone(crop_16_10(im, p.focus))
+        cropped = duotone(crop_16_10(im, p.focus, p.zoom))
         out.mkdir(parents=True, exist_ok=True)
         p.photo_sizes = [s for s in PHOTO_SIZES if cropped.width >= s] or [cropped.width]
         for size in p.photo_sizes:
@@ -472,7 +486,14 @@ def page_home(posts, chapters=()):
     newest = posts[0]
     latest = [{"t": p.title, "k": p.cat_label, "d": p.short_date(), "x": p.excerpt, "u": p.url} for p in posts[:5]]
     first = latest[0]
-    windows = "".join(card_html(p, root) for p in posts)
+    # una foto per ognuno dei 5 scritti recenti (se manca, resta lo sfondo sfumato); la prima e' subito visibile
+    last_imgs = "".join(
+        f'<img class="lph-img{" on" if i == 0 else ""}" data-i="{i}" src="{root}{PHOTO_OUT}/{p.slug}-{p.photo_sizes[-1]}.webp" alt="" width="{p.photo_sizes[-1]}" height="{round(p.photo_sizes[-1] / 1.6)}"{"" if i == 0 else " loading=\"lazy\""} decoding="async">'
+        for i, p in enumerate(posts[:5]) if p.has_photo)
+    # prime 9 finestre visibili; le altre restano nell'HTML (si leggono anche senza JS) e "Carica altri" ne mostra 9 alla volta
+    windows = "".join(card_html(p, root, hidden=i >= HOME_PAGE) for i, p in enumerate(posts))
+    more = (f'<div class="more-row" data-more-row hidden><button type="button" class="more-btn" data-more>Carica altri</button></div>'
+            f'<noscript><style>.desk-window[hidden]{{display:flex!important}}</style></noscript>') if len(posts) > HOME_PAGE else ""
     tiktok = ""
     if TIKTOK_VIDEOS:
         cards = "".join(f'<a class="desk-phone" href="{esc(u)}" target="_blank" rel="noopener noreferrer"><span class="desk-screen">teloscrivo <span>{esc(t)}<small>{esc(s)}</small></span></span></a>' for t, s, u in TIKTOK_VIDEOS)
@@ -490,7 +511,7 @@ def page_home(posts, chapters=()):
             f'<li><a href="{root}{c.url}"><span class="bk-n">{c.chapter or "P"}</span><span class="bk-ct">{esc(c.title)}</span><span class="bk-cm">{c.minutes} min</span></a></li>'
             for c in chapters[-3:])
         toc = f'<ol class="bk-toc" aria-label="Ultimi capitoli">{rows}</ol>'
-        book = (f'<section class="bk" aria-labelledby="h-book" data-book><div class="bk-box">'
+        book = (f'<div class="bkwin"><div class="desk-bar"><i></i><i></i><i></i><span>il-libro.txt</span></div><section class="bk" aria-labelledby="h-book" data-book><div class="bk-box">'
                 f'<div class="bk-l"><p class="cap bk-kick">Il libro · <b>in corso</b></p>'
                 f'<h2 id="h-book" class="bk-ttl">{esc(BOOK_TITLE)}</h2>'
                 f'<p class="bk-quarta">{esc(BOOK_HOME_BLURB)}</p></div><div class="bk-r">'
@@ -500,7 +521,7 @@ def page_home(posts, chapters=()):
                 f'<div class="bk-bar" data-bk-bar hidden><i data-bk-fill></i></div>'
                 f'<div class="bk-foot"><p class="bk-ghost" data-bk-ghost>{lettura_totale(total)}</p>'
                 f'<a class="bk-all" href="{root}libro/" data-bk-all{" hidden" if len(chapters) <= 5 else ""}>Tutti i capitoli <span aria-hidden="true">→</span></a></div>'
-                f'{toc}</div></div><script type="application/json" id="book-data">{bdata}</script></section>')
+                f'{toc}</div></div><script type="application/json" id="book-data">{bdata}</script></section></div>')
     desc = "Pensieri, poesie, citazioni e scritti nati da una canzone, da leggere scorrendo. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
     latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
@@ -521,13 +542,16 @@ def page_home(posts, chapters=()):
     </div>
     <article class="last">
       <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · <b class="lk-cat">{newest.cat_label}</b> · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
-      <div class="wbody"><p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p></div>
-      <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
+      <div class="lph">{last_imgs}<div class="lov">
+        <p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p>
+        <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden>❚❚</button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
+      </div></div>
     </article>
   </section>
-  {book}
   <section class="desk-section" aria-labelledby="h-all"><div class="sec-h"><h2 id="h-all">Gli scritti</h2><span class="cap count">{plural(len(posts), "scritto", "scritti")}</span></div><p>Una finestra per ogni scritto: aprila per leggere.</p>
-    <div class="desk-shelf">{windows}</div>
+    {book}
+    <div class="desk-shelf" data-shelf>{windows}</div>
+    {more}
   </section>
   {tiktok}
   {foot_html(root)}
