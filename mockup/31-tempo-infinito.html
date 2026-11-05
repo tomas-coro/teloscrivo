@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 31 - tempo infinito</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  body{padding:28px 16px 60px}
+  .wrap{max-width:520px;margin:0 auto}
+  h1{font:400 1.7rem "Instrument Serif",serif;margin:0 0 6px}
+  .intro{color:var(--muted);font-size:.85rem;margin:0 0 28px}
+  .var{border:1px solid var(--line);border-radius:16px;padding:20px 20px 22px;margin:0 0 18px;background:color-mix(in srgb,var(--bg) 55%,transparent)}
+  .var h2{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--pink);margin:0 0 14px}
+  .tit{font:400 2rem/1.05 "Instrument Serif",serif;margin:0 0 12px}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .chip{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--line);border-radius:99px;color:var(--fg)}
+  .note{color:var(--muted);font-size:.78rem;margin:14px 0 0;text-wrap:pretty}
+  .ref{opacity:.7}
+
+  /* A: freccia, infinito rosa grande */
+  .a .t{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .a .inf{font:400 1.45rem/1 "Instrument Serif",serif;color:var(--pink);vertical-align:-.12em;margin-left:.15em;letter-spacing:0}
+  .a .ar{color:var(--muted);margin:0 .35em}
+
+  /* B: serif corsivo, "da" e "a" tenui */
+  .b .t{font:italic 400 1.1rem "Instrument Serif",serif;color:var(--fg)}
+  .b .t s{text-decoration:none;color:var(--muted)}
+  .b .inf{font:400 1.5rem/1 "Instrument Serif",serif;color:var(--pink);vertical-align:-.1em}
+
+  /* C: come B ma l'infinito respira piano */
+  .c .t{font:italic 400 1.1rem "Instrument Serif",serif;color:var(--fg)}
+  .c .t s{text-decoration:none;color:var(--muted)}
+  .c .inf{display:inline-block;font:400 1.5rem/1 "Instrument Serif",serif;color:var(--pink);vertical-align:-.1em;animation:resp 4.2s ease-in-out infinite}
+  @keyframes resp{0%,100%{opacity:.55;text-shadow:0 0 0 transparent}50%{opacity:1;text-shadow:0 0 14px color-mix(in oklab,var(--pink) 70%,transparent)}}
+  @media (prefers-reduced-motion:reduce){.c .inf{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tempo di lettura delle poesie</h1>
+  <p class="intro">3 rese per "da 1 min a ∞". Scegline una (A, B o C). Sotto, per contrasto, un racconto con i minuti veri.</p>
+
+  <section class="var a">
+    <h2>A - Freccia, asciutta</h2>
+    <p class="tit">Limite specchio</p>
+    <div class="row"><span class="chip">Poesie</span><span class="cap">5 nov · <span class="t">1 min</span><span class="ar">→</span><span class="inf">∞</span></span></div>
+    <p class="note">Stesso carattere di oggi (maiuscoletto condensato), solo l'infinito diventa serif e rosa.</p>
+  </section>
+
+  <section class="var b">
+    <h2>B - Corsivo, più poetica</h2>
+    <p class="tit">Limite specchio</p>
+    <div class="row"><span class="chip">Poesie</span><span class="cap">5 nov</span><span class="t"><s>da</s> 1 min <s>a</s> <span class="inf">∞</span></span></div>
+    <p class="note">Serif corsivo come i sottotitoli del sito, "da" e "a" più tenui: si legge come una frase.</p>
+  </section>
+
+  <section class="var c">
+    <h2>C - Come B, con l'infinito che respira</h2>
+    <p class="tit">Limite specchio</p>
+    <div class="row"><span class="chip">Poesie</span><span class="cap">5 nov</span><span class="t"><s>da</s> 1 min <s>a</s> <span class="inf">∞</span></span></div>
+    <p class="note">Il simbolo pulsa piano (4 secondi). Si ferma da solo se il telefono ha "riduci animazioni".</p>
+  </section>
+
+  <section class="var ref">
+    <h2>Riferimento - un racconto (invariato)</h2>
+    <p class="tit">Nella nostra testa</p>
+    <div class="row"><span class="chip">Testi</span><span class="cap">5 nov · 4 min</span></div>
+  </section>
+</div>
+</body>
+</html>

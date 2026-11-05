@@ -193,6 +193,15 @@ class Post:
         return max(1, round(len(self.full_text.split()) / 200))
 
     @property
+    def time_html(self):  # data + tempo di lettura; le poesie non hanno un tempo giusto: "da N min a infinito"
+        if "poesie" in self.cats:
+            return (f'<span class="cap">{self.short_date()}</span>'
+                    f'<span class="tinf" aria-label="da {self.minutes} min a infinito">'
+                    f'<span class="tw" aria-hidden="true">da</span> {self.minutes} min '
+                    f'<span class="tw" aria-hidden="true">a</span> <span class="inf" aria-hidden="true">\u221e</span></span>')
+        return f'<span class="cap">{self.short_date()} · {self.minutes} min</span>'
+
+    @property
     def url(self):  # relativo alla radice del sito
         return f"scritti/{self.slug}/"
 
@@ -507,7 +516,7 @@ def page_reader(p, posts):
 <div class="rprog" aria-hidden="true"></div>
 <header class="rbar"><div class="rbtns"><a class="rbtn rbtn-home" data-home="scritto" href="{root}" aria-label="Torna alla home">{ICON_HOME}<span>Home</span></a><a class="rbtn" data-rback href="{root}{p.cat}/">{ICON_BACK}Indietro</a></div></header>
 <main id="contenuto" class="rsc"><article class="rart">
-  <header class="rhead"><div class="rhero"><div class="rphoto{" has-img" if p.has_photo else ""}">{photo_img(p, root, "(min-width:700px) 736px, 100vw", eager=True)}</div><h1 class="rt">{esc(p.title)}</h1></div><div class="rcard-b"><div class="metarow">{chip}<span class="cap">{p.short_date()} · {p.minutes} min</span></div></div></header>
+  <header class="rhead"><div class="rhero"><div class="rphoto{" has-img" if p.has_photo else ""}">{photo_img(p, root, "(min-width:700px) 736px, 100vw", eager=True)}</div><h1 class="rt">{esc(p.title)}</h1></div><div class="rcard-b"><div class="metarow">{chip}{p.time_html}</div></div></header>
   <div class="rbody">{p.body_html()}</div>
   <footer class="rend">
     <section class="rbye"><p class="bye">Grazie per aver letto e ricorda che<br><em>la luna porta consiglio</em>{ICON_MOON}</p>
