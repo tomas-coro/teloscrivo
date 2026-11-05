@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup 47 - immagini di anteprima (OG)</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* struttura del mockup; le immagini vere sono 1200x630 e qui si riducono con una scala */
+  body{padding:24px 16px 60px}
+  .ctl{display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:center;margin:0 auto 28px;max-width:900px}
+  .grp{display:flex;gap:6px;align-items:center}
+  .grp>span{font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+  .ctl button{min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--fg);font:500 .85rem Poppins,sans-serif;cursor:pointer}
+  .ctl button[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:var(--navy)}
+  .list{display:grid;gap:34px;justify-content:center;margin:0 auto}
+  .item{width:100%}
+  .lbl{margin:0 0 10px;font:600 .68rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .box{position:relative;width:100%;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+  .box .og{position:absolute;left:0;top:0;transform-origin:0 0}
+
+  /* ── le immagini, 1200x630 reali ── */
+  .og{width:1200px;height:630px;overflow:hidden;background:#072D59;color:#DBF2FC;font-family:"Instrument Serif",serif}
+  .sig{display:flex;align-items:baseline;gap:0;font:400 44px/1 "Instrument Serif",serif;color:#DBF2FC}
+  .sig i{width:11px;height:11px;border-radius:50%;background:#FD6E88;margin-left:5px;display:inline-block}
+
+  /* HOME (v2, piu' calma): blocco a sinistra centrato in altezza. "t" + nome in riga, tagline con la mezzaluna piccola
+     come nell'intestazione del sito, alone appena accennato in alto a destra. Niente elementi giganti. */
+  .home{background:radial-gradient(700px 520px at 88% 12%,#4f4768 0,#072D5900 70%),#072D59}
+  .home .blk{position:absolute;left:100px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:34px}
+  .home .row{display:flex;align-items:center;gap:34px}
+  .home .mk{width:124px;height:124px;border-radius:28px;flex:none}
+  .home h1{margin:0;font:400 150px/1 "Instrument Serif",serif;letter-spacing:-.01em;white-space:nowrap}
+  .home h1 i{display:inline-block;width:24px;height:24px;border-radius:50%;background:#FD6E88;margin-left:6px}
+  .home .tag{margin:0;display:flex;align-items:center;gap:18px;font:italic 400 54px/1 "Instrument Serif",serif;color:#DBF2FCd9;letter-spacing:.02em}
+  .home .tag svg{width:44px;height:44px;color:#FD6E88;flex:none}
+
+  /* HOME · A "Solo nome": centrato, sobrio, niente altro */
+  .hA{background:radial-gradient(900px 600px at 50% 0%,#33405f 0,#072D5900 70%),#072D59;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px}
+  .hA h1{margin:0;font:400 190px/1 "Instrument Serif",serif;white-space:nowrap}
+  .hA h1 i{display:inline-block;width:30px;height:30px;border-radius:50%;background:#FD6E88;margin-left:8px}
+  .hA .tag{margin:0;display:flex;align-items:center;gap:18px;font:italic 400 52px/1 "Instrument Serif",serif;color:#DBF2FCd9;letter-spacing:.02em}
+  .hA .tag svg{width:42px;height:42px;color:#FD6E88}
+  /* HOME · B "Finestra": la finestra coi tre pallini del sito, con dentro il nome, su una foto sfocata e scura */
+  .hB .bg{position:absolute;inset:-30px;width:calc(100% + 60px);height:calc(100% + 60px);object-fit:cover;filter:blur(10px)}
+  .hB::before{content:"";position:absolute;inset:0;background:#071c3bd9}
+  .hB .win{position:absolute;left:130px;right:130px;top:105px;bottom:105px;border:2px solid #DBF2FC40;border-radius:26px;background:#072D59e6;overflow:hidden;display:flex;flex-direction:column}
+  .hB .wb{height:68px;border-bottom:2px solid #DBF2FC30;background:#DBF2FC14;display:flex;align-items:center;gap:12px;padding:0 30px;flex:none}
+  .hB .wb i{width:20px;height:20px;border-radius:50%;background:#DBF2FC40}.hB .wb i:first-child{background:#FD6E88}
+  .hB .wc{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 64px;gap:22px}
+  .hB h1{margin:0;font:400 150px/1 "Instrument Serif",serif;white-space:nowrap}
+  .hB h1 i{display:inline-block;width:24px;height:24px;border-radius:50%;background:#FD6E88;margin-left:6px}
+  .hB .tag{margin:0;display:flex;align-items:center;gap:16px;font:italic 400 46px/1 "Instrument Serif",serif;color:#DBF2FCd9}
+  .hB .tag svg{width:38px;height:38px;color:#FD6E88}
+  /* HOME · C "Mosaico": a destra le foto degli scritti, a sinistra il nome */
+  .hC{background:#072D59}
+  .hC .tiles{position:absolute;right:0;top:0;bottom:0;width:560px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px}
+  .hC .tiles img{width:100%;height:100%;object-fit:cover;display:block}
+  .hC .tiles::after{content:"";position:absolute;inset:0;background:linear-gradient(to right,#072D59 0%,#072D5900 38%)}
+  .hC .t{position:absolute;left:92px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:26px}
+  .hC h1{margin:0;font:400 128px/1 "Instrument Serif",serif;white-space:nowrap}
+  .hC h1 i{display:inline-block;width:20px;height:20px;border-radius:50%;background:#FD6E88;margin-left:5px}
+  .hC .tag{margin:0;display:flex;align-items:center;gap:14px;font:italic 400 44px/1 "Instrument Serif",serif;color:#DBF2FCd9}
+  .hC .tag svg{width:36px;height:36px;color:#FD6E88}
+
+  /* SCRITTO: foto a tutta immagine con velatura blu (la stessa della card in home), titolo grande in basso */
+  .post .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .post::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to right,#071c3bf2 0%,#071c3bcc 45%,#071c3b66 100%),linear-gradient(to top,#071c3bf5 0%,#071c3b00 55%)}
+  .post>*:not(.ph){position:relative;z-index:2}
+  .post .cat{position:absolute;left:92px;top:80px;font:500 30px/1 Poppins,sans-serif;letter-spacing:.04em;color:#DBF2FC}
+  .post .cat b{color:#FD6E88;font-weight:500}
+  .post .ti{position:absolute;left:92px;right:300px;bottom:150px;margin:0;font:400 116px/1.02 "Instrument Serif",serif;text-wrap:balance;text-shadow:0 4px 40px #071c3b}
+  .post .sig{position:absolute;left:92px;bottom:64px}
+  .post .dt{position:absolute;right:92px;bottom:64px;font:400 28px/1 Poppins,sans-serif;color:#DBF2FCb3}
+</style>
+</head>
+<body>
+<div class="ctl">
+  <div class="grp" id="gv"><span>Grandezza</span>
+    <button type="button" data-w="900" aria-pressed="true">Grande</button>
+    <button type="button" data-w="300" aria-pressed="false">Piccola (come in chat)</button>
+  </div>
+</div>
+
+<div class="list" id="list">
+  <div class="item"><p class="lbl">Home · A · Solo nome</p><div class="box"><div class="og hA">
+    <h1>teloscrivo<i></i></h1><p class="tag">la luna porta consiglio<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" fill="currentColor"/></svg></p>
+  </div></div></div>
+
+  <div class="item"><p class="lbl">Home · B · Finestra</p><div class="box"><div class="og hB">
+    <img class="bg" src="../assets/foto/che-se-sparisci-696.webp" alt="">
+    <div class="win"><div class="wb"><i></i><i></i><i></i></div><div class="wc"><h1>teloscrivo<i></i></h1><p class="tag">la luna porta consiglio<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" fill="currentColor"/></svg></p></div></div>
+  </div></div></div>
+
+  <div class="item"><p class="lbl">Home · C · Mosaico</p><div class="box"><div class="og hC">
+    <div class="tiles"><img src="../assets/foto/che-se-sparisci-696.webp" alt=""><img src="../assets/foto/nella-nostra-testa-720.webp" alt=""><img src="../assets/foto/limite-specchio-736.webp" alt=""><img src="../assets/foto/la-vita-con-te-441.webp" alt=""></div>
+    <div class="t"><h1>teloscrivo<i></i></h1><p class="tag">la luna porta consiglio<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" fill="currentColor"/></svg></p></div>
+  </div></div></div>
+
+  <div class="item"><p class="lbl">Scritto · Che se sparisci</p><div class="box"><div class="og post">
+    <img class="ph" src="../assets/foto/che-se-sparisci-696.webp" alt="">
+    <p class="cat">Poesia <b>·</b> daCanzone</p>
+    <h2 class="ti">Che se sparisci</h2>
+    <div class="sig">teloscrivo<i></i></div><span class="dt">5 novembre</span>
+  </div></div></div>
+
+  <div class="item"><p class="lbl">Scritto · Nella nostra testa (titolo lungo, foto chiara)</p><div class="box"><div class="og post">
+    <img class="ph" src="../assets/foto/nella-nostra-testa-720.webp" alt="">
+    <p class="cat">Pensiero e Poesia</p>
+    <h2 class="ti">Nella nostra testa</h2>
+    <div class="sig">teloscrivo<i></i></div><span class="dt">4 novembre</span>
+  </div></div></div>
+</div>
+
+<script>
+  // ogni immagine e' 1200x630: la scalo per farla stare nella colonna (altezza = larghezza * 630/1200)
+  const list = document.getElementById('list');
+  function fit(w){
+    list.style.width = 'min(100%,' + w + 'px)';
+    document.querySelectorAll('.box').forEach(b => {
+      const s = b.clientWidth / 1200;
+      b.style.height = (630 * s) + 'px';
+      b.querySelector('.og').style.transform = 'scale(' + s + ')';
+    });
+  }
+  let w = 900;
+  document.querySelectorAll('#gv button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#gv button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    w = +b.dataset.w; fit(w);
+  });
+  addEventListener('resize', () => fit(w));
+  document.fonts.ready.then(() => fit(w));
+  fit(w);
+</script>
+</body>
+</html>
