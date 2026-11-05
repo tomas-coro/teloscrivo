@@ -394,7 +394,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=10" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=11" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -556,7 +556,7 @@ def page_home(posts, chapters=()):
       <p class="hero-sub">la luna porta consiglio{ICON_MOON}</p>
     </div>
     <article class="last">
-      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk><b class="lk-cat">{newest.bar_label}</b> · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
+      <div class="wbar"><span class="wd" aria-hidden="true"><i></i><i></i><i></i></span><p class="cap lk"><span data-lk>Ultimo scritto · <b class="lk-cat">{newest.bar_label}</b> · {newest.short_date()}</span></p><span aria-hidden="true"></span></div>
       <div class="lph">{last_imgs}<div class="lov">
         <p class="lt" data-lt>{esc(first["t"])}</p><p class="lx" data-lx>{esc(first["x"]).replace(chr(10), "<br>")}</p>
         <div class="lf"><div class="last-controls"><div class="pg" data-pg role="group" aria-label="Ultimi scritti"></div><button class="pause" data-pause type="button" aria-label="Metti in pausa gli ultimi scritti" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg></button></div><a class="cta" data-cta href="{first["u"]}">Leggi{ARROW_CTA}</a></div>
