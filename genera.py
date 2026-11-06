@@ -433,7 +433,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=11" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=12" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):

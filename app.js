@@ -216,7 +216,8 @@
       content.inert = header.inert = skipLink.inert = true;
       opening.focus({ preventScroll: true });
       max.addEventListener('click', expand);
-      skip.addEventListener('click', () => finish(true));
+      // il focus va sul logo solo se il tasto e' stato attivato da tastiera (click.detail 0): con tocco o mouse il contorno rosa sul logo non ha senso
+      skip.addEventListener('click', (e) => finish(e.detail === 0));
       autoTimer = setTimeout(() => max.click(), 3400);
     }
   }
