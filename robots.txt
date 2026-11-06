@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tomas-coro.github.io/teloscrivo/sitemap.xml
+Sitemap: https://teloscrivo.it/sitemap.xml

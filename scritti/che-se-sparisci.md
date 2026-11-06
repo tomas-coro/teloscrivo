@@ -1,6 +1,6 @@
 ---
 titolo: Che se sparisci
-data: 2026-11-05
+data: 2026-11-06
 sezione: poesie, canzoni
 spotify: https://open.spotify.com/intl-it/track/6ZERZ7aiL214VIKLTBkaxS?si=811f81377ed9469b
 canzone: Sparisci - Tony Boy

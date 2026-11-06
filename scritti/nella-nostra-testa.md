@@ -1,6 +1,6 @@
 ---
 titolo: Nella nostra testa
-data: 2026-11-04
+data: 2026-11-06
 sezione: pensieri, poesie
 ---
 

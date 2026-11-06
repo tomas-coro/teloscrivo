@@ -37,11 +37,12 @@ from urllib.parse import urlparse
 
 # ═══ IMPOSTAZIONI (l'URL base sta qui, in un posto solo) ═══
 # Quando il dominio vero e' pronto, cambia solo questa riga e rilancia lo script.
-BASE_URL = "https://tomas-coro.github.io/teloscrivo/"
+BASE_URL = "https://teloscrivo.it/"
 SITE = "teloscrivo"
 # Sezione TikTok: resta nascosta finche' TIKTOK_URL e' vuoto (il profilo non esiste ancora).
 TIKTOK_URL = ""
 # Profili social mostrati in fondo a ogni scritto ("Trovami su"): chiave = icona, valore = (link, nome mostrato). Per aggiungerne uno, serve anche l'icona in SOCIAL_ICONS.
+EMAIL = "info@teloscrivo.it"  # mostrata nel footer, accanto ai social
 SOCIAL = {"instagram": ("https://www.instagram.com/teloscrivo.it/", "@teloscrivo.it")}
 TIKTOK_VIDEOS = []  # elenco di (titolo, sottotitolo, link al video), facoltativo
 
@@ -411,15 +412,23 @@ def top_html(root):
 """
 
 
+# freccia diagonale a fine riga di contatto (si vede solo su mobile, vedi style.css)
+ICON_ARR = '<svg class="arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M7 5h8v8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+
+
 def foot_html(root):
     # profili social (stessa lista di "Trovami su" in fondo agli scritti): icona + nome, in una riga sola
     soc = "".join(
         f'<a class="foot-soc" href="{esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="{SOCIAL_ICONS[k][0]}: {esc(label)}">'
-        f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span>{esc(label)}</span></a>'
+        f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span class="lab">{SOCIAL_ICONS[k][0]}</span><span class="v">{esc(label)}</span>{ICON_ARR}</a>'
         for k, (url, label) in SOCIAL.items() if url)
+    mail = (f'<a class="foot-soc" href="mailto:{EMAIL}" aria-label="Scrivimi una email: {EMAIL}">'
+            f'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>'
+            f'<path d="m3.5 6.5 8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            f'<span class="lab">Email</span><span class="v">{EMAIL}</span>{ICON_ARR}</a>')
     return (f'<footer class="foot"><span class="wm2">{SITE}<span class="dot" aria-hidden="true"></span></span>'
-            f'{soc}'
-            f'<a class="up" href="#inizio">Torna su{ICON_UP}</a>'
+            f'{soc}{mail}'
+            f'<a class="up" href="#inizio" aria-label="Torna su"><span class="upt">Torna su</span>{ICON_UP}</a>'
             f'<small class="cp">© {date.today().year}</small></footer>')
 
 
@@ -632,7 +641,7 @@ def social_html():
     """"scrivoanchesu" + profili social: lo stesso fondo per scritti e scene del libro."""
     soc = "".join(
         f'<a class="soc-a" href="{esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="{SOCIAL_ICONS[k][0]}: {esc(label)}">'
-        f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span>{esc(label)}</span></a>'
+        f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span class="lab">{SOCIAL_ICONS[k][0]}</span><span class="v">{esc(label)}</span>{ICON_ARR}</a>'
         for k, (url, label) in SOCIAL.items() if url
     )
     find_html = f'<div class="rsign"><span class="wm2 wm-find">scrivoanchesu<span class="dot" aria-hidden="true"></span></span><div class="soc">{soc}</div></div>' if soc else ""

@@ -248,13 +248,25 @@ body:has(.desk-shelf) .hero{margin-bottom:68px}
 .phead .cap{display:block;margin:0 0 14px;color:var(--pink)}
 
 /* ── piede ── */
-.foot{margin-top:72px;padding:22px 0 8px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.78rem}
-.foot .cp{order:3;flex:1 0 100%;font-size:.72rem;opacity:.8}
+.foot{margin-top:72px;padding:22px 0 8px;border-top:1px solid var(--line);display:flex;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.78rem}
 .foot-soc{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 6px;color:var(--fg);text-decoration:none;font-size:.78rem;transition:color .2s}
 .foot-soc svg{width:18px;height:18px;flex:none}
 .foot-soc:hover{color:var(--pink)}
-/* desktop: a sinistra logo + (c), a destra Instagram + Torna su; il margine automatico spinge il secondo gruppo a destra */
-@media (min-width:640px){.foot{column-gap:28px}.foot .cp{order:1;flex:0 0 auto;font-size:.78rem;opacity:1}.foot-soc{order:2;margin-left:auto}.foot .up{order:3}}
+.foot .lab,.foot .arr{display:none}
+/* mobile, "colophon": riga 1 logo + tasto su tondo, poi una riga larga per contatto, in fondo (c) */
+.foot .wm2{order:1;margin-right:auto}
+.foot .up{order:2;width:48px;height:48px;padding:0;justify-content:center;border:1px solid var(--line);border-radius:50%;transition:border-color .2s,color .2s}
+.foot .up:hover{border-color:var(--pink);color:var(--pink)}
+.foot .upt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.foot .up svg{width:18px;height:18px}
+.foot-soc{order:3;flex:1 0 100%;gap:12px;min-height:58px;padding:0;border-top:1px solid var(--line)}
+.foot-soc:first-of-type{margin-top:16px}
+.foot-soc .lab{display:inline;width:78px;font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.foot-soc .v{flex:1;font-size:.9rem}
+.foot-soc .arr{display:block;width:14px;height:14px;opacity:.6}
+.foot .cp{order:4;flex:1 0 100%;margin-top:12px;font-size:.72rem;opacity:.8}
+/* desktop: a sinistra logo + (c), a destra Instagram, mail e Torna su in una riga */
+@media (min-width:640px){.foot{justify-content:space-between;gap:12px 28px}.foot .wm2{margin-right:0}.foot .cp{order:1;flex:0 0 auto;margin-top:0;font-size:.78rem;opacity:1}.foot-soc{order:2;flex:0 0 auto;min-height:44px;padding:0 6px;border-top:0;margin-left:auto;gap:8px}.foot-soc+.foot-soc{margin-left:0}.foot-soc:first-of-type{margin-top:0}.foot-soc .lab,.foot-soc .arr{display:none}.foot-soc .v{flex:none;font-size:.78rem}.foot .up{order:3;width:auto;height:auto;min-height:44px;padding:0 6px;border:0;border-radius:0;justify-content:flex-start}.foot .up:hover{color:var(--fg)}.foot .upt{position:static;width:auto;height:auto;overflow:visible;clip:auto}.foot .up svg{width:16px;height:16px}}
 .wm2{font-family:"Instrument Serif",Poppins,sans-serif;font-size:1.3rem;color:var(--fg);display:inline-flex;align-items:baseline;gap:3px}
 .up{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 6px;font:600 .7rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--fg);text-decoration:none}
 .up svg{width:16px;height:16px;transition:transform .2s}
