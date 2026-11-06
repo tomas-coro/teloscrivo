@@ -576,7 +576,8 @@ def page_home(posts, chapters=()):
                 f'<div class="bk-foot"><p class="bk-ghost" data-bk-ghost>{lettura_totale(total)}</p>'
                 f'<a class="bk-all" href="{root}libro/" data-bk-all{" hidden" if len(chapters) <= 5 else ""}>Tutti i capitoli <span aria-hidden="true">→</span></a></div>'
                 f'{toc}</div></div><script type="application/json" id="book-data">{bdata}</script></section></div>')
-    desc = "Pensieri, poesie, citazioni e scritti nati da una canzone, da leggere scorrendo. La luna porta consiglio."
+    # testo generico, non nomina le sezioni: resta vero qualunque cosa sia online
+    desc = "Il mio blog di scritti e poesie, da leggere con calma. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
     latest_json = json.dumps(latest, ensure_ascii=False).replace("</", "<\\/")
     body = f"""<body id="inizio">
@@ -612,7 +613,7 @@ def page_home(posts, chapters=()):
 </div></main>
 <script type="application/json" id="latest">{latest_json}</script>
 {tail_html(root)}"""
-    return head_html(root, f"{SITE} · pensieri, poesie e citazioni", desc, BASE_URL, jsonld=ld) + body
+    return head_html(root, f"{SITE} · scritti e poesie", desc, BASE_URL, jsonld=ld) + body
 
 
 def page_section(k, posts):
