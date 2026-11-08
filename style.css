@@ -535,3 +535,5 @@ body.book{--navy:#0E2240;--bg:#0E2240;--fg:#C9D6E4;--pink:#F08AA0;
 .book .book-end{max-width:36rem;margin:56px auto 0}  /* stessa colonna del fondo degli altri scritti */
 @media (min-width:700px){.book .book-end{max-width:46rem}}
 .book .phead p:has(.cta){margin-bottom:24px}
+/* home: bottone Wattpad sotto il prologo */
+.bk-wp{margin:14px 0 0}

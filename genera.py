@@ -401,7 +401,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=46">
+<link rel="stylesheet" href="{root}style.css?v=47">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -426,6 +426,8 @@ def foot_html(root):
         f'<a class="foot-soc" href="{esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="{SOCIAL_ICONS[k][0]}: {esc(label)}">'
         f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span class="lab">{SOCIAL_ICONS[k][0]}</span><span class="v">{esc(label)}</span>{ICON_ARR}</a>'
         for k, (url, label) in SOCIAL.items() if url)
+    soc += (f'<a class="foot-soc" href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer" aria-label="Libro su Wattpad: {esc(BOOK_TITLE)}">'
+            f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS["wattpad"][1]}</svg><span class="lab">Libro</span><span class="v">{esc(BOOK_TITLE)}</span>{ICON_ARR}</a>')
     mail = (f'<a class="foot-soc" href="mailto:{EMAIL}" aria-label="Scrivimi una email: {EMAIL}">'
             f'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>'
             f'<path d="m3.5 6.5 8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -437,7 +439,7 @@ def foot_html(root):
 
 
 def tail_html(root):
-    return f'<script src="{root}app.js?v=12" defer></script>\n</body>\n</html>\n'
+    return f'<script src="{root}app.js?v=13" defer></script>\n</body>\n</html>\n'
 
 
 def icon(k):
@@ -563,23 +565,15 @@ def page_home(posts, chapters=()):
         start = chapters[0]
         label = "Prologo" if not start.chapter else f"Cap. {start.chapter}"
         # dati per il JS: "Continua da" / progresso / "Restano circa" (senza JS resta lo stato "Inizia da")
-        bdata = json.dumps([{"s": c.slug, "u": c.url, "n": c.chapter or 0, "t": c.title, "m": c.minutes} for c in chapters], ensure_ascii=False).replace("</", "<\\/")
-        total = sum(c.minutes for c in chapters)
-        rows = "".join(
-            f'<li><a href="{root}{c.url}"><span class="bk-n">{c.chapter or "P"}</span><span class="bk-ct">{esc(c.title)}</span><span class="bk-cm">{c.minutes} min</span></a></li>'
-            for c in chapters[-3:])
-        toc = f'<ol class="bk-toc" aria-label="Ultimi capitoli">{rows}</ol>'
         book = (f'<div class="bkwin"><div class="desk-bar"><i></i><i></i><i></i><span>il-libro.txt</span></div><section class="bk" aria-labelledby="h-book" data-book><div class="bk-box">'
                 f'<div class="bk-l"><p class="cap bk-kick">Il libro · <b>su Wattpad</b></p>'
                 f'<h2 id="h-book" class="bk-ttl">{esc(BOOK_TITLE)}</h2>'
                 f'<p class="bk-quarta">{esc(BOOK_HOME_BLURB)}</p></div><div class="bk-r">'
                 f'<a class="bk-go" href="{root}{start.url}" data-bk-go><span class="bk-mark" aria-hidden="true"></span>'
-                f'<span class="bk-lbl"><span class="bk-k" data-bk-k>Inizia da</span> <span class="bk-t" data-bk-t>{label}&nbsp;·&nbsp;{esc(start.title)}</span></span>'
-                f'<span class="bk-min" data-bk-min>{start.minutes} min</span><span class="bk-arr" aria-hidden="true">→</span></a>'
-                f'<div class="bk-bar" data-bk-bar hidden><i data-bk-fill></i></div>'
-                f'<div class="bk-foot"><p class="bk-ghost" data-bk-ghost>{lettura_totale(total)}</p>'
-                f'<a class="bk-all" href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer" data-bk-all>Leggi il libro su Wattpad <span aria-hidden="true">→</span></a></div>'
-                f'{toc}</div></div><script type="application/json" id="book-data">{bdata}</script></section></div>')
+                f'<span class="bk-lbl"><span class="bk-t">Leggi il {label.lower()}</span></span>'
+                f'<span class="bk-min">{start.minutes} min</span><span class="bk-arr" aria-hidden="true">→</span></a>'
+                f'<p class="bk-wp"><a class="cta" href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer">Leggi il libro su Wattpad{ARROW_CTA}</a></p>'
+                f'</div></div></section></div>')
     # testo generico, non nomina le sezioni: resta vero qualunque cosa sia online
     desc = "Il mio blog di scritti e poesie, da leggere con calma. La luna porta consiglio."
     ld = [{"@context": "https://schema.org", "@type": "WebSite", "name": SITE, "url": BASE_URL, "inLanguage": "it", "description": desc}]
