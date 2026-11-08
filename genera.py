@@ -43,7 +43,10 @@ SITE = "teloscrivo"
 TIKTOK_URL = ""
 # Profili social mostrati in fondo a ogni scritto ("Trovami su"): chiave = icona, valore = (link, nome mostrato). Per aggiungerne uno, serve anche l'icona in SOCIAL_ICONS.
 EMAIL = "info@teloscrivo.it"  # mostrata nel footer, accanto ai social
-SOCIAL = {"instagram": ("https://www.instagram.com/teloscrivo.it/", "@teloscrivo.it")}
+SOCIAL = {"instagram": ("https://www.instagram.com/teloscrivo.it/", "@teloscrivo.it"),
+          "wattpad": ("https://www.wattpad.com/user/TomasCoronato", "@TomasCoronato")}
+# Il libro completo vive su Wattpad: il sito tiene solo il prologo come anteprima. Link pulito, senza utm/fbclid.
+WATTPAD_BOOK = "https://www.wattpad.com/story/419288316-la-sindrome-del-cielo"
 TIKTOK_VIDEOS = []  # elenco di (titolo, sottotitolo, link al video), facoltativo
 
 # Foto: cartella sorgente, misure in uscita e regola "nessuno scritto senza foto".
@@ -93,6 +96,7 @@ ICON_SHARE = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 12.5V3M6.
 SOCIAL_ICONS = {
     "instagram": ("Instagram", '<rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.2" cy="6.8" r="1.15" fill="currentColor"/>'),
     "facebook": ("Facebook", '<path d="M13.6 21v-8h2.7l.5-3.2h-3.2V7.9c0-.9.4-1.7 1.8-1.7h1.5V3.4S15.6 3.2 14.4 3.2c-2.6 0-4.1 1.5-4.1 4.3v2.3H7.6V13h2.7v8z" fill="currentColor"/>'),
+    "wattpad": ("Wattpad", '<path d="M4 7.5c2.6-1.4 5.4-1.4 8 0 2.6-1.4 5.4-1.4 8 0v11c-2.6-1.4-5.4-1.4-8 0-2.6-1.4-5.4-1.4-8 0z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 7.5v11" fill="none" stroke="currentColor" stroke-width="1.8"/>'),
     "tiktok": ("TikTok", '<path d="M16.6 3c.3 2.4 1.7 3.9 4 4.1v3c-1.4.1-2.6-.3-4-1.1v6.2c0 3.9-3.2 6-6.3 5.4-2.6-.5-4.5-2.8-4.3-5.6.2-3.2 3.2-5.2 6.3-4.6v3.1c-1.5-.5-3.2.3-3.2 2 0 1.5 1.4 2.4 2.7 2 1-.3 1.6-1.2 1.6-2.3V3z" fill="currentColor"/>'),
 }
 ICON_DOWN = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M5 11l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
@@ -397,7 +401,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=45">
+<link rel="stylesheet" href="{root}style.css?v=46">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -566,7 +570,7 @@ def page_home(posts, chapters=()):
             for c in chapters[-3:])
         toc = f'<ol class="bk-toc" aria-label="Ultimi capitoli">{rows}</ol>'
         book = (f'<div class="bkwin"><div class="desk-bar"><i></i><i></i><i></i><span>il-libro.txt</span></div><section class="bk" aria-labelledby="h-book" data-book><div class="bk-box">'
-                f'<div class="bk-l"><p class="cap bk-kick">Il libro · <b>in corso</b></p>'
+                f'<div class="bk-l"><p class="cap bk-kick">Il libro · <b>su Wattpad</b></p>'
                 f'<h2 id="h-book" class="bk-ttl">{esc(BOOK_TITLE)}</h2>'
                 f'<p class="bk-quarta">{esc(BOOK_HOME_BLURB)}</p></div><div class="bk-r">'
                 f'<a class="bk-go" href="{root}{start.url}" data-bk-go><span class="bk-mark" aria-hidden="true"></span>'
@@ -574,7 +578,7 @@ def page_home(posts, chapters=()):
                 f'<span class="bk-min" data-bk-min>{start.minutes} min</span><span class="bk-arr" aria-hidden="true">→</span></a>'
                 f'<div class="bk-bar" data-bk-bar hidden><i data-bk-fill></i></div>'
                 f'<div class="bk-foot"><p class="bk-ghost" data-bk-ghost>{lettura_totale(total)}</p>'
-                f'<a class="bk-all" href="{root}libro/" data-bk-all{" hidden" if len(chapters) <= 5 else ""}>Tutti i capitoli <span aria-hidden="true">→</span></a></div>'
+                f'<a class="bk-all" href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer" data-bk-all>Leggi il libro su Wattpad <span aria-hidden="true">→</span></a></div>'
                 f'{toc}</div></div><script type="application/json" id="book-data">{bdata}</script></section></div>')
     # testo generico, non nomina le sezioni: resta vero qualunque cosa sia online
     desc = "Il mio blog di scritti e poesie, da leggere con calma. La luna porta consiglio."
@@ -782,7 +786,7 @@ def page_book(chapters, blog):
     groups += close()
     body = book_head_html(root, root, "Indietro") + f"""<main id="contenuto" class="page"><div class="wrapin">
   <header class="phead"><span class="cap">Libro</span><h1>{esc(BOOK_TITLE)}</h1>{book_quarta()}
-    <p><a class="cta" data-book-start href="{root}{chapters[0].url}">Inizia{ARROW_CTA}</a></p></header>
+    <p><a class="cta" href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer">Leggi il libro su Wattpad{ARROW_CTA}</a> <a class="bk-all" data-book-start href="{root}{chapters[0].url}">Leggi il prologo</a></p></header>
   {groups}
   <div class="book-end">{book_end_html(blog, root)}</div>
 </div></main>
@@ -810,6 +814,8 @@ def page_chapter(p, chapters, blog):
         return f'<a class="{cls}" href="{root}{c.url}"><small>{label}</small><span>{esc(c.title)}</span>{arrow}</a>'
     prev_a = cell("Prologo" if prev_c and not prev_c.chapter else "Capitolo precedente", prev_c, "pv", ICON_BACK) if prev_c else ""
     next_a = cell("Capitolo successivo", next_c, "nx", ARROW_CTA) if next_c else ""
+    if not next_c:  # ultimo capitolo online: il libro continua su Wattpad
+        next_a = f'<a class="nx" href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer"><small>Il libro continua</small><span>Continua su Wattpad</span>{ARROW_CTA}</a>'
     body = book_head_html(root, f"{root}libro/", "Indice", p.slug) + f"""<main id="contenuto" class="rsc"><article class="rart">
   <header class="rhead"><div class="rhero"><div class="rphoto{" has-img" if p.has_photo else ""}">{photo_img(p, root, "(min-width:700px) 736px, 100vw", eager=True)}</div></div>
     <div class="rcard-b"><p class="kick">{chapter_kicker(p)}</p><h1 class="rt">{esc(p.title)}</h1><p class="bmeta">{p.short_date()} · {p.minutes} min</p></div></header>
