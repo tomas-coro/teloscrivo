@@ -401,7 +401,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=47">
+<link rel="stylesheet" href="{root}style.css?v=48">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -451,7 +451,7 @@ def card_html(p, root, hidden=False):
     return (f'<article class="desk-window" data-cat="{p.cat}"{" hidden" if hidden else ""}><div class="desk-bar"><i></i><i></i><i></i><span>{esc(p.slug)}.txt</span></div>'
             f'<a href="{root}{p.url}" data-card><span class="desk-photo{" has-img" if p.has_photo else ""}" aria-hidden="true">{photo_img(p, root, "(min-width:900px) 380px, 90vw")}</span>'
             f'<span class="desk-info"><span class="desk-meta"><b>{esc(p.cat_label)}</b>{p.long_date()} · {p.minutes_short}</span>'
-            f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), " ")}</span>'
+            f'<span class="desk-title">{esc(p.title)}</span><span class="desk-excerpt">{esc(p.excerpt).replace(chr(10), "<br>")}</span>'
             f'<span class="desk-more"><span class="t">Apri lo scritto</span><i class="arr" aria-hidden="true">{ARROW_CTA}</i></span></span></a></article>')
 
 
@@ -652,7 +652,7 @@ def rcards_html(items, root):
     return "".join(
         f'<a class="rcard" data-cat="{x.cat}" href="{root}{x.url}"><span class="desk-photo{" has-img" if x.has_photo else ""}" aria-hidden="true">{photo_img(x, root, "(min-width:640px) 340px, 120px")}</span>'
         f'<span class="rcb"><span class="rcm"><b>{esc(x.cat_label)}</b>{x.short_date()}</span>'
-        f'<span class="rct">{esc(x.title)}</span><span class="rcx">{esc(x.excerpt).replace(chr(10), " ")}</span>'
+        f'<span class="rct">{esc(x.title)}</span><span class="rcx">{esc(x.excerpt).replace(chr(10), "<br>")}</span>'
         f'<span class="rcgo">Leggi{ARROW_CTA}</span></span></a>'
         for x in items)
 

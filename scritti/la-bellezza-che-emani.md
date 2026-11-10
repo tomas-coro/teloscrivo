@@ -28,7 +28,7 @@ Conoscere ogni virgola,
 Come fosse lo scritto del mio libro preferito
 Voglio sfiorare ogni pagina
 Della tua pelle ogni centimetro
-E io non posso farlo, ma la mente volta
+E io non posso farlo, ma la mente vola
 Gli occhi chiusi, ogni ricordo assopito
 
 Nella mia mente come tempesta

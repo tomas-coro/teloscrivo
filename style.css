@@ -348,7 +348,7 @@ body.reader{background:radial-gradient(70% 38% at 50% 0,color-mix(in oklab,var(-
 .rcm{display:flex;gap:10px;align-items:baseline;font:600 .66rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .rcm b{color:var(--pink);font-weight:600}
 .rct{font-family:"Instrument Serif",Poppins,sans-serif;font-size:1.55rem;line-height:1.05}
-.rcx{font-weight:300;font-size:.86rem;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rcx{font-weight:300;font-size:.86rem;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .rcgo{display:inline-flex;align-items:center;gap:8px;font:600 .72rem "Roboto Condensed",sans-serif;letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
 .rcgo svg{width:16px;height:16px;transition:transform .2s;color:var(--pink)}
 .rcard:hover .rcgo svg{transform:translateX(4px)}
