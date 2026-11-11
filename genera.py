@@ -401,7 +401,7 @@ def head_html(root, title, desc, canon, og_type="website", jsonld=None, noindex=
 <link rel="icon" href="{root}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="{root}apple-touch-icon.png">
 <link rel="preload" href="{root}assets/fonts/instrumentserif-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{root}style.css?v=48">
+<link rel="stylesheet" href="{root}style.css?v=52">
 <script>document.documentElement.classList.add('js')</script>
 {ld}</head>
 """
@@ -416,26 +416,24 @@ def top_html(root):
 """
 
 
-# freccia diagonale a fine riga di contatto (si vede solo su mobile, vedi style.css)
+# freccia diagonale dei link nel footer
 ICON_ARR = '<svg class="arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 15 15 5M7 5h8v8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
 
 def foot_html(root):
-    # profili social (stessa lista di "Trovami su" in fondo agli scritti): icona + nome, in una riga sola
-    soc = "".join(
-        f'<a class="foot-soc" href="{esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="{SOCIAL_ICONS[k][0]}: {esc(label)}">'
-        f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS[k][1]}</svg><span class="lab">{SOCIAL_ICONS[k][0]}</span><span class="v">{esc(label)}</span>{ICON_ARR}</a>'
-        for k, (url, label) in SOCIAL.items() if url)
-    soc += (f'<a class="foot-soc" href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer" aria-label="Libro su Wattpad: {esc(BOOK_TITLE)}">'
-            f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS["wattpad"][1]}</svg><span class="lab">Libro</span><span class="v">{esc(BOOK_TITLE)}</span>{ICON_ARR}</a>')
-    mail = (f'<a class="foot-soc" href="mailto:{EMAIL}" aria-label="Scrivimi una email: {EMAIL}">'
+    instagram = SOCIAL["instagram"][0]
+    return (f'<footer class="foot"><div class="foot-main">'
+            f'<span class="wm2">{SITE}<span class="dot" aria-hidden="true"></span></span>'
+            f'<nav class="foot-links" aria-label="Link e contatti">'
+            f'<a href="{esc(instagram)}" target="_blank" rel="noopener noreferrer">'
+            f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS["instagram"][1]}</svg>Instagram</a>'
+            f'<a href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer">'
+            f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS["wattpad"][1]}</svg>Il libro su Wattpad</a>'
+            f'<a href="mailto:{EMAIL}" aria-label="Scrivimi una email: {EMAIL}">'
             f'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>'
-            f'<path d="m3.5 6.5 8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-            f'<span class="lab">Email</span><span class="v">{EMAIL}</span>{ICON_ARR}</a>')
-    return (f'<footer class="foot"><span class="wm2">{SITE}<span class="dot" aria-hidden="true"></span></span>'
-            f'{soc}{mail}'
-            f'<a class="up" href="#inizio" aria-label="Torna su"><span class="upt">Torna su</span>{ICON_UP}</a>'
-            f'<small class="cp">© {date.today().year}</small></footer>')
+            f'<path d="m3.5 6.5 8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Email</a>'
+            f'</nav></div><div class="foot-bottom"><small class="cp">© {date.today().year} {SITE}</small>'
+            f'<a class="up" href="#inizio"><span class="upt">Torna su</span>{ICON_UP}</a></div></footer>')
 
 
 def tail_html(root):
