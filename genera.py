@@ -43,8 +43,7 @@ SITE = "teloscrivo"
 TIKTOK_URL = ""
 # Profili social mostrati in fondo a ogni scritto ("Trovami su"): chiave = icona, valore = (link, nome mostrato). Per aggiungerne uno, serve anche l'icona in SOCIAL_ICONS.
 EMAIL = "info@teloscrivo.it"  # mostrata nel footer, accanto ai social
-SOCIAL = {"instagram": ("https://www.instagram.com/teloscrivo.it/", "@teloscrivo.it"),
-          "wattpad": ("https://www.wattpad.com/user/TomasCoronato", "@TomasCoronato")}
+SOCIAL = {"instagram": ("https://www.instagram.com/teloscrivo.it/", "@teloscrivo.it")}
 # Il libro completo vive su Wattpad: il sito tiene solo il prologo come anteprima. Link pulito, senza utm/fbclid.
 WATTPAD_BOOK = "https://www.wattpad.com/story/419288316-la-sindrome-del-cielo"
 TIKTOK_VIDEOS = []  # elenco di (titolo, sottotitolo, link al video), facoltativo
@@ -427,8 +426,6 @@ def foot_html(root):
             f'<nav class="foot-links" aria-label="Link e contatti">'
             f'<a href="{esc(instagram)}" target="_blank" rel="noopener noreferrer">'
             f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS["instagram"][1]}</svg>Instagram</a>'
-            f'<a href="{WATTPAD_BOOK}" target="_blank" rel="noopener noreferrer">'
-            f'<svg viewBox="0 0 24 24" aria-hidden="true">{SOCIAL_ICONS["wattpad"][1]}</svg>Il libro su Wattpad</a>'
             f'<a href="mailto:{EMAIL}" aria-label="Scrivimi una email: {EMAIL}">'
             f'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>'
             f'<path d="m3.5 6.5 8.5 6.5 8.5-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Email</a>'
